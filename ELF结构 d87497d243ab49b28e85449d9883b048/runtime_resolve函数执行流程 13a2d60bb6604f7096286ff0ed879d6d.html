@@ -1,0 +1,840 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>runtime_resolve函数执行流程</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="13a2d60b-b660-4f70-9628-6ff0ed879d6d" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1560350894-68244ac04656?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/directional-sign_gray.svg"/></div><h1 class="page-title">runtime_resolve函数执行流程</h1><p class="page-description"></p></header><div class="page-body"><h1 id="588313e0-34f1-461c-9f4f-59f7bdec0abe" class="">一、前置知识</h1><h3 id="3213d1be-e726-4b8b-88e1-ca3a288e918c" class="block-color-gray_background">1-由链接器所维护的</h3><p id="c1132d37-46f9-4c21-be25-8a3901a8ee15" class=""><strong>共享库链表：</strong><div class="indented"><p id="470e560a-ae33-4862-b38e-4b1e2cb5b09d" class="">由动态链接器所维护，它的意义是用链表的方式存放了所有.so模块的信息</p><p id="6b6b286d-97b0-46d4-b610-cf5011e64a92" class="">其中它的每个节点都是一个link_map类型的结构体，定义如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="226755bb-1b31-46e4-9740-43191bcd40fa" class="code"><code class="language-C">struct link_map {
+		// 这三个域用于存储该.so模块的信息
+    Elf64_Addr l_addr;          // 该.so模块的加载基地址
+    char* l_name;               // 该.so模块的绝对文件路径名称，用来载入该.so模块
+    Elf64_Dyn* l_ld;            // 指向该.so模块维护的Dynamic表位置(注意，不是指向程序维护的Dynamic表)
+    
+    // 这两个域是用来维护链表结构
+    struct link_map* l_next;    // 下一个 link_map 结构体的指针，用于构成链表
+    struct link_map* l_prev;    // 前一个 link_map 结构体的指针，用于构成链表
+
+    // ...其他域，都是动态链接器内部使用的,可能会随时变更
+};</code></pre></div></p><p id="151eff7c-5fab-41ae-b0f4-21e70da36140" class="">.dynsym表：<div class="indented"><p id="42da5fbf-2c96-4660-bca0-179ae239abfc" class="">这个表的意义是类似一张<mark class="highlight-blue">“导出表”</mark>。用来提示某.so模块导出的所有符号，它们对应的在.so模块中的位置。</p><p id="2b81757e-d1ba-4b89-a0f9-4fc85f7d0afc" class="">它是由动态链接器产生和维护的。一个动态链接器可以维护多张.dynsym表，每张表对应一个.so模块。</p><p id="14947762-369f-4202-8695-098edf965807" class="">它是一个结构体数组，每个元素都是一个<code>Elf32_Sym</code>类型的结构体，定义如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9e8ebaad-8e4c-4d7b-97b2-46b74599497d" class="code"><code class="language-C">typedef struct {
+    Elf32_Word st_name;    /* 偏移值，指向符号名字符串(该字符串在字符串表的偏移) */
+	  Elf32_Addr st_value;   /* 符号的地址，这是一个rva！ */
+													 /* 他有可能是设置好的也有可能是没有设置好的，如果是后者则对应st_other域的值应为0以表示st_value还没有被设置好 */
+													 /* 这时动态链接器就回去查询所有.so模块所维护的.dynsym表以得到正确的rva值 */
+    Elf32_Word st_size;    /* 符号大小 */
+    unsigned char st_info; /* 符号的类型和绑定信息 */
+    unsigned char st_other;/* 保留，目前未使用 */
+    Elf32_Half st_shndx;   /* 符号所在的节索引 */
+} Elf32_Sym;</code></pre></div></p><h3 id="8508f738-20c9-4e95-8b25-c13a028f88f1" class="block-color-gray_background">2-由程序&amp;模块所维护的</h3><p id="773a10dc-c70d-4ddb-b9b8-d368732e46e7" class=""><strong>Dynmic表：</strong><div class="indented"><p id="d0136cae-2c9b-444c-8a5b-071889e7c4a2" class="">也叫“动态段”(Dynamic Section)，它的意义作为一个<mark class="highlight-blue">“中心索引表”</mark>提供当前elf文件所需要的其他动态链接相关的表的地址（有点类似PE文件中的数据目录表）</p><p id="8080d133-551a-4d29-8c96-db84807282c0" class="">程序会维护一张Dynamic表，然后程序依赖的每个.so模块，因为它们也可能会有自己所以依赖的.so模块，所以每个.so模块也会各自维护一张它们自己的Dynamic表。</p><p id="e3ba558e-898f-4f9e-9b35-0ea988f30205" class="">它是一个结构体数组，每个元素是一个Elf32_Dyn类型的结构体，每个元素的意义是提示某张动态链接相关的表的地址</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="8b938514-cdeb-47a0-bc6e-63ace98b493f" class="code"><code class="language-C">typedef struct {
+    Elf32_Sword d_tag;        // 标识这个条目的类型，可以取以下这些值：
+															//     所需的共享库(DT_NEEDED)、全局偏移表(DT_PLTGOT)、过程链接表(DT_JMPREL)、符号表(DT_SYMTAB)、字符串表(DT_STRTAB).....
+    union {
+        Elf32_Word d_val;     // 整数值
+        Elf32_Addr d_ptr;     // 虚拟地址
+    } d_un;
+} Elf32_Dyn;</code></pre><ul id="64f27c62-f9a7-4e5f-8224-1f042bbb532e" class="toggle"><li><details open=""><summary>更详细地说，d_tag域可以取以下这些值</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b6f229c3-1d57-4ea1-92f6-d16385f5e022" class="code"><code class="language-C">#define DT_NULL     0           // 结束标记
+#define DT_NEEDED   1           // 表示需要的共享对象的字符串表偏移量
+#define DT_PLTRELSZ 2           // PLT重定位入口的数量
+#define DT_PLTGOT   3           // 重定位入口地址
+#define DT_HASH     4           // 符号哈希表的地址
+#define DT_STRTAB   5           // 字符串表的地址
+#define DT_SYMTAB   6           // 符号表的地址
+#define DT_RELA     7           // 重定位表地址
+#define DT_RELASZ   8           // 重定位表的尺寸
+#define DT_RELAENT  9           // 重定位表的表项大小
+#define DT_STRSZ    10          // 字符串表的尺寸
+#define DT_SYMENT   11          // 符号表的表项大小
+#define DT_INIT     12          // 初始化函数的地址
+#define DT_FINI     13          // 结束函数的地址
+#define DT_SONAME   14          // 共享对象名称的字符串表偏移量
+#define DT_RPATH    15          // 以冒号分隔的目录列表，用于在运行时查找共享对象
+#define DT_SYMBOLIC 16          // 修改重定位的类型
+#define DT_REL      17          // 重定位表的地址
+#define DT_RELSZ    18          // 重定位表的尺寸
+#define DT_RELENT   19          // 重定位表的表项大小
+#define DT_PLTREL   20          // 重定位表的类型
+#define DT_DEBUG    21          // 调试信息的地址
+#define DT_TEXTREL  22          // 修改重定位的类型
+#define DT_JMPREL   23          // PLT的重定位表地址
+#define DT_BIND_NOW 24          // 修改重定位的类型
+#define DT_INIT_ARRAY   25      // 初始化数组的地址
+#define DT_FINI_ARRAY   26      // 结束数组的地址
+#define DT_INIT_ARRAYSZ 27      // 初始化数组的尺寸
+#define DT_FINI_ARRAYSZ 28      // 结束数组的尺寸
+#define DT_RUNPATH  29          // 以冒号分隔的目录列表，用于在运行时查找共享对象
+#define DT_FLAGS    30          // 对象的标志
+#define DT_ENCODING 32          // 编码规则
+#define DT_PREINIT_ARRAY 32     // 预初始化数组的地址
+#define DT_PREINIT_ARRAYSZ 33   // 预初始化数组的尺寸
+#define DT_SYMTAB_SHNDX 34      // 符号表的扩展索引
+#define DT_NUM      35          // DT_*的数量
+#define DT_LOOS     0x6000000d  // 低操作系统特定的动态标签范围起始值
+#define DT_HIOS     0x6ffff000  // 高操作系统特定的动态标签范围结束值
+#define DT_LOPROC   0x70000000  // 低处理器特定的动态标签范围起始值
+#define DT_HIPROC   0x7fffffff  // 高处理器特定的动态标签范围结束值</code></pre></details></li></ul><blockquote id="4a02baf4-15c4-4b0b-ba17-dac0eb19b2ba" class="">其中，DT_NEEDED类型的条目会有很多个，其对应的d_un域会去指向这个.so库的名字字符串(这些字符串都在dymstr表中)。其他类型的条目都只会有一个。<p id="e3b3b8bd-7bc0-424d-90c3-8fd8941f3138" class="">如下图：</p><figure id="c9f42f92-4ded-433b-868e-7c0ab10ddc8b" class="image"><a href="runtime_resolve%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%2013a2d60bb6604f7096286ff0ed879d6d/Untitled.png"><img style="width:288px" src="runtime_resolve%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%2013a2d60bb6604f7096286ff0ed879d6d/Untitled.png"/></a><figcaption>其中这里指向的dynsym是当前模块的导出表，而不是当前模块所依赖的.so模块的导出表</figcaption></figure></blockquote></div></p><p id="1c4642b4-ff27-4d34-aa59-023ff29d7ffb" class=""><strong>.rel.plt表：</strong><div class="indented"><p id="97dc908a-e66a-402c-ad8b-e079d8344e11" class="">这个表的意义是用来<mark class="highlight-blue">对.got.plt表进行重定位</mark>。它由程序维护，每个.so模块也会维护一张该表。</p><p id="4cec79b1-d9eb-4af7-b927-678fc4f8b39f" class="">它是一个结构体数组，每个成员是一个Elf32_Rel结构体，定义如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="7ed15167-4ebc-47b0-a18f-9912eab13495" class="code"><code class="language-C">typedef struct {
+    Elf32_Addr r_offset; // 需要重定位的地址
+    Elf32_Word r_info;   // 它的高3B是“符号索引”，指向被重定位的符号在dynsym表中的表项
+											   // 它的低1B是“重定位类型”，一般是0x07
+} Elf32_Rel;</code></pre><ul id="6472ecc5-ea51-4d64-9c0d-8f03ea09ad67" class="toggle"><li><details open=""><summary>对于64位架构</summary><p id="40c72ea3-c6a8-4ab1-a3a9-b38978a34d8c" class="">对于64位架构，<code>r_info</code>是一个64位的整数。通常情况下，其高位32位用于存储符号表索引，低位32位用于存储重定位类型</p></details></li></ul><blockquote id="690216a3-f338-406d-be5d-aac603baae93" class="">关于r_info字段的设立，它是在运行前的链接阶段被设立的<p id="3ec9f212-b6a1-40f8-b255-13950cc4dedf" class="">链接器会读被导入的.so文件的导出表，匹配到对应的表项，然后把其对应的下标设置到程序可执行文件.rel.plt表的对应项的r_info域中。</p></blockquote></div></p><h1 id="2abbae7a-bccb-4330-9be3-42330e5a04c0" class="">二、函数执行过程解析</h1><h3 id="c6429fd9-c8de-49de-b4d3-667fb755ff10" class="">1-函数传参</h3><p id="e52d1838-16bc-4c0a-a159-595e8fb9d5a7" class="">这是一个被动态链接器所维护的函数，函数原型如下↓：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c7ab8b4f-7fb8-40df-b06d-cb2a1cf03623" class="code"><code class="language-C">_dl_runtime_resolve(link_map_obj, reloc_index)</code></pre></div></p><p id="0fdfbedb-bd12-4e9c-9c22-1bb770e36b71" class="">函数传参：<div class="indented"><p id="b591db82-f766-493e-abda-aa4f2774b046" class="">1、<code><strong>link_map_obj</strong></code><code> </code>指向动态链接器维护的“共享库链表”中该.so模块对应的表项，该表项中提示了：<div class="indented"><p id="6162b3df-a60b-4c36-afef-a227ee45fcf4" class="">（1）该.so模块的加载基地址</p><p id="2b630cf3-07ad-4b2f-9a37-27369791995f" class="">（2）该.so模块的文件路径</p><p id="e65bf13d-b4f6-49d4-9c9e-c2fa66abd875" class="">（3）该.so模块的Dynamic表</p></div></p><p id="a24fdfb4-76b6-4588-a8b7-113236148ab9" class="">2、<code>reloc_index</code>指向在当前程序维护的.rel.plt表中被重定位函数的对应表项(x32下是rva，x64下是索引)，该表项中提示了：<div class="indented"><p id="c3b4e521-e1d2-44af-9102-3cfdcad48737" class="">（1）需要重定位的地址</p><p id="8984d6cb-ce86-481b-a055-3816a0e68da6" class="">（2）符号索引(r_info高3B)，重定位类型(r_info低1B)</p></div></p></div></p><blockquote id="48aa6df9-b6cb-4e29-8410-5818a6eaa55e" class="">注意：64 位程序一般情况下使用寄存器传参，但给 <code>_dl_runtime_resolve</code> 传参时使用栈</blockquote><h3 id="1bef5095-befc-4c17-990b-34933347eeaf" class="">2-执行过程</h3><blockquote id="9438988d-4fb5-41f8-bd49-c531e014ccba" class="">进入dl_runtime_resolve函数后它只进行一些简单的初始化处理，然后调用了_dl_fixup()函数，以下这些操作都在dl_fixup函数中发生，而dl_fixup函数的执<mark class="highlight-default">行过程则可以简单分为以下几步↓：</mark><p id="122f975a-336a-4db9-8e9e-d43ddbb84d63" class=""><mark class="highlight-default">（一）执行</mark><mark class="highlight-default"><code><strong>dl_lookup_symbol_x</strong></code></mark><mark class="highlight-default">函数，做以下事情：</mark><div class="indented"><p id="e8af6b0f-1f46-47ef-8d75-bf620f129da9" class=""><mark class="highlight-default">1、先处理link_map_obj传参，得到该.so模块基址；同时往该.so模块维护的Dynamic表方向走获得两个表的基址</mark></p><p id="dc3b66c0-7160-4203-ad3e-ebc6edd9d6a2" class=""><mark class="highlight-default">2、再处理reloc_index传参，获得要被重定位处的va；同时往导出表方向走期间结合上一步获得的两个表的基址，最终进到动态链接器维护的该.so模块该符号的.dynsym条目获得该符号的符号名va和地址rva</mark></p></div></p><p id="cbf3ba73-e5f3-4a01-92ff-d94d8cfa19b9" class=""><mark class="highlight-default">（二）执行</mark><mark class="highlight-default"><code><strong>DL_FIXUP_MAKE_VALUE</strong></code></mark><mark class="highlight-default">函数，做以下事情：</mark><div class="indented"><p id="558c2fcc-e198-406c-a4bf-713425095718" class=""><mark class="highlight-default">链接器根据符号名va，去再去查所有的.dynsym，以重新确定该符号对应的是哪个.dynsym条目，这个过程我也不知道为什么会这样</mark></p><p id="5f366bf0-e66a-4002-b833-3b3741f3b9ee" class="">然后根据新读到的.dynsym表项的st_value域知道符号在.so模块中的rva</p><p id="a3df523b-5879-4b0c-a7a8-4da95889eeaf" class="">根据刚刚“1”读到的.so模块基址，加上刚刚读到的符号rva，得到符号va</p></div></p><p id="446515ed-a34e-40e9-a0f5-a6c45ee3547f" class="">（三）地址相加和重定位写入，执行流跳转：<div class="indented"><p id="ee715aa0-52c4-41df-b9e2-bb1e795ce924" class="">把“（二）”得到的va写进“（一）2”中读r_offset获得要被重定位处的va处</p><p id="936289f0-bac9-449e-a808-4d1538873e7e" class="">然后执行流给到.so模块中被重定位的函数的代码处（不用担心retaddr，因为这已经在还没进plt时的call函数填充在栈上了）</p><p id="75cfe11a-e8b6-422b-8b08-d822b5ba7d30" class="">同时，runtime_resolve是一个内平栈的函数</p></div></p></blockquote><p id="3d838e3c-518e-489e-96d6-f28c1e0d73b7" class="block-color-gray_background">详细过程如下：</p><p id="e47a43b5-069a-478d-ad8e-d1c1792b12c7" class=""><strong>（一）执行dl_lookup_symbol_x函数，做以下事情：</strong></p><p id="f51fb7eb-926d-4456-8354-eadff3168bfc" class=""><strong>1、link_map_obj传参处理：</strong><div class="indented"><p id="b713dff3-448e-485a-84f7-00355fae1b82" class="">其指向动态链接器维护的“共享库链表”中该.so模块对应的表项，一个link_map结构体，然后他就知道了它要找到是哪个.so模块，和这个模块的一些重要信息，它要读两个重要信息：</p><p id="0eed2ff5-6a40-4750-9d4b-53917beef4df" class="">（1）读l_addr域获得该模块的基址</p><p id="233c32ee-7fd8-4f42-9559-11a3587d925b" class="">（2）读l_ld域，这是个重要的域指向该.so模块维护的Dynamic表(“中心索引表”)，这可以相当于获取这个.so模块的所有动态链接表的索引</p><p id="6211f5f5-dbea-4c3d-92a0-29bfabfd5834" class="">现在我们读了l_ld域，获取了这个.so模块的所有动态链接表的索引，这里我们主要是要获得2个表的基址的信息，为了后面可以用到：</p><p id="3886f5b8-1c88-4155-8891-b0a4f9a8e1c1" class="">（1）取出其中的DT_STRTAB类型条目，就可以获得该.so模块维护的.dynstr表基址</p><p id="7dd3a9cf-aa8e-46fe-be49-a30a4f103834" class="">（2）取出其中的DT_SYMTAB类型条目，就可以获得动态链接器维护的该.so模块对应的那张.dynsym表的基址</p></div></p><p id="0fa5d7cf-cfdc-4585-839c-84c17a197085" class=""><strong>2、reloc_index传参处理：</strong><div class="indented"><p id="7c97e937-bf12-4044-afb7-aaf29f686c91" class="">其指向在当前程序维护的.rel.plt表中被重定位函数的对应表项，是个Elf32_Rel结构体，获取两个信息：</p><p id="9e7c8f7a-f83c-4955-b4cc-0e315a845bd3" class="">（1）读r_offset获得要被重定位处的va</p><p id="581a7aa1-76aa-4815-98c8-393b06b3b367" class="">（2）读这个结构体的r_info域的高3B，就会得到一个指向动态链接器维护的该.so模块对应的.dynsym表中的该符号条目的下标。结合刚刚读DT_SYMTAB类型条目得到的基址就可以知道该条目的va。</p><p id="c44244b2-c4d5-4564-b656-78faf9ceccc5" class="">现在就进入了该符号的.dynsym条目，从而获得了这个被导入符号在其对应.so模块里的所有相关信息，这里我们主要是要获得两个信息：</p><p id="7dbe50df-b945-427e-8452-e52c8723328c" class="">（1）读st_name域知道符号名(这里又是结合刚刚获得的.dynstr表基址获得符号名va)</p><p id="d14d703b-d7cf-4bf3-a49d-9e5c22e11aaa" class="">（2）读st_value域知道符号在.so模块中的rva</p></div></p><p id="eb121f17-c8d3-40bd-8b8f-8d4eee1f6300" class=""><strong>（二）执行DL_FIXUP_MAKE_VALUE函数，做以下事情：</strong><div class="indented"><p id="8d622026-94f8-433d-a687-2f26f4b72865" class="">如果动态链接器维护的dynsym表项中的st_other域的值不为0，则链接器会视为st_value已经被设置，就会直接执行“st_value读出的rva+.so模块基址”而得到要重定位写入got表的符号va</p><p id="890be472-a643-4cfb-8f89-9d69d930084b" class="">如果动态链接器维护的dynsym表项中的st_other域的值不为0，则链接器会视为st_value未被设置，则会根据符号名va，去再去查所有.so模块维护的.dynsym，以重新确定该符号对应的是哪个.dynsym条目。</p><blockquote id="104cb6e9-1a45-4aa3-803b-9b86d25d8b6d" class="">动态链接器维护的dynsym表(导出表)的st_value域有可能不是一开始就被设置好的。<p id="81e2bb62-d5d3-48db-ba42-5bb8a09bf2f2" class="">也有可能是一开始</p></blockquote><p id="39439e90-5ea4-4b80-98cc-2b457a6821f3" class="">然后根据新读到的.dynsym表项的st_value域知道符号在.so模块中的rva</p><p id="f76981f0-9341-4ce4-9179-98b06842c077" class="">根据刚刚“1”读到的.so模块基址，加上刚刚读到的符号rva，得到符号va</p></div></p><p id="e3221156-cd36-409c-b13a-1dc3cd6647f4" class="">（三）<strong>地址相加和重定位写入，执行流跳转：</strong><div class="indented"><p id="b2c80a19-a90b-4e71-a487-c552c5b1ac0a" class="">把“（二）”得到的va写进“（一）2”中读r_offset获得要被重定位处的va处</p><p id="89da7d25-470f-4a31-aba0-5faeb83ed632" class="">然后执行流给到.so模块中被重定位的函数的代码处（不用担心retaddr，因为这已经在还没进plt时的call函数填充在栈上了）</p><p id="eb9a5c43-128e-458d-b52d-6c76d2491ec8" class="">同时，runtime_resolve是一个内平栈的函数</p></div></p><h1 id="60a65081-8bd0-4e11-b1f6-3e29f0156b18" class="">三、源码分析</h1><p id="665ecd78-ec86-46d2-9767-49dbbca670c5" class="">源码位于 glibc-2.23/elf/dl-runtime.c</p><ul id="1777b08d-c6da-4acd-b3da-bcdad5d163cd" class="toggle"><li><details open=""><summary>源码内容带注释</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="98459493-34fe-419e-97d1-328ca23973fb" class="code"><code class="language-C">_dl_fixup (struct link_map *l, ElfW(Word) reloc_arg) 
+// 第一个参数link_map，也就是got[1]
+{
+    // 获取link_map中存放DT_SYMTAB的地址
+  const ElfW(Sym) *const symtab = (const void *) D_PTR (l, l_info[DT_SYMTAB]);
+
+    // 获取link_map中存放DT_STRTAB的地址
+  const char *strtab = (const void *) D_PTR (l, l_info[DT_STRTAB]);
+
+    // reloc_offset就是reloc_arg,获取重定位表项中对应函数的结构体
+  const PLTREL *const reloc = (const void *) (D_PTR (l, l_info[DT_JMPREL]) + reloc_offset);
+
+    // 根据重定位结构体的r_info得到symtab表中对应的结构体
+  const ElfW(Sym) *sym = &amp;symtab[ELFW(R_SYM) (reloc-&gt;r_info)];
+ 
+  void *const rel_addr = (void *)(l-&gt;l_addr + reloc-&gt;r_offset);
+  lookup_t result;
+  DL_FIXUP_VALUE_TYPE value;
+ 
+// 检查r_info的最低位是不是7
+  assert (ELFW(R_TYPE)(reloc-&gt;r_info) == ELF_MACHINE_JMP_SLOT); 
+
+// 这里是一层检测，检查sym结构体中的st_other是否为0，正常情况下为0，执行下面代码
+  if (__builtin_expect (ELFW(ST_VISIBILITY) (sym-&gt;st_other), 0) == 0) 
+    {
+      const struct r_found_version *version = NULL;
+
+    // 这里也是一层检测，检查link_map中的DT_VERSYM是否为NULL，正常情况下不为NULL，执行下面代码
+      if (l-&gt;l_info[VERSYMIDX (DT_VERSYM)] != NULL)
+    {
+      /* 到了这里就是64位下报错的位置，在计算版本号时，vernum[ELFW(R_SYM) (reloc-&gt;r_info)] &amp; 0x7fff的过程中，
+			由于我们一般伪造的symtab位于bss段，就导致在64位下reloc-&gt;r_info比较大,故程序会发生错误。所以要使程序不发生错误，
+			自然想到的办法就是不执行这里的代码，分析上面的代码我们就可以得到两种手段：
+
+			第一种手段就是使上一行的if不成立，也就是设置link_map中的DT_VERSYM为NULL，那我们就要泄露出link_map的地址，而如果我们能泄露地址，根本用不着ret2dlresolve。
+			第二种手段就是使最外层的if不成立，也就是使sym结构体中的st_other不为0，直接跳到后面的else语句执行。*/
+      const ElfW(Half) *vernum = (const void *) D_PTR (l, l_info[VERSYMIDX (DT_VERSYM)]);
+      ElfW(Half) ndx = vernum[ELFW(R_SYM) (reloc-&gt;r_info)] &amp; 0x7fff;
+      version = &amp;l-&gt;l_versions[ndx];
+      if (version-&gt;hash == 0)
+        version = NULL;
+    }
+ 
+      int flags = DL_LOOKUP_ADD_DEPENDENCY;
+      if (!RTLD_SINGLE_THREAD_P)
+    {
+      THREAD_GSCOPE_SET_FLAG ();
+      flags |= DL_LOOKUP_GSCOPE_LOCK;
+    }
+ 
+      RTLD_ENABLE_FOREIGN_CALL;
+
+    // 在32位情况下，上面代码运行中不会出错，就会走到这里，这里通过strtab+sym-&gt;st_name找到符号表字符串，result为libc基地址
+      result = _dl_lookup_symbol_x (strtab + sym-&gt;st_name, l, &amp;sym, l-&gt;l_scope,
+                    version, ELF_RTYPE_CLASS_PLT, flags, NULL);
+ 
+      if (!RTLD_SINGLE_THREAD_P)
+    THREAD_GSCOPE_RESET_FLAG ();
+ 
+      RTLD_FINALIZE_FOREIGN_CALL;
+ 
+      // 同样，如果正常执行，接下来会来到这里，得到value的值，为libc基址加上要解析函数的偏移地址，也即实际地址，即result+st_value
+      value = DL_FIXUP_MAKE_VALUE (result, sym ? (LOOKUP_VALUE_ADDRESS (result) + sym-&gt;st_value) : 0);
+    }
+  else
+    {
+      // 这里就是64位下利用的关键，在最上面的if不成立后，就会来到这里,这里value的计算方式是 l-&gt;l_addr + st_value,我们的目的是使**value为我们所需要的函数的地址，所以就得控制两个参数，l_addr 和 st_value
+      /* We already found the symbol.  The module (and therefore its load
+     address) is also known.  */
+      value = DL_FIXUP_MAKE_VALUE (l, l-&gt;l_addr + sym-&gt;st_value);
+      result = l;
+    }
+ 
+  /* And now perhaps the relocation addend.  */
+  value = elf_machine_plt_value (l, reloc, value);
+ 
+  if (sym != NULL
+      &amp;&amp; __builtin_expect (ELFW(ST_TYPE) (sym-&gt;st_info) == STT_GNU_IFUNC, 0))
+    value = elf_ifunc_invoke (DL_FIXUP_VALUE_ADDR (value));
+ 
+  /* Finally, fix up the plt itself.  */
+  if (__glibc_unlikely (GLRO(dl_bind_not)))
+    return value;
+  // 最后把value写入相应的GOT表条目中
+  return elf_machine_fixup_plt (l, result, reloc, rel_addr, value);
+}</code></pre></details></li></ul><p id="078bf547-67c8-4228-8c8e-4d9374d686d4" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

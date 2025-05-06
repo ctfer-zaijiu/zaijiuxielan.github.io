@@ -1,0 +1,847 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>后续版本新增：tcache、fastbin poisoning机制</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="f4640b0d-0d7e-405f-b6cb-f584c5eee326" class="page sans"><header><img class="page-cover-image" src="https://www.notion.so/images/page-cover/gradients_8.png" style="object-position:center 70%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/grid_green.svg"/></div><h1 class="page-title">后续版本新增：tcache、fastbin poisoning机制</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1730427e-38bb-80f1-a320-c8967a503372" class="">妈妈，我看见了雪白的墙。</blockquote><h1 id="16f0427e-38bb-80e8-9ecc-e62c031bd299" class="">一、tcache机制</h1><p id="1dee3cf7-98c1-4ac5-ba45-e401c4dc4aac" class=""><strong>【定义】</strong></p><p id="e142941e-c7c4-464c-90fa-28f2003b007e" class="">该机制出现于glibc2.26及其之后的glibc版本</p><p id="9b5e3a61-a9a5-4244-9752-a6d7b611611e" class="">这是一种纯粹为了运行效率而设计出来的机制，其中处处都是为运行效率而设计出来的优化措施，体现出了对性能优化的极致追求（很想知道当时开发出tcache机制的兄弟是不是被什么脏东西刺激到了emm）。</p><p id="a529983d-ab23-4c21-9e91-0c3b9c534a92" class="">但这写对运行效率的极致追求也伴随地引入了更多的不安全性</p><p id="557a35e5-d3c1-4abb-90af-1501950365c7" class=""><strong>【结构】</strong></p><p id="5096c84e-6bb0-452c-8ee5-8d13c4913c46" class="">tcache是64个单向链表，每个链表最多7如下个节点(chunk)，chunk的大小范围如下：</p><ul id="523f2a55-e198-4387-bf96-8e19a581af23" class="bulleted-list"><li style="list-style-type:disc">x32上：是12~512B（8byte递增）</li></ul><ul id="de1b402e-b429-4a78-8e5f-f4e04aa78bc7" class="bulleted-list"><li style="list-style-type:disc">x64上：是24~1024B（16bytes递增）</li></ul><p id="4001e1e4-737e-44f8-b5c4-7268fb57d488" class="">tcache和fastbin一样，都是<strong>LIFO</strong></p><p id="dcb15b15-1f10-48dd-9439-783b67533393" class="">数据结构如图：</p><figure id="f7a36029-8b70-4a3e-87f8-560ad4f6ac3a" class="image" style="text-align:left"><a href="%E5%90%8E%E7%BB%AD%E7%89%88%E6%9C%AC%E6%96%B0%E5%A2%9E%EF%BC%9Atcache%E3%80%81fastbin%20poisoning%E6%9C%BA%E5%88%B6%20f4640b0d0d7e405fb6cbf584c5eee326/Untitled.png"><img style="width:480px" src="%E5%90%8E%E7%BB%AD%E7%89%88%E6%9C%AC%E6%96%B0%E5%A2%9E%EF%BC%9Atcache%E3%80%81fastbin%20poisoning%E6%9C%BA%E5%88%B6%20f4640b0d0d7e405fb6cbf584c5eee326/Untitled.png"/></a></figure><p id="85e5db48-ddbd-412a-9c82-7f8155bca60a" class="">这里注意两点：<div class="indented"><p id="6d67c37e-3bf1-46cf-8337-e8f261561a5e" class=""><mark class="highlight-red">1、tcache的fd指向的是下一个tcache的fd域而不是块头！</mark></p><p id="eb18e059-a3f8-481b-9007-c3b6b99b678e" class=""><mark class="highlight-red">2、tcache_perthread_struct这一结构体是在heap段的，而不像其他bin数组是在glibc</mark></p><blockquote id="e49cb81d-16d3-4811-8e71-02c41e75a96c" class="">一般来说，heap段的前0x40B是counts数组（0x40*0x1B），而后是p2tcache数组，其大小是0x40*0x8B</blockquote></div></p><p id="02705c5e-ced5-4293-a6b9-f5dc44a26284" class=""><strong>【运行机制】</strong></p><p id="86030935-2590-4228-93ea-97dd9847e8cc" class=""><strong>counts数组：</strong></p><p id="f6f571fc-8f9d-4efb-b780-2f2508868038" class="">每次取tcache会减少counts对应元素的值，添加tcache会增加counts对应元素的值</p><p id="0298e05f-4c4a-4c20-806b-f04273c83937" class=""><strong>什么时候会去尝试获取tcache块：</strong><div class="indented"><p id="f8fa423a-549e-451f-961f-484a6565a1ae" class="">1、在最开始malloc的时候，如果tcache中有合适的chunk，那么就从tcache中取出（malloc_hook之后，int_malloc之前）</p><p id="dc003696-6ff8-45ee-a464-f3fa22da3b72" class="">2、遍历完unsorted bin后（遍历时会把合适大小的freechunk放入tcache里），若tcachebin中有对应大小的freechunk，从tcache中取出</p></div></p><p id="fcf45f8c-d90d-4d8c-b849-575ce36c024e" class="">尝试获取tcache块时，是通过调用tcache_get函数</p><p id="de9ef730-3adf-4c46-be55-12b9eb5d750b" class=""><strong>什么时候会去尝试添加tcache块：</strong></p><p id="ca7eb647-1b5c-487c-ba80-79c51c505454" class="">（一）malloc时，会在各个bin里面找适合tcache的块，添加进tcache，有如下三种寻找方式：<div class="indented"><ol type="1" id="54d8d3e9-2748-4bd9-8e4e-3693262664d0" class="numbered-list" start="1"><li>如果malloc<mark class="highlight-blue">在某个fastbin链上找到适合回收的块了</mark>，它会顺便遍历处理这条fastbin链上的所有其他块——如果tcache对应位置处没满7，这些块会被放到tcache里</li></ol><ol type="1" id="bc23986b-6345-49e6-a6bd-bd9c6780b4af" class="numbered-list" start="2"><li>如果malloc<mark class="highlight-blue">在某个smallbin链上找到适合回收的块了</mark>，它会顺便遍历处理这条smallbin链上的所有其他块——如果tcache对应位置处没满7，这些块会被放到tcache里</li></ol><ol type="1" id="206b5768-6b58-4450-963d-b6da41e0ff0c" class="numbered-list" start="3"><li>如果malloc进行到了“<mark class="highlight-blue">尝试从unsortedbin中获取可用块</mark>，并顺便对unsortedbin里的块进行分割分类”环节，那么他会顺便对于看到的在tcache范围内的unsorted块——如果tcache对应位置处没满7，这些块会被放到tcache里</li></ol></div></p><p id="efc38fb5-5a73-403a-a800-4eb9dcb62745" class="">（二）<mark class="highlight-blue">free时</mark>，会在最开始free的时候尝试把freechunk放进trcache中：<div class="indented"><ol type="1" id="67104bcf-12d4-454d-81a0-38230f7f22fd" class="numbered-list" start="4"><li>如果freechunk是tcache大小且tcache没有满7，那么就放入tcache（int_free的最开始），只有当某一个tcache链表满了7个再free会进入到arena里，也就是说会进行先尝试进fastbin再进unsortedbin的那些我们熟悉的操作。</li></ol></div></p><p id="9ac83090-1b4e-43d3-a157-eb07f9b54ef5" class="">尝试添加tcache时，是通过调用tcache_put函数</p><p id="556c0f3a-ab8e-4219-8e0b-5a8b14b45e49" class=""><strong>calloc不使用tcache机制：</strong><div class="indented"><p id="8d8c75f8-c2ca-4634-ac12-ec0b48afa4f6" class="">calloc函数有一个很特殊的性质，在使用calloc分配堆块时不会从tcachebin中获取chunk，也就是说calloc可以直接分配smallbin中的chunk无论tcachebin满不满</p></div></p><p id="ae9aeb52-f9aa-4be1-baab-ab0a2851bbe1" class=""><strong>【相关代码】</strong></p><blockquote id="9d598bfb-0392-4312-84ce-457159401214" class="">以下所有代码均来自glibc 2.27-3ubuntu1.5，需要注意的是，此时key机制已经被引入了 </blockquote><ul id="009122e1-dd3a-41a9-8026-4950f6ea2baf" class="toggle"><li><details open=""><summary>tcache相关结构定义、参数初始化代码如下</summary><p id="3d52f70e-453f-4bb3-bb9f-480aef312e5f" class="">malloc.c中第302到307行：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c34354ba-d3d3-4130-99b5-d994c3f7da7b" class="code"><code class="language-C">#if USE_TCACHE
+// 这一宏定义表示了同个大小的tcache链里最多能填多少个tcache
+# define TCACHE_FILL_COUNT 7 
+...... // 一些其他的宏定义
+// 这一宏定义表示有64条tcache链
+# define TCACHE_MAX_BINS		64
+#endif</code></pre><p id="360612fd-2cae-47b8-8a05-b803592bb16f" class="">malloc.c中第2900行：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="639b36b0-eb22-44bc-b850-28bd56b63f83" class="code"><code class="language-C">#if USE_TCACHE
+
+typedef struct tcache_entry{
+  struct tcache_entry *next;//指向的下一个chunk的next域,占用的是fd的位置
+} tcache_entry;
+
+typedef struct tcache_perthread_struct{
+  char counts[TCACHE_MAX_BINS];//表示entries指针数组每个元素对应链表有多少个节点，每个元素是char型仅占用一个字节
+  tcache_entry *entries[TCACHE_MAX_BINS];//entries指针数组（对应64个tcache链表，cache bin中最大为0x400字节
+} tcache_perthread_struct;
+
+...... // 一些其他的与tcache有关的定义
+#endif</code></pre></details></li></ul><ul id="992ed900-7f7a-4289-bf7d-ff0cc30b9d9c" class="toggle"><li><details open=""><summary>tcache_get、tcache_put函数代码如下</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="762490b3-4dfa-4901-8707-107d865afbfe" class="code"><code class="language-C">// 其中。tc_idx是tcache指针数组entries的索引，指向一条特定大小的tcache链，由于该函数的安全机制设施单薄，所以其调用者必须先确保我们知道 tc_idx 是有效的，并且有可用的块可以移除
+
+tcache_put (mchunkptr chunk, size_t tc_idx){
+  tcache_entry *e = (tcache_entry *) chunk2mem (chunk);// 根据索引找到那条对应tcache链表的头指针，记为e
+
+  assert (tc_idx &lt; TCACHE_MAX_BINS);// 安全性检查：看tc_idx 是否存在数组越界访问呢
+
+	// 通过链表增头节点操作，将e取放入
+  e-&gt;next = tcache-&gt;entries[tc_idx];
+  tcache-&gt;entries[tc_idx] = e;
+
+  ++(tcache-&gt;counts[tc_idx]);// counts中对应的元素减一
+}
+
+static __always_inline void *tcache_get (size_t tc_idx){// 其中__always_inline 是函数调用约定，表示该段代码使用拼接入函数调用处的方式而不是异地调用，以此减少平栈和跳转带来的时间损耗
+  tcache_entry *e = tcache-&gt;entries[tc_idx];// 根据索引找到那条对应tcache链表的头指针，记为e
+
+  assert (tc_idx &lt; TCACHE_MAX_BINS);// 安全性检查1：看tc_idx 是否存在数组越界访问呢
+  assert (tcache-&gt;entries[tc_idx] &gt; 0);// 安全性检查2：看该tc_idx对应的tcache链里是否已经满7个
+
+  tcache-&gt;entries[tc_idx] = e-&gt;next;// 通过链表删除头节点操作，将e取出
+  --(tcache-&gt;counts[tc_idx]);// counts中对应的元素减一
+
+  return (void *) e;
+}</code></pre><p id="01737f7b-b9a3-413d-b6be-f2e084f0aa5f" class="">可以看到，在 tcache_get 中，为了效率，仅仅检查了tc_idx，这就导致了很不安全容易被日</p></details></li></ul><p id="382f1659-753b-426d-8be5-ada2b36db056" class="">加入tcache：</p><ul id="d41fb30e-9b67-403e-8276-800a7f2b927a" class="toggle"><li><details open=""><summary>malloc在开始阶段，先尝试把freechunk加入tcache的相关代码</summary><p id="3245aaa2-2b87-4a35-8a3e-cc15d87da23c" class="">malloc函数会先进入__libc_malloc函数，该函数会尝试从tcache bin中获取freechunk，代码如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a4708725-47ba-4047-97e5-11bf4df97e5f" class="code"><code class="language-C">void * __libc_malloc (size_t bytes){
+	...... //省略一些初始化代码
+
+	#if USE_TCACHE
+	
+	// 一些tcache使用的准备代码
+	size_t tbytes;
+	checked_request2size (bytes, tbytes);  // tbytes为bytes请求的转换后得到的chunk的size
+	size_t tc_idx = csize2tidx (tbytes);  // 根据大小 tbytes ，找到 tcache-&gt;entries 索引
+	MAYBE_INIT_TCACHE (); // 进行一些tcache的初始化，只有第一次调用malloc时才会执行到
+	DIAG_PUSH_NEEDS_COMMENT; // 告诉编译器在执行之后的代码块期间忽略一些警告策略
+	
+	// 一些从tcache中尝试回收tcache的代码
+	if (tc_idx &lt; mp_.tcache_bins // 条件1：所申请的chunk大小在tcache范围内
+		&amp;&amp; tcache // 条件2：tcahce已经初始化
+		&amp;&amp; tcache-&gt;entries[tc_idx] != NULL) // 条件3：对应大小的tcache链不为null
+	{
+		return tcache_get (tc_idx); // 调用 tcache_get 拿到 chunk 然后返回
+	}
+	
+	DIAG_POP_NEEDS_COMMENT; // 告诉编译器在执行之后的代码执行中恢复那些警告策略
+	
+	#endif
+	
+	// 如果当前是主线程，则直接从main_arena中获取内存块
+	if (SINGLE_THREAD_P) {
+		victim = _int_malloc (&amp;main_arena, bytes);// 调用int_malloc，这个函数会执行我们熟悉的先尝试取fastbin再尝试取smallbinlargebin再unsortedbin再topchunk的操作
+		assert (!victim || chunk_is_mmapped (mem2chunk (victim)) ||&amp;main_arena == arena_for_chunk (mem2chunk (victim)));
+		return victim;
+    }
+
+	// 如果当前是多线程中的非主线程，则从线程所属的 arena 中获取内存块
+	arena_get (ar_ptr, bytes);
+	victim = _int_malloc (ar_ptr, bytes); // 调用int_malloc
+	
+	...// 一些结尾的处理代码
+}</code></pre></details></li></ul><ul id="5e78b572-d179-4a97-ba81-79885a2f8d4b" class="toggle"><li><details open=""><summary>malloc在某个fastbin链上找到适合回收的块时，顺便遍历尝试将这条fastbinbin链上的所有其他块入tcache</summary><p id="f4cde553-47e0-4c1e-80e3-db854e166d5a" class="">malloc.c中第3600行</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="3922af31-133e-4e9f-bf20-2c28c13e190f" class="code"><code class="language-C">#if USE_TCACHE
+size_t tc_idx = csize2tidx(nb);// 将传入的块大小（nb）转换成对应的tcache索引，记为tc_idx
+
+// 如果tcache不为空并且该nb的大小是在tcache范围内（通过tc_idx来判断）
+if (tcache &amp;&amp; tc_idx &lt; mp_.tcache_bins) {
+    mchunkptr tc_victim;// 声明待处理堆块指针，记为tc_victim
+
+    // 遍历处理当前fastbin链上的所有fastchunk（获取dastbin的方式是不断访问fastbin的头节点，其中fb就是指向fastbin头节点的指针），直到其对应的smallbin链满7或当前fastbin链上的所有fastchunk被处理完
+    while (tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count &amp;&amp; (tc_victim = *fb) != NULL) {
+
+        // 如果是单线程环境，这里可以什么都不用做，因为tc_victim已经指向那个fastchunk了，所以这里只需要更新一下fb的值
+        if (SINGLE_THREAD_P)
+            *fb = tc_victim-&gt;fd;
+
+				// 如果是多线程环境，则需要使用REMOVE_FB从fastbins中移除tc_victim顺便更新fb的值，其中传参pp是用于记录删除操作的步骤的结构体
+        else {
+            REMOVE_FB(fb, pp, tc_victim);
+            // 如果tc_victim在fastbin中不存在，则表示取出失败，退出循环
+            if (__glibc_unlikely(tc_victim == NULL))
+                break;
+        }
+
+        tcache_put(tc_victim, tc_idx);// 这里不管是单线程还是多线程，就统一调用tcache_put函数将tc_victim指向的块放入tcache中对应的bin中
+    }
+}
+#endif</code></pre></details></li></ul><ul id="70927c6f-7136-4fd1-90ef-f75179f4ddf7" class="toggle"><li><details open=""><summary>malloc尝试回收smallbin，然后在某个smallbin链上找到适合回收的块时，顺便遍历尝试将这条smallbin链上的所有其他块入tcache</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="7edcd5c9-472f-4e8a-a72d-8593f12b44df" class="code"><code class="language-C">// 在glibc2.27中，对smallbin的函数不是通过在这段代码里调用malloc_consolidate函数实现的，而是通过在_int_malloc开始时调用arena_get2函数实现的
+// 检查我们想申请的块是否在small bin范围内（通常是较小的内存块）
+if (in_smallbin_range(nb)) {
+    idx = smallbin_index(nb); // 根据请求大小计算对应的small bin索引，存为idx
+    bin = bin_at(av, idx); // 获取idx对应的smallbin链表，存为bin
+
+		// 获取那条对应大小的 small bin链的最后一个chunk，记为victim。然后检查：如果victim != bin，就表示该smallbin链里至少有两个节点，此时做安全性检查之后取出节点，然后循环地尝试将smallbin链表中的对应节点放入tcache里
+    if ((victim = last(bin)) != bin) {
+
+				// 安全性检查：检查是否bk-&gt;fd等于它自己，如果不等于，则表示出现问题报错之
+        bck = victim-&gt;bk;
+        if (__glibc_unlikely(bck-&gt;fd != victim))
+            malloc_printerr(&quot;malloc(): smallbin double linked list corrupted&quot;);
+
+				// 设置victim块的inuse标志位
+        set_inuse_bit_at_offset(victim, nb); 
+
+				// 伪循环链表的删除节点操作
+        bin-&gt;bk = bck; 
+        bck-&gt;fd = bin; 
+
+				// 设置victim的no_main_arena标志位
+        if (av != &amp;main_arena)
+            set_non_main_arena(victim); 
+
+				// 对分配的块进行检查，防止错误
+        check_malloced_chunk(av, victim, nb); 
+
+        #if USE_TCACHE
+        // 如果启用了tcache（用于高效地缓存小块内存分配）
+        size_t tc_idx = csize2tidx(nb); // 计算对应大小的tcache索引，记为tc_idx 
+        if (tcache &amp;&amp; tc_idx &lt; mp_.tcache_bins) {// 检查p2tcache结构体是否为空且请求的smallchunk大小在tcache大小范围内，如果有，则下面正式开启smallchunk遍历加入tcache里的操作
+
+            mchunkptr tc_victim;// 那个被取出要被加入到tcache里的smallchunk记为victim
+            while (tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count &amp;&amp; (tc_victim = last(bin)) != bin) {// 循环从该smallbin链中取出块，直到tcache的数量达到7个的上限或smallbin链被拿空
+                if (tc_victim != 0) {
+
+                    bck = tc_victim-&gt;bk; // 获取tcache victim的前一个块，记为bck，用于后续的链表删除节点操作
+                    set_inuse_bit_at_offset(tc_victim, nb); // 设置victim块的inuse标志位
+
+										// 设置victim的no_main_arena标志位
+                    if (av != &amp;main_arena)
+                        set_non_main_arena(tc_victim); 
+
+										// 伪双向循环链表删除节点操作
+                    bin-&gt;bk = bck; // 将tcache victim从bin链表中移除
+                    bck-&gt;fd = bin; // 更新前一个块的后向指针，将其指向bin
+
+                    tcache_put(tc_victim, tc_idx); // 将tcache victim放回tcache中
+                }
+            }
+        }
+        #endif
+
+        void *p = chunk2mem(victim); // 将victim块转换为指向用户可用内存块的指针
+
+        alloc_perturb(p, bytes); // 安全性措施，对内存块进行内容扰动
+
+        return p; // 返回指向分配的块的指针
+    }
+}</code></pre></details></li></ul><h1 id="16f0427e-38bb-8080-a074-e343ff14387d" class="">fastbin poisoning机制</h1><p id="00ab2947-2c57-4209-a162-126a88fafae0" class="">该机制在glibc2.26之后被引入</p><p id="16f0427e-38bb-80e9-8fc0-e4dc0657fa64" class="">通过将已释放的快速分配内存块标记为“poison”，即无效值，程序可以在尝试使用这些已释放的内存块时立即崩溃</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

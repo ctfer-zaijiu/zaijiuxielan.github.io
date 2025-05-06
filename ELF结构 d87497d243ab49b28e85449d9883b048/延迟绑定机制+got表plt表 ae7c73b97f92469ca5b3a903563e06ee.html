@@ -1,0 +1,691 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>延迟绑定机制+got表plt表</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="ae7c73b9-7f92-469c-a5b3-a903563e06ee" class="page sans"><header><img class="page-cover-image" src="https://www.notion.so/images/page-cover/met_william_morris_1877_willow.jpg" style="object-position:center 90%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/skip-forward_gray.svg"/></div><h1 class="page-title">延迟绑定机制+got表plt表</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="92ba4ce0-a65c-447a-a460-b05b1fb40165" class="">也不必说，鸣蝉在树叶里长吟，肥胖的黄蜂伏在菜花上 🌾</blockquote><h1 id="c9993d78-8602-4792-b180-d006c5c477dd" class="">.plt表和.got.plt表</h1><p id="3c1b3604-e4c8-4b20-bcdf-734b0bcf8b8c" class=""><strong>【定义】</strong></p><p id="e04b17e9-5a1e-4a90-b4b3-ecda8e5098fd" class="">got表思想就是设计一个got表用来存放所有全局符号地址，早在静态链接的设计中就有，其中实现上被实现为了以下两个表：<div class="indented"><p id="33aa3592-84aa-49f7-af1d-cf9bdfa2d545" class=""><mark class="highlight-blue">1、</mark><mark class="highlight-blue"><code>.got</code></mark><mark class="highlight-blue">存放全局变量引用地址</mark></p><p id="a976b012-0be9-4400-a3db-575e6b71049d" class=""><mark class="highlight-blue">2、</mark><mark class="highlight-blue"><code>.got.plt</code></mark><mark class="highlight-blue">存放函数引用地址</mark></p></div></p><p id="4969993e-a5ca-432e-bbcb-f81312774892" class="">为了实现延迟绑定机制，才在got表的基础上接入了plt表，其加入有2 个设计目标：<div class="indented"><p id="1d3c9332-77c6-49a3-9623-9471837982d2" class="">1、实现第一次调用函数时会做重定位，而后第二次之后的所有函数调用就都是直接调用</p><p id="67e0c34c-10d6-426c-a15d-ea3ee916d4de" class="">2、实现传参并调用_dl_runtime_resolve()</p></div></p><p id="98dc18c5-826b-46e5-bc86-b13e704ea2de" class="">这两个表被ld.so也就是动态链接器所维护，主要是：在ld.so里定义了一个_dl_runtime_resolve函数用来进行重定位+符号地址解析，并将结果更新在plt、got表中。</p><p id="c5c885b8-b14a-4218-afc3-5bd9dca9d9af" class=""><strong>【结构】</strong></p><p id="3ab17b4f-f778-4afe-8a6a-e1dee5d6dea3" class=""><mark class="highlight-yellow_background">plt表存储指令，got表存储指令要用到的数据。他们都是：可复用的东西放表头，某函数独有的东西做表项。</mark></p><ul id="6c4f0f82-21d0-42aa-ad39-88d5419e738d" class="toggle"><li><details open=""><summary><strong>.plt表的结构如下：</strong></summary><ul id="7e819384-4c10-432f-b9d2-c1e556b6edac" class="bulleted-list"><li style="list-style-type:disc">表头是调用runtime_resorve函数的指令，每个函数在第一次用runtime_resorve函数进行“符号地址解析”时就对该段指令进行复用。</li></ul><ul id="ba4bb4d1-3ce1-4757-97ec-5a441da1197e" class="bulleted-list"><li style="list-style-type:disc">每个表项是以下三条指令：<p id="0e313089-f219-43a6-aaaa-699d31bc9f00" class="">1、jmp,用来跳到函数处，使用的地址存在got表表项。如果成功就直接调到函数，如果失败（符号地址未被解析）就跳到接下来的指令“2”“3”</p><p id="95b979a0-9a3d-4c85-941a-40119413af7e" class="">2、push,用来给runtime_resorve函数传参，数据用立即数</p><p id="cb70d874-05da-415c-ba6f-45b6b880bdcd" class="">3、jmp,跳回plt表头</p></li></ul></details></li></ul><ul id="a170bb4b-ebf5-4ddb-898b-a9c63f55612c" class="toggle"><li><details open=""><summary><strong>.got.plt表的结构如下：</strong></summary><ul id="3d226d01-4c3c-4666-bfee-9347db42756c" class="bulleted-list"><li style="list-style-type:disc">表头是三个特殊地址，是每个函数进行重定位时可以复用的调用runtime_resolve函数的数据，其中：<ul id="ee65b368-84aa-4003-abae-6be1ee4a1afa" class="bulleted-list"><li style="list-style-type:circle">got[0]是.dymanic段的基址</li></ul><ul id="2d152422-b460-4fd3-8ad1-f1b6512dd72c" class="bulleted-list"><li style="list-style-type:circle">got[1]是一个指向linkmap结构体实现的指针，该结构体实现位于栈上</li></ul><ul id="f0451024-0d6c-492e-99be-19af2b38abd8" class="bulleted-list"><li style="list-style-type:circle">got[2]是_dl_runtime_resolve函数的地址</li></ul></li></ul><ul id="bc8cb73c-6f56-4390-b7f1-1fd8795bd92d" class="bulleted-list"><li style="list-style-type:disc">每个表项都是一个地址指针，被重定位前指向plt表的对应字段的第二句指令开始处，被重定位后指向对应函数地址处</li></ul></details></li></ul><p id="e0ea5007-3f79-45c5-b76c-3607753512ad" class=""><strong>总体结构如下图↓：</strong></p><figure id="7f4ca2f0-7894-4942-b7e7-5594bf57f75f" class="image" style="text-align:left"><a href="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled.png"><img style="width:480px" src="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled.png"/></a><figcaption>其中plt表头是一个桩（stub）函数，用来把执行流给到<code>runtime_resolve</code>函数</figcaption></figure><blockquote id="f0aee57d-bfb6-4869-8f2f-6abb2f9e857f" class="">实际上，x32下，got表基址是存放在ebx寄存器中，所以其对应的为PLT stub为：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="759edef0-290e-4181-9e05-08babd3c82b3" class="code"><code class="language-Python">0x56556030: push 0x4(%ebx)      ; 当前模块的linkmap
+0x56556036: jmp *0x8(%ebx)      ; 跳转到GOT中的特定条目，通常是_dl_runtime_resolve的地址</code></pre></blockquote><p id="8895a540-78b9-42fa-8d18-cf37c1cf0692" class=""><strong>【位置】</strong></p><p id="165bb0d6-f480-4ffc-a455-e182fdcdbde7" class="">这两个表是每个程序私有的，而不是可以多个程序之间共享的。</p><p id="2b6f1bef-11d3-4dea-a733-d8a5e8da5996" class="">也就是说，在不开ASLR的情况下，每一次运行elf程序时got表、plt表的基址是一样的！</p><blockquote id="086352f4-db07-4844-9b26-d06666591feb" class="">他们的基址好像是被记录在elf相关的头结构处</blockquote><p id="9c78c00b-8dca-492b-9f21-f871779ce89e" class=""><strong>【相关操作】</strong></p><p id="c8d83c43-89f4-4eca-a1e7-020fb373fb1e" class="">可以通过pwntools的以下指令来获得这两个表中某个函数的地址：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d1f1ba08-5f0f-40df-a69f-e77bca2ecb78" class="code"><code class="language-Shell">elf = ELF(&quot;./pwntest&quot;)
+
+read_plt = elf.plt[&#x27;read&#x27;]
+read_got = elf.got[&#x27;read&#x27;]</code></pre><p id="bc242d47-ebce-4591-9f13-4efb94f72194" class="">可以通过objdump来查看一个elf的got表plt表中共有哪些函数：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d0f1e174-4dde-4c53-b50f-f8fc73d3fe04" class="code"><code class="language-Shell">#查看文件的got表
+$ objdump -R pwn3
+#查看文件的plt表
+$ objdump -dj .plt migration </code></pre><h1 id="0ec562aa-fa69-43bc-985a-278e8cff67a3" class="">延迟绑定机制</h1><p id="bfead260-d974-4f18-8692-e0bf92ff172c" class=""><strong>【定义】</strong></p><p id="118aca50-c527-4bc0-b56d-83aaaf1dbe75" class="">又叫lazybinding，其通过got表和plt表的联动，实现：<div class="indented"><p id="da104cc8-b201-47bf-8ec8-f584a4bed619" class="">第一次访问plt表时会执行run_time_resolve，第二次及以后访问plt表时就会自动跳转到函数代码，如图↓：</p><figure id="383dca76-ccd2-402b-8f22-810345611903" class="image"><a href="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled%201.png"><img style="width:384px" src="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled%201.png"/></a></figure><p id="3081fb8b-2138-41c7-ab93-e8e501cebc96" class="">当函数第一次用到时才进行重定位获取位置，这样会大大提高程序启动速度</p></div></p><p id="1db8d1de-5778-46ee-8409-8a07390cabf4" class=""><strong>【实现过程】</strong></p><p id="701f67cf-4f04-4e8b-bc9b-82cb1acee360" class="">第一次执行该对该func的call时的指令执行流程：</p><figure id="5e825519-5922-43e9-85ee-bb85a93018c5" class="image"><a href="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled%202.png"><img style="width:707.9896240234375px" src="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled%202.png"/></a><figcaption>执行完dl_runtime_resolve函数完成重定位后会返回call语句的前一句语句位置，然后再执行第2次对该func的call</figcaption></figure><p id="bcd3f7c3-4d50-4b42-ae33-82161f649290" class="">重定位完成后，第2、3、4…次执行对该func的call时的指令执行流程：</p><figure id="bb967e60-7554-4046-8bc8-c164adf6cb0c" class="image"><a href="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled%203.png"><img style="width:707.9479370117188px" src="%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6+got%E8%A1%A8plt%E8%A1%A8%20ae7c73b97f92469ca5b3a903563e06ee/Untitled%203.png"/></a></figure><h1 id="8c3d90d7-5f48-440b-9e1b-c12b8969d515" class="">不使用延迟绑定</h1><p id="64e3d21d-001f-4b09-a7e7-9a4e357af266" class="">1、在一些情况下，一个 GCC 编译的程序可能不会有 PLT 表。这通常是因为编译器或链接器在某些情况下会进行优化，例如，如果程序中没有对动态链接库函数的显式调用或者只有很少的动态链接库函数，那么编译器或链接器可能会选择不生成 PLT 表。</p><p id="237963a0-c3ab-49cd-99c8-517da98f8853" class="">2、在linux系统中使用使用FullRelro安全策略时，默认直接装载时全部重定位，此时也不会有plt表而只会有got表</p><p id="c215cd72-d266-4d3c-8f86-8804bac0db88" class=""><mark class="highlight-red_background">（真滴吗？↑这个不太确定）</mark></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

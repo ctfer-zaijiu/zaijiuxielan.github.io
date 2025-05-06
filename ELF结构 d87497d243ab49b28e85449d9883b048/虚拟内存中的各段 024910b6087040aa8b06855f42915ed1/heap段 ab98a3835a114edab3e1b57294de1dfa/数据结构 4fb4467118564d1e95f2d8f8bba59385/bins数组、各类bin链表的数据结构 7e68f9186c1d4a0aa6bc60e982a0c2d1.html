@@ -1,0 +1,785 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>bins数组、各类bin链表的数据结构</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="7e68f918-6c1d-4a0a-a6bc-60e982a0c2d1" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1543906965-f9520aa2ed8a?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/factory_green.svg"/></div><h1 class="page-title">bins数组、各类bin链表的数据结构</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="74c0a84c-97ff-49a6-8d26-664afd3d1b75" class="">malloc一个chunk的顺序：<ol type="1" id="9fc15827-7605-4766-8cab-e9cca100a25b" class="numbered-list" start="1"><li>对于小块的分配，先查找fast bin，再查找small bin，最后查找unsorted bin。</li></ol><ol type="1" id="73cd5009-dec3-41a9-922f-d789d42c6c40" class="numbered-list" start="2"><li>对于大块的分配，先查找large bin，再查找unsorted bin。</li></ol><ol type="1" id="f1778e89-3fbf-4408-be8e-578ef51b68ce" class="numbered-list" start="3"><li>对于超级大块的分配，直接mmap</li></ol></blockquote><h1 id="1700427e-38bb-8097-a5c9-ea28c2ed405a" class="">一、整体介绍</h1><p id="1700427e-38bb-80f0-b3b1-c02427a15e86" class="">一个arena对应地由一个malloc_state结构体维护，该结构体中有域分别指向以下这两个数组：</p><p id="1700427e-38bb-808f-adc3-f12fa7400cd2" class="">1、fastbinsY数组：大小为[10]，用来存储7个fastbins。其中[7][8][9]是冗余设计。</p><p id="1700427e-38bb-80a2-85c8-fbe5afd6573e" class="">2、bin数组：大小为[64]，用来存储unsorted bin、 small bins、large bins。<div class="indented"><p id="1700427e-38bb-80b0-a1e3-e1137f16b4c8" class="">其中：</p><blockquote id="1700427e-38bb-8093-a0af-c9f6d2b1aa30" class="">各个下标对应的bin类型如下：<ul id="fb2d0c51-5ca4-4aea-bf0a-b781d858a130" class="bulleted-list"><li style="list-style-type:disc">bin[0]是null，作为冗余设计</li></ul><ul id="f425dbec-629d-4154-9705-e4febeab0bf0" class="bulleted-list"><li style="list-style-type:disc">1 个 unsorted bin，存储在bin[1]</li></ul><ul id="b0e3eee1-8cc0-4cff-80a1-ada6d199eb28" class="bulleted-list"><li style="list-style-type:disc">62 个 small bins，存储在bin[2]至bin[63]</li></ul><ul id="cef3eeae-7770-4b0b-b4d2-74cac07510fe" class="bulleted-list"><li style="list-style-type:disc">63 个 large bins，存储在bin[64]至bin[126]</li></ul></blockquote><blockquote id="1700427e-38bb-800d-969b-f396e7e4b007" class="">一个数组元素的数据类型如下：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1700427e-38bb-8014-a72c-e8627e6d2363" class="code"><code class="language-C">struct malloc_chunk {
+    INTERNAL_SIZE_T prev_size; /* 前一个块的大小（如果已释放） */
+    INTERNAL_SIZE_T size;      /* 包含开销的总大小（以字节为单位） */
+    struct malloc_chunk* fd;   /* 双向链表（仅在已释放时使用） */
+    struct malloc_chunk* bk;   /* 只用于大块：指向下一个更大的块 */
+    struct malloc_chunk* fd_nextsize; /* 双向链表（仅在已释放时使用） */
+    struct malloc_chunk* bk_nextsize; /* 只用于大块：指向下一个更大的块 */
+};</code></pre></blockquote></div></p><h1 id="1700427e-38bb-8029-b5b7-db66b610d4d6" class="">二、具体结构</h1><h2 id="7f1e5a8b-3b19-4be6-aba2-b0138f009752" class="block-color-default">（一）fastbin</h2><h3 id="1700427e-38bb-8019-941d-d26ee320aa68" class="">1-思想</h3><p id="af66a307-3239-41d7-bffb-e10cfa5d0430" class="">它的设计目的是：设计得像高速缓存一样，从而尽可能地实现加快其访问速度。</p><h3 id="98bb6def-f630-4df0-83e2-802edc088dd1" class="">2-相关机制</h3><p id="1710427e-38bb-8055-be20-d41d25fc4824" class="">为了提高速度，使用了以下3个机制：</p><ul id="70b2e139-f43a-4259-a6ed-b1c1d05adc01" class="bulleted-list"><li style="list-style-type:disc">其日常被free时不主动执行“日常整理碎片块机制”，而是集中在某些特定的时刻用一个专门的malloc_consolidate函数来做碎片块整理合并。以减少其做碎片块整理合并的次数，节约时间。<blockquote id="1700427e-38bb-8089-b0c5-d71c47d001a4" class="">注意，但是它的物理相邻下一个chunk或上一个chunk如果执行了“日常整理碎片块机制”，还是有可能导致它被合并。</blockquote></li></ul><ul id="555c594d-6646-4c38-97a4-0115d121efda" class="bulleted-list"><li style="list-style-type:disc">fastbin是单向链表，这样在表头插入删除节点会比双向链表更快，同时使用原子操作进行link和unlink。</li></ul><ul id="1880427e-38bb-8026-906f-ff9931e044ba" class="bulleted-list"><li style="list-style-type:disc">不维护它的任何相关标志位。</li></ul><p id="1880427e-38bb-8032-9c15-f8406ec63bf9" class="">其具体的加入取出行为如下：<div class="indented"><p id="1880427e-38bb-80cc-ac61-fababfc74ce6" class="">LIFO：新加入的块link入链表头，取出时从链表头取出</p><p id="eb4fc8f2-f98d-4f4a-b3db-a1709fc900df" class="">如图：</p><figure id="1880427e-38bb-8027-bd9f-fd8aa5552050" class="image"><a href="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/image.png"><img style="width:384px" src="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/image.png"/></a></figure></div></p><h3 id="add34e44-1acb-4c6f-9b95-690e144a416d" class="">3-数据结构</h3><p id="1710427e-38bb-808f-ac77-c5eb87def5ad" class=""><mark class="highlight-default">宏定义：</mark><div class="indented"><p id="1710427e-38bb-8040-a3ef-fc2ad55259ce" class="">当一个块被free时，会判断它的size是否≤<mark class="highlight-default">global_max_fast宏。如果符合，则将其放入fastbin中。</mark></p><blockquote id="1710427e-38bb-8023-a643-e867050eba26" class="">可以通过mallopt函数修改<mark class="highlight-default">global_max_fast宏定义的值：</mark><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1710427e-38bb-803e-8ad5-c45ba0622fc4" class="code"><code class="language-Plain Text">mallopt(1,0); //将global_max_fast修改为0，这样chunk被free后就不会进入fastchunk</code></pre></blockquote></div></p><p id="203e11cc-3b4e-4bca-b6c3-ff2eb0fbfae4" class="">块大小：<div class="indented"><p id="1710427e-38bb-80c7-bc38-f06724f72c09" class="">fastbinY[i]对应的大小为“<mark class="highlight-default_background">(2i+4) * sizeof(void)</mark>”</p><blockquote id="1710427e-38bb-80ed-99a7-d5d46d2cf91b" class="">其中：<p id="1710427e-38bb-802e-ae3f-dd5c8c4e17a6" class="">sizeof(void)的大小在x32中为4，在x64中为8。<mark class="highlight-default">这个fastbin大小的最大值由宏定义描述 。</mark></p><p id="bf6949e8-a7bb-477a-b7a8-a5dd22fec282" class=""><mark class="highlight-red">此处所说的块大小是包含块头的大小</mark>。</p><p id="1700427e-38bb-806c-8d63-c3016dd65dcc" class="">也就是说：</p><p id="1710427e-38bb-802b-9f76-d292d4ac4a53" class="">大小范围是0x10~0x40B——32位。0x20~0x80B——64位。一共七种大小。</p><p id="1700427e-38bb-802f-8870-c876429deb70" class="">相邻bin存放的大小相差0x8B——32位。0x10B——64位。</p></blockquote></div></p><p id="19c21af4-6079-4289-9ef8-e48e7309a31e" class="">数组-链表结构：<div class="indented"><p id="1710427e-38bb-809e-9135-d34a17e75293" class="">fastbinY数组的大小是[10]，是一个指针数组。其中[0]~[6]各自指向一条fastbin链表，[7][8][9]作为冗余保留。</p><p id="d7ae1117-edcc-4917-9bc2-a8550a181cd0" class="">其中，数组元素和每个块的fd指向链表下一个块，链表尾的那个块的fd=NULL。</p><p id="3e7d82fb-d54b-46d4-8dc2-bc441e09cc8a" class="">需注意的是，每一个块的下一块的P标志位必==1（这是因为它从free到重新malloc的过程中都不动它的P标志位）</p></div></p><h2 id="c334ebc7-513e-4991-bb40-f496d8a034d0" class="block-color-default_background">（二）small bin</h2><h3 id="b1cabf3a-bc50-432a-a20b-500d0acd726b" class="">1-数据结构</h3><p id="9335a150-1a49-4837-80e1-ab9dfc84cbe8" class="">块大小：<div class="indented"><p id="1740427e-38bb-807b-ba48-eeb86caf2260" class="">大小范围是：0x10-0x1f0B<mark class="highlight-purple">（x64位：0x20-0x3f0）</mark></p><p id="1740427e-38bb-807b-a5dd-d61aa5edbed7" class="">相邻bin存放的大小相差：0x8B<mark class="highlight-purple">（x64位：0x10）</mark></p><blockquote id="14b36e1d-5d85-4b93-91cf-65d82aeaf20f" class="">有一个快速的对应公式，chunk_size = 2*SIZE_SZ *index</blockquote></div></p><p id="1740427e-38bb-80dc-9599-d54f1ac9b135" class="">bin[2]~bin[63]结构细节：<div class="indented"><p id="1740427e-38bb-8049-98ba-d1fc6521eeb7" class="">是 62 个 smallbins，对应 62 个循环双向链表。每一个链表内部的各个节点是等大的。</p><p id="1740427e-38bb-8022-bfb9-e55197880edc" class="">链表结构如下图：<div class="indented"><figure id="1750427e-38bb-802f-b0e1-fe3afc1840d7" class="image"><a href="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/image%201.png"><img style="width:240px" src="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/image%201.png"/></a></figure><figure id="1750427e-38bb-80f3-9940-d4ebf641d03e" class="image"><a href="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/image%202.png"><img style="width:240px" src="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/image%202.png"/></a></figure><p id="1750427e-38bb-80a3-a4be-d5b84db491ce" class=""><mark class="highlight-red"><mark class="highlight-red_background">然后做一下再新加入两个chunk之后的示意图，以及再先后取走两个chunk的示意图</mark></mark></p></div></p></div></p><h3 id="8366a2bb-6d5b-40aa-967c-1d89dfeecf7e" class="block-color-default_background">3-large bin</h3><p id="d11ad174-d9e2-4d96-8312-13a7268fef2d" class=""><strong>【数据结构】</strong></p><p id="6f9cfcf4-a0a4-4b38-91fe-45a71398161c" class="">块大小：<div class="indented"><p id="1740427e-38bb-8040-a5e1-ce0fe9615e20" class="">大小范围是：0x200B~无穷</p><blockquote id="57a43bff-d47b-4b12-91c5-a842f8895acb" class="">x64下是0x400B~无穷</blockquote></div></p><p id="1740427e-38bb-8082-9fc1-d0413aa6ad1f" class="">bin[64]~bin[126]结构细节：<div class="indented"><p id="b9a30080-9772-4c61-94ea-1a914aa03f02" class="">bin[64]~bin[126]对应的是63个双向循环链表，占用，每一个链表按从大到小顺序存储大小在某一个大小区间的块，具体来说：</p><ul id="5cba8613-0356-4bd2-b5b4-2c62297bd9e1" class="bulleted-list"><li style="list-style-type:disc">前 32 个 bins：从 0x200B 开始每次+0x40B</li></ul><ul id="c352e411-0d03-49e7-b6ee-dcaa0abd7be9" class="bulleted-list"><li style="list-style-type:disc">接下来的 16 个 bins：从0xA00B开始每次+0x200B</li></ul><ul id="89b90580-7f6e-4165-9f3d-0cb00a590347" class="bulleted-list"><li style="list-style-type:disc">接下来的 8 个 bins：从0x2A00B开始每次+0x1000B</li></ul><ul id="5a7c684c-53ad-47f0-b447-e51449fcf995" class="bulleted-list"><li style="list-style-type:disc">接下来的 4 个 bins：从0xAA00B开始每次+0x8000B</li></ul><ul id="76664b7c-4b0c-494a-95ba-335f9bc5b0d5" class="bulleted-list"><li style="list-style-type:disc">接下来的 2 个 bins：从0x2AA00B开始每次+0x40000B</li></ul><ul id="3bbf5e47-078a-4bd5-9761-e599c73f409a" class="bulleted-list"><li style="list-style-type:disc">接下来的1个bin（最后一个）：从0xAAA00B开始到无穷大</li></ul><blockquote id="1e9d47a0-baa3-4dc8-9798-5002e579eed7" class="">例如，第一个bin就是存储在[0x200,0x240]这个区间内大小的freechunk</blockquote><ul id="69a304ef-c173-4972-99fb-71893ad4b706" class="toggle"><li><details open=""><summary>链表&amp;块</summary><p id="4ea75b19-377f-4118-8cf2-87cf0eee48ba" class="">如图，fd和bk还是像smallbin那样去形成双向链表，而<mark class="highlight-blue">fd_nextsize、fd_nextsize：</mark><div class="indented"><p id="e3af0785-aed6-4e2d-8a5f-c553a5f2ab6f" class=""><mark class="highlight-blue">则只有当其前后有大小不同的chunk时才会被启用，否则其他时间里都会被设置为0</mark>：</p><blockquote id="899c7113-31ea-4b5c-983f-fe70fbbe83eb" class="">这是一种“跳表”的设计思想</blockquote></div></p><figure id="fd03cb58-ce9c-4730-88d1-650b83d31b8d" class="image"><a href="../%E5%A0%86%E5%88%9B%E5%BB%BA%E5%88%A0%E9%99%A4%E8%BF%87%E7%A8%8B%EF%BC%88%E9%99%84%E6%BA%90%E7%A0%81%EF%BC%89%204577645dfc3b419b9e615a0dc389f6fa/Untitled%201.png"><img style="width:679.9874877929688px" src="../%E5%A0%86%E5%88%9B%E5%BB%BA%E5%88%A0%E9%99%A4%E8%BF%87%E7%A8%8B%EF%BC%88%E9%99%84%E6%BA%90%E7%A0%81%EF%BC%89%204577645dfc3b419b9e615a0dc389f6fa/Untitled%201.png"/></a></figure><p id="f022eebc-8ad8-4d15-ab30-e5c40c97770a" class="">链表初始化时，每条链表不会初始化有一个空头节点，链表的首个节点就是链表的第一个有效节点。</p><blockquote id="94ae52d2-1c57-4911-874b-68012b86668a" class="">如果链表只有一个chunk，则其fd域指向他自己</blockquote></details></li></ul></div></p><p id="a77de989-7163-4e59-b741-537e65b74544" class=""><strong>【操作】</strong></p><p id="a57fa83e-ef45-4d16-bafa-ce676e6ddc2c" class="">遵循<code>best fit</code>原则，即：取出满足大小的最小chunk。</p><p id="7daafbcc-cb73-4e0e-b528-df7b98390eaf" class="">如果malloc函数想在large bin的某条链表中取出一个chunk给程序使用，但该链表中的所有free chunk都比我要取出的chunk小，但它后面的large bin链表里面有比它大的free chunk：<div class="indented"><p id="f274bb6a-fc3f-4a69-b183-8fdf3dab8b97" class="">malloc函数会遍历从下一条链表开始的所有 large bin 链表，直到找到一个 free chunk 大小超过所需大小的链表，从该链表中分离出一个 free chunk，并将其分裂为所需大小的 chunk 和一个剩余大小的 free chunk。</p></div></p><h3 id="1379c10c-0707-4483-9748-1764545ec504" class="block-color-default_background">3-unsorted bin</h3><p id="ff237abe-9eeb-444c-b375-1cad0aa36ac4" class=""><strong>【定义】</strong></p><p id="1f2d02ea-4ee0-4202-b1e6-c0748c5617cf" class="">大小超过<code>global_max_fast</code>的 chunk 被释放时会加入到这里，多次free就会多次把free chunk加入其中，一直等到要malloc了，就才会遍历判断切割unsofted chunk并把它们丢到small bin或large bin。</p><p id="deb0997d-2b8c-49cd-ba35-82c1e6b9fd75" class="">这个设计其实就是为了实现large bin和small bin就必须要有一个切割过程，而这个切割过程我们就可以根据延迟绑定的思想设计unsorted bin。</p><p id="8fe549a1-932b-46cf-9d16-3f97f499c967" class="">其进出顺序是<strong>FIFO</strong>，即<strong>进去时会被插入到链表头部，出来时从链表尾部取出</strong></p><p id="d5e3e516-3561-4f04-95eb-7a65003a30d0" class=""><strong>【数据结构】</strong></p><p id="74f8b7ad-d6aa-4b16-af6f-30245ac045da" class="">他是一个双向循环链表，bin[1]指向该链表头，使用fd和bk成员作为指针，表中的元素是不做大小排序的</p><p id="a53fbf0e-5d12-4611-91c9-190e7567323b" class="">如图：</p><figure id="711756fa-f31b-42aa-830b-283905ec9e46" class="image" style="text-align:left"><a href="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/Untitled.png"><img style="width:240px" src="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/Untitled.png"/></a></figure><p id="d53b2445-c4b3-4f4d-a58e-4bb2a32dd2dd" class=""><strong>【使用操作】</strong></p><p id="016d6832-67f5-456c-8bd0-c7fa4e0cd803" class=""><strong>【free】</strong></p><p id="11c61b72-7921-49f1-973c-f4c3f4b98cf8" class="">当程序free一个chunk，会先判断该free chunk大小是否大于<code>global_max_fast</code>，如果大于，                                             就将其加入unsofted bin。</p><p id="440a15d5-f748-4445-9fee-0d0014f1ebf1" class=""><strong>【malloc】</strong></p><p id="ced4277c-5792-4795-937b-a4df7dfbd01e" class="">malloc会按照传参大小，使其向8B对齐，然后判断对齐后的大小是否小于<code>global_max_fast</code>，如果大于就表示要到unsorted bin中找free chunk。</p><p id="3ef09d13-513a-490a-a357-95364d394c00" class="">分配器从最后一个unsorted chunk开始，遍历整个unsofted bin链表，并对链表中的每个节点做如下检查：</p><ol type="1" id="2e80a160-495f-4d70-ba0f-1210821a187a" class="numbered-list" start="1"><li>如果unsorted chunk满足以下几个条件，它就会被切割为一块满足申请大小的chunk和另一块剩下的chunk，前者返回给程序，后者重新回到unsorted bin。<ul id="7726982a-6085-42df-a85d-61c23d70d38c" class="bulleted-list"><li style="list-style-type:disc">申请大小属于small bin范围</li></ul><ul id="42254378-3b37-4b11-9c88-5d5aabb8a560" class="bulleted-list"><li style="list-style-type:disc">unosrted bin中只有该chunk</li></ul><ul id="2c56bbf4-7a49-4d1e-8955-1ea6e525b272" class="bulleted-list"><li style="list-style-type:disc">切割之后的大小依然可以作为一个chunk</li></ul></li></ol><ol type="1" id="d8370945-3c03-4417-9fc0-d4f8fabf5530" class="numbered-list" start="2"><li>否则，从unsorted bin中删除该unsorted chunk，并对其处理后事：<ul id="c899b540-e1b6-49ec-bbd2-568779c41a11" class="bulleted-list"><li style="list-style-type:disc">若unsorted chunk恰好和申请大小相同，则直接返回这个chunk</li></ul><ul id="0d738dd5-d9ac-406c-b6de-f65244c1f323" class="bulleted-list"><li style="list-style-type:disc">若unsorted chunk属于small bin范围，插入到相应small bin</li></ul><ul id="13874959-a92e-47b8-b0d3-c3801809b8fe" class="bulleted-list"><li style="list-style-type:disc">若unsorted chunk属于large bin范围，插入到相应large bin：判断对应large bin为空，若是，直接插入unsorted chunk，其<code>fd_nextsize</code>与<code>bk_nextsize</code>指向自身。若否，则按大小降序插入对应large bin。</li></ul></li></ol><p id="7f5840b5-04cd-4cb0-acbe-33695428a6b7" class="">直到找到满足要求的unsorted chunk。</p><ul id="5695cb53-074c-4131-b708-651dcd31197e" class="toggle"><li><details open=""><summary>相关源码如下</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="df46f05b-d02e-4021-a6ab-772ae17e6b18" class="code"><code class="language-C">#源码的第3470行-3597行
+              alloc_perturb (p, bytes);
+              return p;
+            }
+
+          /* place chunk in bin */
+		  #如果之前的条件都不满足，意味着目前的victim不能满足用户的需求，
+          #需要根据其size放入small bin或large bin的链，
+          #其中在后者实现中存在large bin attack，
+          #由于同本文无关就不再进一步展开，最后是unlink将victim彻底解链。
+          if (in_smallbin_range (size))
+            {
+              victim_index = smallbin_index (size);
+              bck = bin_at (av, victim_index);
+              fwd = bck-&gt;fd;
+            }
+          else
+            {
+              victim_index = largebin_index (size);
+              bck = bin_at (av, victim_index);
+              fwd = bck-&gt;fd;
+
+              /* maintain large bins in sorted order */
+              if (fwd != bck)
+                {
+                  /* Or with inuse bit to speed comparisons */
+                  size |= PREV_INUSE;
+                  /* if smaller than smallest, bypass loop below */
+                  assert ((bck-&gt;bk-&gt;size &amp; NON_MAIN_ARENA) == 0);
+                  if ((unsigned long) (size) &lt; (unsigned long) (bck-&gt;bk-&gt;size))
+                    {
+                      fwd = bck;
+                      bck = bck-&gt;bk;
+
+                      victim-&gt;fd_nextsize = fwd-&gt;fd;
+                      victim-&gt;bk_nextsize = fwd-&gt;fd-&gt;bk_nextsize;
+                      fwd-&gt;fd-&gt;bk_nextsize = victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;
+                    }
+                  else
+                    {
+                      assert ((fwd-&gt;size &amp; NON_MAIN_ARENA) == 0);
+                      while ((unsigned long) size &lt; fwd-&gt;size)
+                        {
+                          fwd = fwd-&gt;fd_nextsize;
+                          assert ((fwd-&gt;size &amp; NON_MAIN_ARENA) == 0);
+                        }
+
+                      if ((unsigned long) size == (unsigned long) fwd-&gt;size)
+                        /* Always insert in the second position.  */
+                        fwd = fwd-&gt;fd;
+                      else
+                        {
+                          victim-&gt;fd_nextsize = fwd;
+                          victim-&gt;bk_nextsize = fwd-&gt;bk_nextsize;
+                          fwd-&gt;bk_nextsize = victim;
+                          victim-&gt;bk_nextsize-&gt;fd_nextsize = victim;
+                        }
+                      bck = fwd-&gt;bk;
+                    }
+                }
+              else
+                victim-&gt;fd_nextsize = victim-&gt;bk_nextsize = victim;
+            }
+
+          mark_bin (av, victim_index);
+          victim-&gt;bk = bck;
+          victim-&gt;fd = fwd;
+          fwd-&gt;bk = victim;
+          bck-&gt;fd = victim;
+
+#define MAX_ITERS       10000
+          if (++iters &gt;= MAX_ITERS)
+            break;
+        }</code></pre></details></li></ul><blockquote id="4f21d07f-f68a-4a84-bc71-40cbb8c4c143" class="">也就是说：如果在unsofrted bin中发现一个比当前想要申请的chunk大的一个free chunk，但该free chunk的大小是在large bin的范围，就不会返回这个free chunk</blockquote><p id="05fb5e52-d4f0-455c-a106-88c46ba5f8c4" class=""><strong>【如何获得unsorted chunk】</strong></p><p id="95cc4e06-dc0c-477f-8bcb-fcfdadd0d174" class="">总共有以下三种来源：<div class="indented"><p id="d6acc076-a7aa-4ee0-a920-7766b5d79f59" class="">1、当一个较大的（在bin中的）chunk（由于malloc）被分割成两半之后，如果剩下的部分大于MINSIZE，就会被放到unsortedbin中。</p><p id="77cf7d98-b575-4820-8b6b-c5465d0b1e46" class="">2、释放一个不属于fastbin的chunk，并且该chunk不和top_chunk紧邻时，该chunk会首先被放到unsortedbin中。</p><p id="207b7025-81dc-4c7f-bcf1-d8ba44117524" class="">3、当进行malloc_consolidate时，如果不是和top_chunk近邻的话，可能会把合并后的chunk放到unsortedbin中。</p><blockquote id="41370095-d9c0-4b92-aad4-31a40516e0e8" class="">malloc_consolidate的意思是堆中的碎片整理</blockquote></div></p><h1 id="75f2bb15-3e8c-48d3-aabf-f7ee8d74c593" class="block-color-default_background">三、glibc2.27新增：tcache机制</h1><h3 id="9d8987aa-d0fc-4bec-9475-30630ddb2912" class="">【定义】</h3><p id="bd952aa0-15f3-495b-b63d-43b44876c77e" class=""><code>glibc 2.26</code>开始引入了 <code>tcache</code></p><p id="bf75fb3a-7e49-494a-a25c-6b88c45450eb" class="">它也是不合并的类似于fast bin的单向链表结构，相当于一个范围扩大版的fastbin（因为fastbin的范围只有0x10-0x40<mark class="highlight-purple">（64位0x20-0x80）</mark>太小了）</p><h3 id="ec9dcd5b-5ca6-4785-a965-ee927f25362e" class="">【结构】</h3><p id="86345cc8-66db-44f5-bc0e-47cd81072ed7" class="">这是一个结构体，结构体中有两个数组指针，指向一个counts数组和一个entries数组。</p><p id="d21e353c-1397-43ed-bdbb-1e047104e18a" class="">其中，entries数组的每个元素是一个指向一条空闲chunk链表的指针，counts数组每个元素对应entries数组相同下标哪个元素，表示那条链表上面有多少个节点（最多7个）</p><p id="a4103c60-c3f2-443a-8278-97706b542b41" class="">这两个数组都是64个元素，范围是从0x10开始每次+0x8（x64是从0x20开始每次+0x10）</p><ul id="a7a85649-6157-49af-a589-8abdaaf92e37" class="toggle"><li><details open=""><summary>结构体定义代码如下</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="05d7de6a-fdc2-40e1-9ff2-f28b92a84032" class="code"><code class="language-C" style="white-space:pre-wrap;word-break:break-all">typedef struct tcache_entry{
+  struct tcache_entry *next;//这个 next 和 fd 是重叠在同一个位置上的
+} tcache_entry;
+
+
+typedef struct tcache_perthread_struct{
+  char counts[TCACHE_MAX_BINS];
+  tcache_entry *entries[TCACHE_MAX_BINS]; // 宏定义TCACHE_MAX_BINS = 64
+} tcache_perthread_struct;</code></pre><p id="7c7d97b3-b3af-4e17-97a5-57351c236a56" class="">如图：</p><figure id="9f998adf-013d-4415-87ec-e7d45752900d" class="image"><a href="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/Untitled%201.png"><img style="width:432px" src="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/Untitled%201.png"/></a><figcaption>其中，每个tcache链表都是单向链表</figcaption></figure><p id="14f58fd2-74b0-4472-98fd-3d7625679d72" class="">其中每个块的结构如下：</p><figure id="30b15702-2e9e-4dcd-b407-c9b37d333f9f" class="image"><a href="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/Untitled%202.png"><img style="width:336px" src="bins%E6%95%B0%E7%BB%84%E3%80%81%E5%90%84%E7%B1%BBbin%E9%93%BE%E8%A1%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%207e68f9186c1d4a0aa6bc60e982a0c2d1/Untitled%202.png"/></a></figure></details></li></ul><h3 id="dc27216b-9fd3-4700-9a74-83768ce3a86f" class="">【寻址方式】</h3><p id="8787db7e-dc75-46d2-a4c4-0bc3dbece789" class="">next字段并不是直接存储链表的下一个free chunk的data处的绝对地址，而是其相对于<code><strong>tcache</strong></code><br/>基址的偏移量。<br/></p><h3 id="71f5487b-ad61-47a3-8f38-8285cdd15645" class="">【基本操作】</h3><p id="61f09d7e-8b9f-4a41-b66b-a58c72a2e394" class="">【<strong><strong>tcache_put】</strong></strong><div class="indented"><p id="761082c7-a20a-42c6-a932-fe4f243a2439" class="">定义：<div class="indented"><p id="357941d6-83bb-4de3-81f6-1f5cbaff30ee" class="">用于把一个 <code>chunk</code> 放到 指定的 <code>tcache-&gt;entries</code> 里面去，其中，传参<code>tc_idx</code>是他要放到的entries数组元素的下标，通过 <code>csize2tidx (nb)</code>（nb是chunk的大小）得到。</p><p id="f3e87fa9-24a0-44ec-a5a9-04985db1777b" class="">这个机制的设计目的类似于fast bin，但是它的优先级比fastbin高</p></div></p><p id="039405a9-775a-4b4b-b9c5-59bddd92eb4e" class="">操作流程：<div class="indented"><p id="31b5e3c1-6695-4389-85ba-eedd17c07e14" class="">它首先把 <code>chunk+2*SIZE_SZ</code>（就是除去 <code>header</code>部分） 强制转换成 <code>tcache_entry *</code>类型，然后插入到 <code>tcache-&gt;entries[tc_idx]</code>的首部，最后把 <code>tcache-&gt;counts[tc_idx]</code>加 <code>1</code>，表示新增了一个 <code>chunk</code>到 该 表项。</p><ul id="cf62d271-05af-43a4-a1c7-148d1b33e420" class="toggle"><li><details open=""><summary>函数详细代码如下：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d92c805e-eabb-4d71-9004-6c995cc4fa59" class="code"><code class="language-C">static __always_inline voidtcache_put (mchunkptr chunk, size_t tc_idx){
+  tcache_entry *e = (tcache_entry *) chunk2mem (chunk);
+  assert (tc_idx &lt; TCACHE_MAX_BINS);
+  e-&gt;next = tcache-&gt;entries[tc_idx];
+  tcache-&gt;entries[tc_idx] = e;  // 增加到链表头部
+  ++(tcache-&gt;counts[tc_idx]);  // 记录当前 bin 的 chunk数
+}</code></pre></details></li></ul></div></p></div></p><p id="25e1629f-1b4d-4f9b-bb3d-565285c25806" class="">【<strong><strong>tcache_get】</strong></strong><div class="indented"><p id="97d26bf8-b7c1-4466-8fb2-10eff27e5668" class="">定义：<div class="indented"><p id="7261efde-19c2-448c-87d0-347c723a161f" class="">根据 <code>tc_idx</code> 取出 <code>tcache-&gt;entries[tc_idx]</code> 的第一个<code>chunk</code> ，返回其指针</p><ul id="8f700033-272a-4098-8226-db771852337f" class="toggle"><li><details open=""><summary>函数详细代码如下：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e8dfb457-5b8c-4d9f-b2e3-fea80af876e6" class="code"><code class="language-C">static __always_inline void *tcache_get (size_t tc_idx){
+  tcache_entry *e = tcache-&gt;entries[tc_idx];
+  assert (tc_idx &lt; TCACHE_MAX_BINS);
+  assert (tcache-&gt;entries[tc_idx] &gt; 0);
+  tcache-&gt;entries[tc_idx] = e-&gt;next;
+  --(tcache-&gt;counts[tc_idx]);
+  return (void *) e;
+}</code></pre></details></li></ul></div></p></div></p><h3 id="324edc0d-a25e-47d9-a867-9b083305cb46" class="">【使用操作】</h3><p id="56d5af05-3a75-4644-bd29-17d21a3d338f" class="">【malloc】<div class="indented"><p id="e348290a-0ac7-41bc-8594-64b0f766b4d5" class="">根据需要申请的块大小，转换成对应的索引<code>tc_idx</code></p><p id="830cb391-11bb-4f84-b96e-8a2f2e4c4978" class="">再查看是否<code>tcache-&gt;entries[tc_idx]==NULL</code>，如果非空就直接取freechunk返回，如果为空就到其他内存池去取freechunk</p></div></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

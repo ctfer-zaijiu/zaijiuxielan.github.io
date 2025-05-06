@@ -1,0 +1,701 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>elf编译过程</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="68360d9b-22e1-4f5e-9a36-5f3b59d2563d" class="page sans"><header><h1 class="page-title">elf编译过程</h1><p class="page-description"></p></header><div class="page-body"><h1 id="f776f889-78cb-4037-856e-72b582238733" class="">一、编译指令</h1><p id="afc563d1-10d4-40f1-b8b7-fbe2f4aff8a2" class="">我们有一系列后台程序，被封装。只向用户展示一个名为gcc命令的接口，使用gcc命令加上对应参数即可访问对应的程序</p><p id="826ed06f-8951-4cb8-b112-e42a7712bf3e" class="">（当然直接访问对应的程序也可以，如果你闲的蛋疼）</p><h3 id="f1ad3980-6eb0-46ac-b893-a6702cbf2d71" class="">1-gcc一步到位</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2eb5d0c8-561f-40cc-82ff-acfabb6358ef" class="code"><code class="language-Plain Text">gcc -o 程序名 hello.c		#输出一个名为 程序名 的可执行文件，然后 ./程序名 进行执行</code></pre><ul id="0c22039f-bf31-499e-aa59-f8292204eb5b" class="toggle"><li><details open=""><summary>可以加入相关参数：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="001efdf7-ff5c-4a4f-8850-7e369f877eac" class="code"><code class="language-Plain Text">-save-temps			#保存编译链接过程中生成的中间文件
+--verbose			#查看gcc编译的详细工作流程</code></pre></details></li></ul><h3 id="99ff7d4c-5f54-4663-afcb-f8ccb9c5ec77" class="">2-gcc分步执行</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="887c231a-6664-4d36-941b-b3418a8680d1" class="code"><code class="language-Plain Text">gcc -E -o hello.i hello.c	#预处理，输出一个名为 hello.i 的.i文件
+gcc -S -o hello.s hello.i	#编译，输出一个名为 hello.s 的.s文件
+gcc -c -o hello.o hello.s	#汇编，输出一个名为 hello.o 的.o文件
+gcc -o hello hello.o		#链接，输出一个名为 hello 的可执行文件</code></pre><blockquote id="b3a3f4a2-f05e-44b6-a3fb-cfdc37d10fb8" class="">这些gcc指令的本质是去调用对应的程序<table id="0dd53afb-b7ee-45cc-816b-4e76cb9f3214" class="simple-table"><tbody><tr id="3ac2b780-96bb-42c5-a10a-a48f11a1c10a"><td id="Pj|H" class="">功能</td><td id="f&lt;XR" class="">程序名</td></tr><tr id="98eee10e-a2a3-4488-bdd4-c375fc3b61b0"><td id="Pj|H" class="">预编译+编译</td><td id="f&lt;XR" class="">cc1（c语言）      cc1plus（c++）</td></tr><tr id="bb86402c-7666-4465-ab47-35fe4ae4bb5b"><td id="Pj|H" class="">汇编器</td><td id="f&lt;XR" class="">as</td></tr><tr id="ed7c7ee7-4fdc-432e-8101-648c3508cd6c"><td id="Pj|H" class="">链接器</td><td id="f&lt;XR" class="">ld</td></tr></tbody></table><blockquote id="4e5f53d1-fdfe-46b9-86c8-77927eb42f64" class="">预编译和编译两个步骤现在是合在一个程序里完成的，但是c语言和c++对应的程序不同</blockquote></blockquote><h1 id="99f2bd11-4e7b-4be8-a820-366dd0cefe07" class="">二、编译过程</h1><blockquote id="ee66c65c-d406-48ff-9570-8d94de544460" class="">简介：<ul id="8df62ae8-dcac-4fcf-9617-d71e49116661" class="bulleted-list"><li style="list-style-type:disc"><strong>预处理</strong><p id="83cd1ec7-a3d6-4829-8331-ddb27f42b84e" class=""><strong>作用</strong>：</p><p id="ffc71cc5-f441-4c76-a3a2-466bcd61687d" class="">1.处理各种#号开头的预处理命令<div class="indented"><p id="fa50f446-2d26-4134-8353-5a39daba75cc" class="">1)其中最主要就是处理#include命令，把被包含的文件插入进来，这个过程是递归执行的，因为被包含的文件可能还包含其他文件</p><p id="2dd4def0-a9c4-4076-af87-7d24abbce6e1" class="">2)会保留#pragma编译器指令</p></div></p><p id="d825a0e1-7438-41ad-8814-5d552b1b8410" class="">2.添加行号和文件标识（便于编译报错时显示警告），去掉注释</p></li></ul><ul id="2a92fede-c48f-450c-a8bf-53eb5a6b3cc3" class="bulleted-list"><li style="list-style-type:disc"><strong>编译</strong><p id="e05f8d3f-2830-4045-8eb8-85c51be23aaa" class=""><strong>作用</strong>：</p><p id="e3d1c274-6383-49d7-9f59-c299226463cd" class="">·对.i文件的翻译（翻译为汇编）加优化</p></li></ul><ul id="ad0884ab-c200-440d-9038-1f2a46c8a92f" class="bulleted-list"><li style="list-style-type:disc"><strong>汇编</strong><p id="2a6a1e30-bc06-4625-85e7-953770ab970d" class=""><strong>作用</strong>：</p><p id="c7ea1133-c4ba-4406-8313-24b7a6841ad8" class="">将汇编代码转变成机器码，生成一个后缀为.o的文件，名为目标文件（Object File）</p></li></ul><ul id="a1a298c5-56d3-4c7c-8e5e-65780118eacf" class="bulleted-list"><li style="list-style-type:disc"><strong>链接</strong><p id="2f7023b1-9f60-44a6-b011-917d51b6af94" class=""><strong>作用：</strong></p><p id="d358eb53-4a01-47f8-9e0b-5ed3e77c6468" class="">使目标文件与一些静态链接库建立联系，生成可执行文件</p></li></ul><figure id="c1ddc164-80f9-4cee-91e5-9389405ce00e" class="image"><a href="elf%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%2068360d9b22e14f5e9a365f3b59d2563d/Untitled.png"><img style="width:1120px" src="elf%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%2068360d9b22e14f5e9a365f3b59d2563d/Untitled.png"/></a></figure></blockquote><blockquote id="580c6516-5416-47c2-b72f-6d23ec0f9d3d" class="">编译器可以分为前端和后端，前端为：将源代码翻译为中间语言，后端为：将中间语言转化为汇编代码<p id="dde276a4-47f0-47b0-b0b1-e96c7c21b07f" class="">后面的详解将以以下这段代码为例：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="07c3a73e-5296-4920-90d8-87ea2c0476a6" class="code"><code class="language-Plain Text">arr[index]=(index+4)*(2+6)</code></pre></blockquote><h3 id="20100fe5-484d-4e11-ab91-be66509f4902" class="">1-前端</h3><ul id="74053361-2d94-451c-b266-bdb1ecfbc874" class="toggle"><li><details open=""><summary><strong>词法分析：</strong></summary><p id="35b7ff7a-5863-4b77-b02c-020b179028e6" class=""><strong>定义：</strong></p><p id="2f2ba72d-cf5b-41e8-85ef-1edb3a6537e5" class="">1.源代码被输入进扫描器（Scanner），运用一种类似于有限制状态机的算法将字符序列分割成一个个记号，并识别几号的类型（如：字面量（数字、字符串）、标识符等</p><p id="a25b65ca-9306-4dfc-8315-6b8b8c839448" class="">2.将标识符存放到符号表，数字、字符串常量值存放到文字表，方便后续使用</p><p id="d4646af0-c331-402b-b109-724aecd48f70" class=""><strong>工具：</strong></p><p id="cc02e28c-ed39-49e0-9d34-7b3f2d2b66a6" class="">lex</p></details></li></ul><ul id="1a7dccac-385d-4ba1-ad54-845fab90fada" class="toggle"><li><details open=""><summary><strong>语法分析：</strong></summary><p id="2b289d17-bb8f-4e87-ad57-1ae89ed12218" class=""><strong>定义：</strong></p><p id="a9f9f6e7-2968-4d5d-9952-0ba759bd50c0" class="">1.通过语法分析器，采用上下文无关语法的分析手段，生成了一颗以表达式为节点的语法树</p><p id="2b23f92c-574e-4518-9fe3-66875a087da3" class="">2.对于*这种符号：可以表示乘也可以表示取址，语法分析阶段会借助上下文对这种符号进行区分</p><p id="789016d2-cde8-4b5c-9099-68f21acacfac" class=""><strong>结果：</strong></p><figure id="8e0e265b-cb04-4375-9468-b3da472260f8" class="image"><a href="elf%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%2068360d9b22e14f5e9a365f3b59d2563d/Untitled%201.png"><img style="width:480px" src="elf%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%2068360d9b22e14f5e9a365f3b59d2563d/Untitled%201.png"/></a></figure><p id="041357e9-c534-49bb-bc61-d30abbf3e88a" class="">工具：yacc（对于不同的编程语言，只需要改变语法规则而不需要再编写一个语法分析器）</p></details></li></ul><ul id="33af1b98-0fd8-4e1d-ad4e-efea32864aba" class="toggle"><li><details open=""><summary><strong>语义分析：</strong></summary><p id="cff5c018-219f-4d30-a60d-79cfa67aea29" class=""><strong>定义：</strong></p><p id="ab8cb87d-1e4a-4166-87f4-220a20ee817e" class="">静态语义：在编译器可以确定的语义</p><p id="b30d0a72-8c6e-4097-b3b6-31dff3139902" class="">动态语义：只有在运行期才能确定的语义</p><p id="efd22272-f18f-493e-8bb8-4fe4dbf76656" class="">语义分析：通过语义分析器，实现：</p><p id="7c8365f5-7c67-4b6f-8183-b2561be6d0f6" class="">1.对无意义的句子进行报错//eg：0不能做除数</p><p id="2dcc2746-d3c7-462e-aa19-0bec0e516661" class="">2.对语法树的所有符号标明了类型，并补全隐式类型转换（在语法树中插入对应的转换节点）//eg：将一个浮点数转赋值给一个整数类型时，隐含了一个隐式的从浮点数到整数的转换</p><p id="3d53f392-59c2-40fc-9891-136f69797653" class=""><strong>结果：</strong></p><figure id="923658ab-3713-4c3f-a16c-d3f9f98820cf" class="image"><a href="elf%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%2068360d9b22e14f5e9a365f3b59d2563d/Untitled%202.png"><img style="width:1057px" src="elf%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B%2068360d9b22e14f5e9a365f3b59d2563d/Untitled%202.png"/></a></figure></details></li></ul><ul id="85483da5-f0d0-4c3d-99f6-e70d14d26ea5" class="toggle"><li><details open=""><summary><strong>中间语言生成：</strong></summary><p id="fb44ec7a-e30a-41cd-ba8d-a63a8668938d" class=""><strong>定义：</strong></p><p id="7c2ece5c-73f4-40ce-a213-bbb3fa9225e5" class="">1.通过一个源代码级优化器，会在源代码的级别进行优化，因为直接在语法树上做优化比较困难，所以会将整个语法树顺序表示，生成一个中间代码，类似于汇编代码了</p><p id="523dc028-00e6-4952-9a6c-06a09a2a9cbf" class="">2.中间代码常见的有：三地址码（最常见，后面以此为例）和P-代码</p><p id="f1de8898-bcae-4903-b8f6-88bd9d8ab82c" class="">3.对中间代码进行优化</p><p id="c25373db-30d2-4606-91e5-ad5e74b72f77" class=""><strong>三地址码：</strong></p><p id="9a6bc8f2-87d9-4d44-881a-da5154d07c95" class="">基本格式：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ff88e200-a983-4325-a11e-6a3efd66ce8a" class="code"><code class="language-Plain Text">x=y op z</code></pre><p id="2f77bc2f-922d-46cb-bc00-e1bfbf7f93eb" class="">表示对x和z进行某种操作(operation)，并将结果赋值给z，优化器为了使所有操作都符合三地址码，将引入一些临时变量</p><p id="17b9c025-ba77-4426-b983-ec6a7b9145b6" class="">举例：案例的语法树所生成的三地址码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1726e422-164c-4094-92a5-450f06981c26" class="code"><code class="language-Plain Text">t1=2+6
+t2=index+4
+t3=t2*t1
+array[index]=t3</code></pre><p id="c7c34d8d-6e50-40ab-8716-836d589880ad" class="">进行优化：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="25cd03f6-6a30-41ec-8b76-b0d8ac1d04df" class="code"><code class="language-Plain Text">t2=index+4
+t2=t2*8
+array[index]=t2        
+//因为2+6直接就可以算出来是8，所以直接将t1用8替代；还可以省去一个临时变量t3，因为t2可以重复利用</code></pre></details></li></ul><h2 id="1994f6cd-02a7-4e55-b920-85decc54fb29" class="">2-后端</h2><ul id="1d4c4bfc-7dfa-44ba-8d81-97e1a4ae907c" class="toggle"><li><details open=""><summary><strong>目标代码生成与优化</strong></summary><p id="509abc97-dd59-45af-8ed9-6a60f5a328e5" class=""><strong>定义</strong>：</p><p id="a028e763-68f6-40c6-ac54-6ea1ddfef498" class="">由“代码生成器”和“目标代码优化器”构成</p><ul id="0df971ce-d4bf-4f77-98a6-f0047a48bc79" class="bulleted-list"><li style="list-style-type:disc">代码生成器：将中间代码，转换成目标机器代码（这一步十分依赖于目标机器，因为不同机器有不同的字长、寄存器、int型等）</li></ul><ul id="d5bbb71b-0116-4b22-ae8f-a60ec61614c7" class="toggle"><li><details open=""><summary>如：“代码生成器”对上例中间代码进行转化：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b6b352a9-2d15-4bcd-998a-c70eb57b8a24" class="code"><code class="language-Plain Text">mov ecx,index
+add ecx,4
+mul ecx,8                    //这行表示ecx*=8
+mov eax,index
+mov array(,eax,4),ecx        //从array为起始地址。加上偏移量eax*4（int型数组每个元素是4byte）得到一个目标地址，将ecx的值赋值给这个目标地址上的数据</code></pre></details></li></ul><ul id="7178cfde-cccc-4b05-9053-7f1c9b4ff8f1" class="bulleted-list"><li style="list-style-type:disc">目标代码优化器：会对上述目标代码进行优化，比如：<p id="ac7a5eed-0d1d-4a92-bcb6-6b80de270a90" class="">1、选择合适的寻址方式</p><p id="f0f2c803-ee5d-4a9f-b4e8-c486cacfc544" class="">2、使用位移来代替乘法运算</p><p id="977a3897-5fa4-40d7-bd63-d5f23a43c000" class="">3、删除多余的指令</p></li></ul><ul id="8a9bde7a-ac80-45d0-a280-31d5149d4b12" class="toggle"><li><details open=""><summary>如：“目标代码优化器”对上述转化后的代码进行优化：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e8a25690-9c20-4177-bf3d-fb26b9c13590" class="code"><code class="language-Plain Text">mov edx,index
+lea eax,32(,edx,8)        //乘法被替换成了这条比较复杂的基址比例变址寻址
+mov array(,edx,4),eax    </code></pre></details></li></ul></details></li></ul><ul id="50aee95a-e620-4abc-9829-c838deb6562a" class="toggle"><li><details open=""><summary><strong>链接过程详解</strong></summary><p id="5e15c5a8-9363-443b-ba82-24cd2afa91a1" class=""><strong>定义：</strong></p><ul id="36c91bc9-5c1e-46be-86a3-5f7df308afef" class="bulleted-list"><li style="list-style-type:disc">人们一开始在编写源代码时用绝对地址指向被引用函数，但<strong>如果被引用函数改变了自己的地址，我们就要把之前指向函数的指针的值全部重新写一遍，这就是重定位。</strong></li></ul><p id="c95750d7-4c2d-4da8-a557-2d3b533f1545" class="">（作为上古语言，c语言还保留了这种绝对地址指向的思想，即指针；而在其他高级语言中，则将指针全部删除替换成了符号化）</p><ul id="76bc3e8b-3c73-40be-bdd5-433f098d0118" class="bulleted-list"><li style="list-style-type:disc">后来我们发现：在编写源码时要经常重写函数地址很麻烦，<strong>为了更方便，我们在源码上用符号来表示被引用函数，在编译成可执行文件的过程中再让机器把符号替换成函数地址，就可以避免麻烦的人为重写地址，这就是符号思想</strong>。</li></ul><p id="c67ea980-50c6-4cb8-b17f-a9be39e4c1a6" class="">（比如：汇编中用助记符表示被引用函数起始地址，高级语言用表示变量标识符表示被引用变量，用函数名表示被引用函数等）</p><ul id="af776b3e-b8ee-4734-9139-a11c06101303" class="bulleted-list"><li style="list-style-type:disc">再后来，因为计算机发展，代码量变大（几百万行），人们便<strong>将代码封装在不同的模块里，这就是模块化思想。</strong>模块之间相互引用（比如import xx包）形成一个整体的程序</li></ul><p id="3974f17d-ef52-4c03-9f3f-e3b65f156200" class=""><strong>内容：</strong><div class="indented"><p id="2d4d56e8-87f8-468e-939c-7a1c7e7ec33b" class="">三个过程：地址和空间分配、重定向和符号决议</p><p id="1257af36-a83a-418f-a9a7-30761452c958" class=""><strong>链接文件</strong>：</p><p id="80951d2d-a041-4106-afa1-d3910016f4ed" class="">libc.a（静态库）中函数申明与内容，libc.so（动态库）中函数申明 （方便got-plt表）</p><p id="48fb69ef-35aa-461d-a597-bee22578f6fc" class=""><strong>地址和空间分配：</strong></p><p id="d6ac796f-f98c-4d99-98c9-17413db4e484" class="">1、扫描所有的输入目标文件，获得它们的各个段的长度、属性和位置</p><p id="e2fabe68-1a33-48a9-89d7-817a0b1fb1a9" class="">2、将输入目标文件中的符号表中所有的符号定义和符号引用收集起来，统一放到一个全局符号表</p><p id="fdf58665-3dbd-4603-87c7-3dd6fc487198" class="">3、将相同性质的段合并在一起，成为一个新的段，并且建立旧的段们和新的段的映射关系（计算出偏移量）</p><p id="95c93e30-1182-448f-be6b-5a31f3582f68" class=""><strong>重定位：</strong></p><p id="ecc5cf7d-6e1c-44bb-ba1a-c114572a0054" class="">按新旧段的映射关系进行映射，将指向旧的段的地址值（一些指针变量的值）改为指向新的段的地址值（其实就是旧的值加上偏移量）。每一个需要修改的地址值为一个重定位入口</p><p id="2c412dbd-2b44-4884-920d-186ef347e9b6" class=""><strong>符号决议：</strong></p><p id="37da7a6f-16a5-4f87-bf04-f6bc563ea208" class="">将一些符号用地址替代</p></div></p></details></li></ul><p id="a7724966-955a-4e1c-bb1d-7611d4b04305" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

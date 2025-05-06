@@ -1,0 +1,686 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>heap段</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="ab98a383-5a11-4eda-b3e1-b57294de1dfa" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1547637589-f54c34f5d7a4?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/layers_purple.svg"/></div><h1 class="page-title">heap段</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="3fc1643d-b8fd-41a4-bd3b-f38ba57c1963" class="">glibc堆就像一部修修补补的臃肿法律，上面写满了各种被突破规则之后狼狈添加的补丁。</blockquote><h1 id="6edba20f-36e2-4e53-95b9-f33b28ba6b22" class="">目录</h1><figure id="42d57ad0-4c95-4489-8cfa-507d4d47dde4" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4.html"><span class="icon">💡</span>ptmalloc2库的设计理念</a></figure><figure id="4fb44671-1856-4d1e-95f2-d8f8bba59385" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%204fb4467118564d1e95f2d8f8bba59385.html"><span class="icon">🕶️</span>数据结构</a></figure><figure id="4577645d-fc3b-419b-9e61-5a0dc389f6fa" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/%E5%A0%86%E5%88%9B%E5%BB%BA%E5%88%A0%E9%99%A4%E8%BF%87%E7%A8%8B%EF%BC%88%E9%99%84%E6%BA%90%E7%A0%81%EF%BC%89%204577645dfc3b419b9e615a0dc389f6fa.html"><img class="icon" src="https://www.notion.so/icons/condense_red.svg"/>堆创建删除过程（附源码）</a></figure><figure id="1700427e-38bb-8003-bb5c-e969196ab655" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/%E7%A2%8E%E7%89%87%E5%9D%97%E6%95%B4%E7%90%86%E5%90%88%E5%B9%B6&amp;%E5%A0%86%E5%88%9D%E5%A7%8B%E5%8C%96%E3%80%81%E5%9D%97%E5%AF%B9%E9%BD%90%E6%9C%BA%E5%88%B6%201700427e38bb8003bb5ce969196ab655.html"><span class="icon">🦨</span>碎片块整理合并&amp;堆初始化、块对齐机制</a></figure><figure id="1730427e-38bb-8071-87bb-ff407f01a8dd" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/topchunk%E5%A4%A7%E5%B0%8F%E6%89%A9%E5%A4%A7%E6%9C%BA%E5%88%B6%201730427e38bb807187bbff407f01a8dd.html"><span class="icon">🎲</span>topchunk大小扩大机制</a></figure><figure id="f4640b0d-0d7e-405f-b6cb-f584c5eee326" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/%E5%90%8E%E7%BB%AD%E7%89%88%E6%9C%AC%E6%96%B0%E5%A2%9E%EF%BC%9Atcache%E3%80%81fastbin%20poisoning%E6%9C%BA%E5%88%B6%20f4640b0d0d7e405fb6cbf584c5eee326.html"><img class="icon" src="https://www.notion.so/icons/grid_green.svg"/>后续版本新增：tcache、fastbin poisoning机制</a></figure><figure id="24c31827-ad2c-43c5-a75a-4a4c35887a5a" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/%E5%90%8E%E7%BB%AD%E7%89%88%E6%9C%AC%E6%96%B0%E5%A2%9E%EF%BC%9Akey%E6%9C%BA%E5%88%B6%2024c31827ad2c43c5a75a4a4c35887a5a.html"><span class="icon">🔑</span>后续版本新增：key机制</a></figure><figure id="6e1de237-63a3-4b89-9345-de8818ebeee2" class="link-to-page"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/%E5%85%B6%E4%BB%96%206e1de23763a34b899345de8818ebeee2.html"><img class="icon" src="https://www.notion.so/icons/gear_lightgray.svg"/>其他</a></figure><h1 id="b8101344-887e-426d-8700-f3e515412347" class="">堆相关的系统调用</h1><h3 id="b64014c6-8e1e-44be-8859-fac796987e4c" class="">（一）brk&amp;sbrk</h3><p id="6afec20c-7cd8-4ef0-903a-dad31eb04270" class="">【定义】</p><p id="9a7e5103-de23-453e-b354-f6c5e0c3fdf6" class="">堆的大小由内核中的PCB的start_brk 和brk成员决定（在机制设计中，将brk称之为break指针）</p><p id="f91a2899-6068-4155-813b-4bd5cbfb7010" class="">使用系统调用sbrk() 或brk()可以增加brk的值，达到增大堆空间</p><p id="8a83c180-40ef-44b0-a0f4-45b68f3ef181" class="">【详细定义】</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="150c2baf-add9-46ab-acab-41027bf56224" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">int brk(void *addr);
+void *sbrk(intptr_t increment);</code></pre><p id="dfb7c8a5-d151-440d-9589-71f6c6500c2f" class="">1、<strong>brk函数：</strong><div class="indented"><p id="5cdac74d-4962-48e8-8d22-981d0d233887" class="">将break指针直接设置为某个地址</p><p id="537013a7-e0f0-4b56-84a4-c71579a47e16" class="">在执行成功时返回0，否则返回-1并设置errno为ENOMEM；</p></div></p><p id="13d8160f-4488-4fec-b20e-546aae4631bc" class="">2、<strong>sbrk函数：</strong><div class="indented"><p id="c7b97a1a-cb4f-4a61-9fa5-19b391ef8f44" class="">将break指针从当前位置移动increment所指定的增量。</p><p id="35296109-b763-4efa-9376-8c3f3d7196ad" class="">成功时返回break指针移动之前所指向的地址，否则返回(void *)-1。</p><blockquote id="65a73ce7-9f7b-4604-971f-602d0800cd8c" class="">如果将increment设置为0，则可以获得当前break的地址。</blockquote></div></p><blockquote id="92ab2ee0-d3fb-4750-a35c-b92790d72dd3" class=""> 另外需要注意的是：由于Linux是按页进行内存映射的，所以如果break被设置为没有按页大小对齐，则系统实际上会在最后映射一个完整的页，从而实际已映射的内存空间比break指向的地方要大一些。但是使用break之后的地址是很危险的（尽管也许break之后确实有一小块可用内存地址）</blockquote><h3 id="9b67d5e5-8931-4d83-aef4-08eac4cfab4b" class="">（二）mmap</h3><p id="e73d2481-12e1-4767-92d4-b5b70be4aa84" class="">【定义】</p><p id="085bc0d3-4115-4e72-b764-1444a4a480c0" class="">正常情况下使用该函数它会直接申请一块虚拟内存放到mmap段并映射它到物理内存。</p><p id="9809d170-df68-43cc-8d3e-78c4c1a4e2a8" class="">但malloc调用mmap时，会切割mmap段得到一块chunk，当然这块chunk还是被视为位于mmap段。</p><p id="d404479f-73d7-497b-841a-c1fed570fe08" class="">mmap段的特点是：与进程的虚拟地址空间解耦，即：os不知道该段是在vm的程序区还是内核区。</p><h1 id="2252fb96-2483-43ef-a055-a9d17c528274" class="">glibc堆的整体管理框架</h1><ul id="9fbf8d1d-fa3a-46d9-8a18-e567d83d0416" class="toggle"><li><details open=""><summary><strong>基于刚刚的两个主要思想，我们提出以下三个概念：</strong></summary><p id="a452134a-bb0a-4136-8b0b-c36eb0814a3c" class="">1、<strong>heap&amp;arena</strong>：os会为一整个进程维护一个heap（即“堆”）空间，并且将这个heap空间划分为多个area给该进程的各个线程进行管辖，该进程的每一个线程会各自对应维护自己的area；</p><blockquote id="d68c818f-f4db-4da4-9648-244d8ea0c98d" class="block-color-gray">其中：<p id="52738643-a7f6-4f62-99f8-58bcc9d9492b" class="">在主线程里area叫main_arena，在非主线程里的area叫non_main_arena。</p><p id="ff295271-cb0b-40bb-b006-afae519cba29" class="">os对于heap的维护其实只是通过提供brk或者mmap函数来调整堆大小。而之后更精细化的维护比如切割chunk或者freechunk实现循环利用，这些就属于是各个各个线程对自己的arena进行的维护操作</p></blockquote><p id="64e12bc3-4e9a-4950-9895-cf3693e49649" class="">2、<strong>chunk&amp;allocatedchunk&amp;freechunk</strong>：即：“块”，我们将线程的area切分为多个不同类型的块提供给程序使用。而块又分为allocated chunk即正在使用的块，和freechunk即被free掉没在使用的块</p><p id="d5e4374a-170b-4ec5-ae6a-d7d6ce65b28b" class="">3、<strong>freelist&amp;内存池</strong>：freechunk会被投放进几类链表，它们称之为freelist。当我们想创建一个新块时，就可以把freelist中适合的freechunk拿出来再让它成为chunk被利用。所有的free list形成的整体里面存储了所有的free chunk，我们把这个整体叫做“内存池”。</p><blockquote id="91c756cf-e245-4dda-b409-8d0e7415b29d" class="block-color-gray">在实现上，freelist概念被实现为一种名为bin的数据结构，而bin又被分为很多种，用来对应不同大小范围的freechunk<p id="077dc773-9862-4d5f-9d6c-b1cb471704fd" class="">注意：这里的“内存池”与内核内存池是两个概念</p></blockquote></details></li></ul><ul id="e7475443-73dc-4a4a-b646-4c453bf6f780" class="toggle"><li><details open=""><summary><strong>这三个概念对应的数据结构如下：</strong></summary><p id="69a6a056-9b39-4e74-afba-7b681000954b" class="">malloc会维护一个叫做heap_info的结构体，它包含了arena的起始地址、大小、状态等信息。其中有个成员叫ar_ptr，它指向了一个叫做malloc_state的结构体。</p><p id="a5979b10-04d6-4428-9736-98c808275e39" class="">malloc_state有两个成员叫bins和fastbinsY，他们指向bins和fastbinsY这两个数组，这两个数组用来各个bin链表</p><p id="c2d7dd96-c59f-4659-be47-d1cd0b4eaf5d" class="">每个bin链表的节点是freechunk，而那些allocated chunk则不会组成链表会单独存在，所有chunk头的结构体都是malloc_chunk。</p><p id="2fb05f8c-3317-4281-a271-ed7a95fbb6bb" class="">如图：</p><figure id="be7351a1-dca1-4935-89a2-3b305808104f" class="image"><a href="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/Untitled.png"><img style="width:1022px" src="heap%E6%AE%B5%20ab98a3835a114edab3e1b57294de1dfa/Untitled.png"/></a></figure></details></li></ul><ul id="d7f18756-edfe-41af-8bd3-b508612c2882" class="toggle"><li><details open=""><summary><strong>并结合三个概念设计了glibc堆管理机制：</strong></summary><p id="b62ad13f-3173-4c73-842f-6b636ab07d43" class="">glibc堆管理的核心是向程序提供了malloc和free两个函数</p><ul id="09012737-ec1b-440a-94bb-7c5d97319f7a" class="bulleted-list"><li style="list-style-type:disc">free函数核心执行流程：<p id="e2df849f-62e0-44c3-a63c-4eac2d83916a" class="">1、当申请free掉一个chunk时，该chunk会被设置为freechunk</p><p id="975c18cd-ed3c-4447-8931-88aeb5e192cd" class="">2、然后该freechunk会尝试合并周围chunk并进入内存池</p></li></ul><ul id="724d78aa-5d19-4d9e-ba00-7d7f3717ad23" class="bulleted-list"><li style="list-style-type:disc">malloc函数核心执行流程：<p id="5f4d60e4-2d01-437c-949b-b25ce51c26fb" class="">1、先看这是不是一个超级大chunk，如果是，出门左转找mmap</p><p id="71d633e5-047e-47be-b630-7a4cc58a1c86" class="">2、如果是小块和大块，就先去内存池里面找</p><p id="8f564c09-8967-4977-aaa6-6b5530464dcb" class="">3、内存池找不到，就再尝试切割arena，不行再尝试切割heap，还不行再尝试调用brk为heap申请空间再切割arena，还还不行就直接报错救不了。</p></li></ul></details></li></ul><p id="bcb20ed7-ecef-4b0a-8b3b-3e1789266439" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

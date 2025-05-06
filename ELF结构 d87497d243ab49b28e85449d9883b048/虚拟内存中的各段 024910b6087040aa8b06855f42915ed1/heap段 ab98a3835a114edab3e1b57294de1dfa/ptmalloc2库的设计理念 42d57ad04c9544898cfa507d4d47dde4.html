@@ -1,0 +1,684 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>ptmalloc2库的设计理念</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="42d57ad0-4c95-4489-8cfa-507d4d47dde4" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1548777123-e216912df7d8?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">💡</span></div><h1 class="page-title">ptmalloc2库的设计理念</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1730427e-38bb-809b-ac84-d6156e42f494" class="">长日尽处，我站在你的面前，你看见我老旧的疤痕，它是物是人非的一瞬。</blockquote><h1 id="e214a2eb-ff8f-49e9-bca4-b3d98136a930" class="">一、主流堆管理器介绍</h1><p id="e756aaf2-1e41-42b7-bfdd-9bee36e7b709" class=""><strong>ptmalloc2库</strong>：glibc的堆管理器系统，下文以介绍它为主</p><p id="ffca4b04-c772-4894-a2df-3652d67b5a65" class=""><strong>jemalloc库</strong>：freeBSD操作系统所使用的堆管理器，火狐也用它</p><h1 id="16e0427e-38bb-8040-a7ba-f98bba654e77" class="block-color-default_background">二、该库的设计目标</h1><h3 id="1730427e-38bb-80be-b0e2-c3c9108b15f6" class="">1-ptmalloc库存在的意义</h3><p id="1730427e-38bb-80f5-bc6a-fbd18045c3d7" class="">意义是：</p><p id="eb580409-14c9-46de-8221-d6ae2196a245" class=""><mark class="highlight-blue"><strong>在系统调用的前面，新增一层“管理站”对块进行“一次申请多次切割”+“循环利用管理”，以避免频繁地系统调用+程序无休止的征用新内存空间</strong></mark></p><p id="5b290e97-9f60-44cb-ba17-f26b8c260fc3" class="">其中：</p><p id="1730427e-38bb-8063-a41f-e7a32a9a71bf" class=""><strong>1、“一次申请多次切割”：</strong><div class="indented"><p id="1730427e-38bb-80c3-adf9-ed5b5f492255" class="">一次性向系统调用申请大片空间（实际上一般一个arena是132KB），后续每次切割下来一点点，直到这个arena不够用了再去申请扩大这个area</p><p id="1730427e-38bb-80d6-a381-c14be4b71405" class="">这样就避免了每次malloc都要去访问一次os</p></div></p><p id="1730427e-38bb-8048-b1c9-e066ec138c38" class=""><strong>2、“循环利用管理”：</strong><div class="indented"><p id="d4b4e65c-3713-44ed-8c33-7c3b49f3559a" class="">当想要释放一个旧块时，把它放到一个freelist里，当想要申请一个新块时，就可以把freelist中适合的块赋给他</p><p id="a84a1d87-a325-4d50-80e5-6b7e1c707f4f" class="">这样就可以实现内存的循环利用，程序不至于会去无休止的征用新的内存空间</p></div></p><h3 id="16e0427e-38bb-802b-beff-e00913902c51" class="">2-glibc2.23版本更新</h3><p id="16e0427e-38bb-80ad-9707-f32ed1ac050a" class="">它是基于Doug Lea编写的malloc/free/realloc做改编得到的一个名为ptmalloc2的库。这在当年是一个跨时代的更新。</p><p id="16e0427e-38bb-80b4-ae38-dd11c9fb0bf9" class="">该库中新加入的主要特性如下：</p><p id="16e0427e-38bb-80a8-b2a7-e577be88d6a2" class=""><strong>1、对于各种不同大小的请求做不同处理方式：</strong><div class="indented"><ul id="16e0427e-38bb-8030-b10c-c384e1d92c69" class="bulleted-list"><li style="list-style-type:disc">对于大请求（&gt;= 512字节），它是一个纯粹的最佳适配分配器，有多个同大小freechunk时则通常通过FIFO（先进先出）来决定取用哪块。<blockquote id="16e0427e-38bb-801c-95f5-ffd3aefa0887" class="">最佳适配（Best Fit）是一种内存分配策略，其目标是从所有可用的空闲块中选择最小的那个可以满足请求大小的块。</blockquote></li></ul><ul id="16e0427e-38bb-80a4-9085-d4fd38695357" class="bulleted-list"><li style="list-style-type:disc">对于小请求（&lt;= 默认64字节），它是一个缓存分配器，维持着快速回收的块池。</li></ul><ul id="16e0427e-38bb-80b6-8969-f214d4504e85" class="bulleted-list"><li style="list-style-type:disc">中等大小以及大请求和小请求的组合时，它尽可能同时满足两个目标。</li></ul><ul id="16e0427e-38bb-80a6-8153-cb236c3e1050" class="bulleted-list"><li style="list-style-type:disc">对于非常大的请求（&gt;= 默认128KB），如果受支持的话，它依赖于系统内存映射设施。</li></ul></div></p><p id="16e0427e-38bb-806c-b2c3-fc0e1918bfb2" class=""><strong>2、为了适用于多线程且不带锁竞争，引入了非主分配区的概念。</strong><div class="indented"><p id="16e0427e-38bb-8077-914d-f31ddb546126" class="">Doug_Lea实现的内存分配器中只有一个主分配区（main_arena），每次交互内存都必须对主分配区加锁，交互完成后再释放锁。在多线程的环境下，对主分配区的锁的竞争很激烈，严重影响了malloc的分配效率。</p><p id="16e0427e-38bb-8039-bd5d-c8649aafdc2d" class="">改进后的Glibc的malloc可以支持多线程，增加了非主分配区支持（non_main_arena），主分配区和非主分配区形成一个<mark class="highlight-default"><mark class="highlight-blue_background">环形链表</mark></mark>进行管理。每一个分配区使用<mark class="highlight-default"><mark class="highlight-blue_background">互斥锁</mark></mark>使多线程对于该分配区的访问互斥。</p><blockquote id="16f0427e-38bb-8028-bded-d756703fbfa5" class="">其中，“互斥锁”的具体方式如下：<p id="16f0427e-38bb-800a-affb-e7d780f3f481" class="">每个 arena 对应一个锁，当多个线程需要访问同一个 arena 时，它们必须先尝试获取该 arena 对应的锁，如果锁已经被其他线程持有，则当前线程需要阻塞等待，直到其他线程释放了该锁。</p></blockquote><p id="16e0427e-38bb-80ae-96c9-cf6ed33e7edc" class="">ptmalloc根据系统对分配区的争用<mark class="highlight-blue_background">动态增加分配区的大小</mark>，分配区的数量<mark class="highlight-blue_background">一旦增加，则不会减少</mark>。<mark class="highlight-blue_background">主分配区可以使用brk和mmap来分配，而非主分配区只能使用mmap来映射内存块。</mark></p><blockquote id="16e0427e-38bb-80a7-9b8a-cb8cc4f6a033" class="">其中，“动态增加分配区”的具体方式如下：<p id="16e0427e-38bb-8038-9ca8-e214c82ebb18" class="">当线程需要使用malloc函数分配内存空间时，该线程会先查看线程的私有变量中是否已经存在有一个分配区，如果存在，尝试对分配区加锁，如果加锁成功就使用这个分配区分配内存。如果失败，该线程就搜索循环链表试图获得一个没有加锁的分配区来分配内存。如果所有的分配区都加锁，那么malloc会开辟一个新的分配区，把该分配区添加到循环链表中并加锁，使用这个分配区进行分配内存操作。</p></blockquote></div></p><blockquote id="16e0427e-38bb-808b-b404-cb6eb4d388ed" class="">注：该内容来自glibc2.23 ptmalloc2库源码 最开头注释部分<p id="16e0427e-38bb-80f7-8895-d75a54f18d93" class="">链接：<a href="https://elixir.bootlin.com/glibc/glibc-2.23/source/malloc/malloc.c">https://elixir.bootlin.com/glibc/glibc-2.23/source/malloc/malloc.c</a></p></blockquote><h1 id="c795a064-6744-48d0-9e96-c82681729b26" class="block-color-default_background">三、整体malloc-free循环过程</h1><h3 id="16e0427e-38bb-8036-aed4-ec12a522d2c7" class="">1-glibc2.23版本</h3><p id="16e0427e-38bb-807a-9865-ef2af68bd0b8" class="">malloc函数过程：</p><figure id="16e0427e-38bb-8071-a90e-f9fb51cad2bb" class="image" style="text-align:left"><a href="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled.png"><img style="width:768px" src="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled.png"/></a></figure><figure id="16e0427e-38bb-80c3-812c-f8bd4161a9a3" class="image"><a href="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled%201.png"><img style="width:1050.1875px" src="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled%201.png"/></a></figure><p id="16e0427e-38bb-806b-97a4-dc2929ef1502" class="">free函数过程：</p><figure id="16e0427e-38bb-809f-995d-f48b88b5fddc" class="image" style="text-align:left"><a href="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled%202.png"><img style="width:528px" src="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled%202.png"/></a></figure><figure id="16e0427e-38bb-80c2-b405-dcd8031fa303" class="image" style="text-align:left"><a href="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled%203.png"><img style="width:672px" src="ptmalloc2%E5%BA%93%E7%9A%84%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5%2042d57ad04c9544898cfa507d4d47dde4/Untitled%203.png"/></a></figure></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

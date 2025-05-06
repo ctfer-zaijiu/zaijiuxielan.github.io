@@ -1,0 +1,692 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>chunk的数据结构</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2cdcc72f-37ae-490e-8b3b-ed8741328e61" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1471899236350-e3016bf1e69e?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🐚</span></div><h1 class="page-title">chunk的数据结构</h1><p class="page-description"></p></header><div class="page-body"><h1 id="600c1e0b-3fe9-47e7-9d4c-5f5782dc87b5" class=""><strong>一、块的分类</strong></h1><p id="32288bb7-498a-423b-9f8d-ca90898913fc" class="">chunk分为以下3种：</p><ol type="1" id="de7b46ad-e30c-4e29-b5a2-734a2d044e5d" class="numbered-list" start="1"><li><strong>allocated chunk</strong>：即已经被分配给应用程序使用的chunk。<ul id="6b31da5b-4c0b-4547-9277-11ad0fb05c10" class="toggle"><li><details open=""><summary>其数据结构如下：</summary><figure id="60e58e32-f2c5-4140-8a4e-0d0f239f42fa" class="image"><a href="chunk%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%202cdcc72f37ae490e8b3bed8741328e61/Untitled.png"><img style="width:288px" src="chunk%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%202cdcc72f37ae490e8b3bed8741328e61/Untitled.png"/></a></figure></details></li></ul></li></ol><ol type="1" id="ff69e2b7-bef8-43ad-b26c-dca4557e0972" class="numbered-list" start="2"><li><strong>free chunk</strong>：即空闲的chunk，可以被分配给应用程序使用。其中，unsofted bin的最后一个chunk，叫做“last emainder chunk”。<ul id="055bc44d-885a-45e5-801f-ebc7ade61f5b" class="toggle"><li><details open=""><summary>其数据结构如下：</summary><figure id="a95808e8-c884-45f6-85ab-9f589cb95ba8" class="image"><a href="chunk%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%202cdcc72f37ae490e8b3bed8741328e61/Untitled%201.png"><img style="width:651.9750366210938px" src="chunk%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%202cdcc72f37ae490e8b3bed8741328e61/Untitled%201.png"/></a></figure></details></li></ul></li></ol><ol type="1" id="35c0849d-0549-4ce3-a5b3-1a8b9816ad18" class="numbered-list" start="3"><li><strong>top chunk</strong>：在当前 arena 中没有被分配的部分，被统一当做一个chunk，即：topchunk。</li></ol><h1 id="5ce619b1-b1da-403e-b543-e6e2fab21657" class="">二、块的数据结构</h1><h3 id="16f0427e-38bb-800b-bd48-f48853245302" class="">1-块头的数据结构</h3><p id="54501260-0de2-4a35-a5d5-b7f727804b01" class="">每个chunk的块头的定义代码如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b0516eb5-4d19-457a-a735-540c55604433" class="code"><code class="language-C">struct malloc_chunk {
+  INTERNAL_SIZE_T      mchunk_prev_size; 
+  INTERNAL_SIZE_T      mchunk_size;   
+  struct malloc_chunk* fd;                //指向链表的下一个chunk
+  struct malloc_chunk* bk;                //指向链表的上一个chunk
+  struct malloc_chunk* fd_nextsize;       //指向链表下一个大小不同的chunk（只在largebin使用）
+  struct malloc_chunk* bk_nextsize;       //指向链表上一个大小不同的chunk（只在largebin使用）
+}; </code></pre><p id="94d151d7-2feb-4308-9d19-fd7c3424b7b0" class="">关于它各个成员的解释：</p><ul id="bbb89aa7-3600-40f5-aba4-b94f75a627d6" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-default"><code>mchunk_prev_size</code></mark>：<mark class="highlight-red">这个成员只在物理相邻前一个chunk为freechunk时被引用，用于</mark>记录物理相邻前一个 chunk 的大小 (包括 chunk 头)<mark class="highlight-teal">。</mark><p id="1700427e-38bb-80e7-ab0d-fe778408d188" class="">若物理相邻前一个chunk为allocated_chunk，则该字段被用来作为物理相邻前一个 chunk 的data部分。</p><blockquote id="ad87f020-b973-47b4-98ba-64f1cbb75ce0" class="">注意，为了充分利用空间，<code>mchunk_prev_si</code><mark class="highlight-red"><code>ze</code></mark><mark class="highlight-red">这个字段的位置其实是在当前chunk的物理相邻的上一个chunk的末8B！也就是其不计入当前chunk大小。</mark></blockquote><blockquote id="1700427e-38bb-80ef-af49-f190e7b3eabd" class="">这是为了方便进行碎片块整理合并。合并时，只需要将p2thischunk-=p2thischunk.prev_size即可得到p2prev_chunk。</blockquote></li></ul><ul id="246e2ffb-4d4e-483e-83fe-ffc59149cc1e" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-default">mchunk_size：</mark><mark class="highlight-red">这个成员只在allocated chunk中被引用</mark>，用于表示该 chunk 的大小。<p id="1700427e-38bb-8087-b271-e9ccc4dc3a7d" class="">因为chunk至少也是向0x8B对齐（x32下），也<mark class="highlight-default">就是说它的大小的二进制值的末3位必为0。也就是该字段的低3bit没有信息量。为了充分利用空间，将其作为标志位，它们从低到高分别表示：</mark></p><ul id="56c4a97c-2a78-420d-8e11-44218dc59ca1" class="bulleted-list"><li style="list-style-type:circle"><mark class="highlight-default">PREV_INUSE，记为“P”，记录物理相邻的前一个 chunk 块是否为allocated chunk，不是则置为0。</mark><blockquote id="1700427e-38bb-8017-bbf8-c823b1875ec7" class=""><mark class="highlight-default">这是为了方便进行</mark>“日常整理碎片块机制”<mark class="highlight-default">。合并时，可以快速地通过当前chunk的P位是否为0，来判断是否要执行合并操作。</mark></blockquote></li></ul><ul id="d3d1660c-623b-4f61-a9c7-4669897da3c6" class="bulleted-list"><li style="list-style-type:circle"><mark class="highlight-default">IS_MAPPED，记为“M”，记录当前 chunk 是否是由 mmap 分配的。</mark></li></ul><ul id="ab76cf3b-027e-40be-9100-57f4c559f8cc" class="bulleted-list"><li style="list-style-type:circle"><mark class="highlight-default">NON_MAIN_ARENA，记</mark>为“N”，表示当前 chunk 是否不属于主线程，1 不属于，0 属于。</li></ul><ul id="57ffdf00-1dee-4dec-bea9-dcbf0fa9f657" class="toggle"><li><details open=""><summary> 补充：如何使用标志位</summary><blockquote id="b1055c8e-5597-4b00-8e19-872faf9ce700" class="">一般来说：<p id="1700427e-38bb-805c-84da-c3eee4bce2c3" class="">堆中第一个被分配的内存块的 size 字段的 P 位都会被设置为 1，以防止它物理相邻前面的非法内存被访问；</p><p id="1700427e-38bb-800d-8538-f09fdda51eab" class="">fast_chunk的P位也会被设为1，这是因为fast_chunk为了提高访问速度，在平时不做碎片块整理合并（只在malloc_consolidate函数被调用时才做）。</p></blockquote><blockquote id="5097bfb5-e302-4a44-86c5-88dfd4479fd7" class="">当想要获取该chunk的data部分真正大小时，做以下运算即可：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2102501f-ce1d-4ade-b7e1-40928a1f8577" class="code"><code class="language-C">//以下是x32环境下，mchunk_size大小为4B时的运算代码：
+size_t realSizeOfChunk_data = mchunk_size &amp; 0xFFFFFFF8;//通过按位与运算把mchunk_size的低3bit置为0</code></pre></blockquote></details></li></ul><blockquote id="17d0427e-38bb-8063-b6ae-fef594910cfb" class="">注意：关于简写方式，也有说法是认为要把<mark class="highlight-default">NON_MAIN_ARENA记为A。</mark><p id="17d0427e-38bb-80bb-862b-c68bbb3572e3" class="">参考：<a href="https://blog.csdn.net/weixin_44215692/article/details/123850461?spm=1001.2014.3001.5502">https://blog.csdn.net/weixin_44215692/article/details/123850461?spm=1001.2014.3001.5502</a></p></blockquote></li></ul><ul id="5fd2d40d-5d08-4a2a-86ef-09b1ac5971bd" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-default"><code>fd</code></mark><mark class="highlight-default">、</mark><mark class="highlight-default"><code>bk</code></mark><mark class="highlight-default">、</mark><mark class="highlight-default"><code>fd_nextsize</code></mark><mark class="highlight-default">、</mark><mark class="highlight-default"><code>bk_nextsize</code></mark><mark class="highlight-default">：</mark><mark class="highlight-red">这四个成员只在free chunk中被引用</mark>，其中：<ol type="1" id="d09c0951-6311-4292-9a05-aa44b4718ba5" class="numbered-list" start="1"><li><strong>fastchunk</strong>只使用fd</li></ol><ol type="1" id="7c3b4d86-105c-4916-bc49-ab08d702a921" class="numbered-list" start="2"><li><strong>tcache</strong>只使用fd，在加入key机制后在bk域的位置上存储key</li></ol><ol type="1" id="b88fe221-43f8-4115-a708-7651d58b6123" class="numbered-list" start="3"><li><strong>unsorted bin</strong>只使用bk和fd</li></ol><ol type="1" id="1330db8b-2183-4010-ab88-a20db6d2ff9d" class="numbered-list" start="4"><li><strong>small bin</strong>会使用bk，fd用来维护当前同样大小的块形成的链表，同时使用fd_nextsize和bk_nextsize以实现在 smallbin 中的不同大小的块链之间快速导航（其中fd_nextsize指向下一个更大的块链头，bk_nextsize指向前一个更小的块链头）</li></ol><ol type="1" id="8413a45b-131d-4976-880a-f5fa96251426" class="numbered-list" start="5"><li><strong>large bin</strong>只使用fd和bk</li></ol><blockquote id="1700427e-38bb-8007-a110-e37e104b2394" class="">注意，为了充分利用空间，<mark class="highlight-red">这四个字段的位置其实是在当前chunk的data域。</mark></blockquote><blockquote id="31f74460-d96d-47ea-9515-3cb9e0e96597" class="">注意，<mark class="highlight-red"><mark class="highlight-default_background">它们指向的地方是块的块头，不是data域</mark></mark></blockquote></li></ul><h3 id="a301485f-5869-4c58-bc44-41012eb89d87" class="">2-glibc2.24-块尾部标记</h3><blockquote id="16f0427e-38bb-8082-b653-d4348a879c1e" class="">glibc2.24版本之后引进。</blockquote><p id="d557772f-c369-40ea-9acf-fc7801c122be" class="">【定义】</p><p id="24cd019e-e28c-42d5-9423-ec57239de128" class="">块会在它的数据部分的末尾用4B（x64下是8B，一些高版本glibc在x64下是16B）作为一个尾部标记（又叫：footer），存储一些块的信息。这个尾部标记不计入size字段</p><p id="a00a0052-3870-4a51-ae48-916bcee02b44" class="">【结构】</p><p id="90b22b13-5d52-4da1-87b4-0d4788e4b200" class="">如果两个块相邻，那么它们的尾部标记会重叠</p><h1 id="d1e7ad68-8aae-4ddc-b9f3-2719ac6fe212" class="">三、一些相关的问题</h1><h3 id="24f26f73-285e-45ee-a3a9-b374337bd411" class="">1-如何识别allocated chunk而不把他当成未分割的top chunk中的一部分？</h3><p id="99ce2b36-c57d-487e-84d8-c28e61f43b65" class="">topchunk内存地址前面的chunk，就要么是allocated chunk要么是free chunk，所以只要有一个指针指向topchunk的开头和结尾，就可以避免在分割topchunk时分割到allocated chunk或free chunk</p><blockquote id="aee783e5-9218-4979-ba39-3e55b3084f2f" class="">malloc还会通过检查分配的这个chunk的地址是否在top chunk的范围内来实现判断一个chunk是否在top chunk中，这也是为了增加程序的安全性和健壮性而做出的冗余设计。</blockquote><h3 id="259085d3-1916-48f8-9252-952d31987b56" class="">2-如何识别一个chunk的数据部分</h3><p id="3e6681c5-6c47-4d9b-9b94-43db730c0498" class="">其实这一块上面并没有相关的检查，只是返回一个指针指向数据部分的给程序，如果程序这个指针做了修改，就有可能访问到这个chunk的chunk头</p><p id="037c10f8-b4f1-4330-b613-2ff0f4346219" class="">尾部标记</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

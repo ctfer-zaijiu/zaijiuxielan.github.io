@@ -1,0 +1,1195 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>topchunk大小扩大机制</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1730427e-38bb-8071-87bb-ff407f01a8dd" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1489850846882-35ef10a4b480?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🎲</span></div><h1 class="page-title">topchunk大小扩大机制</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1730427e-38bb-80d8-9034-eec2f6d5cfc8" class="block-color-default">“可是他对你好，并不能说明他就是一个好人”“他对我好，那他是不是好人，还重要吗”</blockquote><h1 id="1730427e-38bb-80e6-a5d1-f171bce5d387" class="">一、topchunk大小扩大机制</h1><h2 id="1730427e-38bb-8025-9633-f6db1ba33879" class="">（一）整体过程</h2><p id="1730427e-38bb-8006-8af7-ff5b32780fcd" class=""><mark class="highlight-red"><strong>待整理</strong></mark></p><h2 id="1730427e-38bb-801e-81ec-ea33d67a94f4" class="">（二）第一层调用</h2><p id="1730427e-38bb-80d6-857c-c23b2a2362a4" class="">sysmalloc函数用于扩大topchunk，详情如下：</p><h3 id="1730427e-38bb-80db-9683-ff4abb196b4d" class="">1-sysmalloc函数</h3><p id="ea47f929-c75e-4a56-bfb8-48ad7a51ea21" class="">【介绍】</p><p id="1c8ecc1f-bf8b-4c13-af1c-a8c79512dc7b" class="">下面是函数的执行逻辑：</p><ol type="1" id="f4089207-3918-4d7b-b25e-ac919b1d0201" class="numbered-list" start="1"><li>首先，函数检查是否可以通过 mmap 直接映射请求大小的内存区域，而不是扩展当前的 top。如果满足一定条件，会尝试直接使用 mmap 来满足分配请求。</li></ol><ol type="1" id="56566304-1979-461a-b741-5d5a954e4af8" class="numbered-list" start="2"><li>如果无法通过 mmap 来满足分配请求，或者需要通过 mmap 来满足但尝试失败，则会尝试使用 sbrk 或者更大单位的 mmap。</li></ol><ol type="1" id="98fdead8-ea43-41df-91b1-88c9cdc02598" class="numbered-list" start="3"><li>如果当前的 arena 不是主 arena（main_arena），则会尝试扩展当前的堆（heap）或者创建新的堆来满足分配请求。</li></ol><ol type="1" id="09580300-776a-4680-982e-201dac8ea583" class="numbered-list" start="4"><li>如果当前的 arena 是主 arena（main_arena），则会尝试通过 sbrk 来扩展堆，并根据需要使用 mmap 来补充。在这个过程中，会对 sbrk 返回的内存进行调整，保证对齐等要求。<blockquote id="53f35b24-d6f1-4a38-ab71-f62903f0c09c" class=""><mark class="highlight-blue">这里其实是会新创建一个topchunk，然后把原来不够用的topchunk变成unsorted chunk！</mark><p id="184ab7a2-2856-4035-b36c-72c7170a9c8c" class="">由此我们也会有一个攻击方式“house of orange”</p></blockquote></li></ol><ol type="1" id="3e87e83e-0240-4a9b-a301-98f52688f5ff" class="numbered-list" start="5"><li>最后，如果有足够的内存满足分配请求，会进行分配操作，并更新 top 指针；如果分配失败，则设置错误码并返回 0。</li></ol><p id="1f760c3e-bbec-4026-8a3d-c6e246909e22" class="">【源码】</p><ul id="1730427e-38bb-808f-a92a-f8a4067ccf73" class="toggle"><li><details open=""><summary>源码如下</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="fb3b1def-97b9-4c54-8604-6b8b1d43a33c" class="code"><code class="language-C">static void *sysmalloc(INTERNAL_SIZE_T nb, mstate av) {
+  mchunkptr old_top;              /* av-&gt;top 的原始值 */
+  INTERNAL_SIZE_T old_size;       /* av-&gt;top 的大小 */
+  char *old_end;                  /* av-&gt;top 的结束地址 */
+
+  long size;                      /* 传递给第一个 MORECORE 或 mmap 调用的参数 */
+  char *brk;                      /* MORECORE 的返回值 */
+
+  long correction;                /* 第二个 MORECORE 调用的参数 */
+  char *snd_brk;                  /* 第二个返回值 */
+
+  INTERNAL_SIZE_T front_misalign; /* 新空间前端无法使用的字节 */
+  INTERNAL_SIZE_T end_misalign;   /* 新空间末端剩余的部分页 */
+  char *aligned_brk;              /* 对齐的 brk 偏移量 */
+
+  mchunkptr p;                    /* 分配/返回的块 */
+  mchunkptr remainder;            /* 分配后的剩余块 */
+  unsigned long remainder_size;   /* 剩余块的大小 */
+
+  size_t pagesize = GLRO(dl_pagesize); /* 获取系统页大小 */
+  bool tried_mmap = false;        /* 是否尝试过 mmap */
+
+  /*
+     如果有 mmap，且请求大小达到 mmap 阈值，且系统支持 mmap，
+     且当前分配的 mmap 区域数量不多，尝试直接映射请求，而不是扩展 top。
+   */
+  if (av == NULL ||
+      ((unsigned long)(nb) &gt;= (unsigned long)(mp_.mmap_threshold) &amp;&amp;
+       (mp_.n_mmaps &lt; mp_.n_mmaps_max))) {
+    char *mm;                     /* mmap 调用的返回值 */
+
+  try_mmap:
+    /*
+       将大小向上舍入到最近的页。对于 mmapped 块，开销比普通块大一个 SIZE_SZ 单位，
+       因为没有后续块可以使用其 prev_size 字段。
+
+       请参见下面的 front_misalign 处理，对于 glibc，除非有高对齐要求，否则无需进一步对齐。
+     */
+    if (MALLOC_ALIGNMENT == 2 * SIZE_SZ)
+      size = ALIGN_UP(nb + SIZE_SZ, pagesize);
+    else
+      size = ALIGN_UP(nb + SIZE_SZ + MALLOC_ALIGN_MASK, pagesize);
+    tried_mmap = true;
+
+    /* 如果大小不会溢出为 0，则尝试映射 */
+    if ((unsigned long)(size) &gt; (unsigned long)(nb)) {
+      mm = (char *)(MMAP(0, size, PROT_READ | PROT_WRITE, 0));
+
+      if (mm != MAP_FAILED) {
+        /*
+           映射区域的起始偏移量存储在块的 prev_size 字段中。
+           这使得我们可以在这里和 memalign() 中调整返回的起始地址以满足对齐要求，
+           并且仍然能够在 free() 和 realloc() 中计算正确的地址参数来进行后续的 munmap。
+         */
+
+        if (MALLOC_ALIGNMENT == 2 * SIZE_SZ) {
+          /* 对于 glibc，chunk2mem 将地址增加了 2*SIZE_SZ，
+             MALLOC_ALIGN_MASK 是 2*SIZE_SZ-1。每个 mmap 区域都是页面对齐的，
+             因此绝对是 MALLOC_ALIGN_MASK 对齐的。 */
+          assert(((INTERNAL_SIZE_T)chunk2mem(mm) &amp; MALLOC_ALIGN_MASK) == 0);
+          front_misalign = 0;
+        } else
+          front_misalign = (INTERNAL_SIZE_T)chunk2mem(mm) &amp; MALLOC_ALIGN_MASK;
+        if (front_misalign &gt; 0) {
+          correction = MALLOC_ALIGNMENT - front_misalign;
+          p = (mchunkptr)(mm + correction);
+          p-&gt;prev_size = correction;
+          set_head(p, (size - correction) | IS_MMAPPED);
+        } else {
+          p = (mchunkptr)mm;
+          set_head(p, size | IS_MMAPPED);
+        }
+
+        /* 更新统计信息 */
+        int new = atomic_exchange_and_add(&amp;mp_.n_mmaps, 1) + 1;
+        atomic_max(&amp;mp_.max_n_mmaps, new);
+
+        unsigned long sum;
+        sum = atomic_exchange_and_add(&amp;mp_.mmapped_mem, size) + size;
+        atomic_max(&amp;mp_.max_mmapped_mem, sum);
+
+        check_chunk(av, p);
+
+        return chunk2mem(p);
+      }
+    }
+  }
+
+	/* 所有可用的分配区域和 mmap 都失败了。 */
+	if (av == NULL)
+	  return 0;
+
+	/* 记录 av-&gt;top 的当前配置 */
+	old_top = av-&gt;top;
+	old_size = chunksize(old_top);
+	old_end = (char *)(chunk_at_offset(old_top, old_size));
+
+	brk = snd_brk = (char *)(MORECORE_FAILURE);
+
+	/*
+	   如果不是第一次执行，则要求 old_size 至少为 MINSIZE，并且设置了 prev_inuse。
+	 */
+	assert((old_top == initial_top(av) &amp;&amp; old_size == 0) ||
+	       ((unsigned long)(old_size) &gt;= MINSIZE &amp;&amp;
+	        prev_inuse(old_top) &amp;&amp;
+	        ((unsigned long)old_end &amp; (pagesize - 1)) == 0));
+
+	/* 前提条件：当前空间不足以满足 nb 请求 */
+	assert((unsigned long)(old_size) &lt; (unsigned long)(nb + MINSIZE));
+	
+	if (av != &amp;main_arena) {
+	    heap_info *old_heap, *heap;
+	    size_t old_heap_size;
+
+	    /* 首先尝试扩展当前堆。 */
+	    old_heap = heap_for_ptr(old_top);
+	    old_heap_size = old_heap-&gt;size;
+	    if ((long)(MINSIZE + nb - old_size) &gt; 0 &amp;&amp;
+	        grow_heap(old_heap, MINSIZE + nb - old_size) == 0) {
+	        av-&gt;system_mem += old_heap-&gt;size - old_heap_size;
+	        arena_mem += old_heap-&gt;size - old_heap_size;
+	        set_head(old_top, (((char *)old_heap + old_heap-&gt;size) - (char *)old_top) | PREV_INUSE);
+	    }
+	    else if ((heap = new_heap(nb + (MINSIZE + sizeof(*heap)), mp_.top_pad))) {
+	        /* 使用新分配的堆。 */
+	        heap-&gt;ar_ptr = av;
+	        heap-&gt;prev = old_heap;
+	        av-&gt;system_mem += heap-&gt;size;
+	        arena_mem += heap-&gt;size;
+	        /* 设置新的 top。 */
+	        top(av) = chunk_at_offset(heap, sizeof(*heap));
+	        set_head(top(av), (heap-&gt;size - sizeof(*heap)) | PREV_INUSE);
+	
+	        /* 设置栅栏并释放旧的 top 块，其大小为 MALLOC_ALIGNMENT 的倍数。 */
+	        /* 栅栏至少占用 MINSIZE 字节，因为它可能稍后再次成为顶部块。
+	           请注意，尽管标记了使用，但还设置了页脚。 */
+	        old_size = (old_size - MINSIZE) &amp; ~MALLOC_ALIGN_MASK;
+	        set_head(chunk_at_offset(old_top, old_size + 2 * SIZE_SZ), 0 | PREV_INUSE);
+	        if (old_size &gt;= MINSIZE) {
+	            set_head(chunk_at_offset(old_top, old_size), (2 * SIZE_SZ) | PREV_INUSE);
+	            set_foot(chunk_at_offset(old_top, old_size), (2 * SIZE_SZ));
+	            set_head(old_top, old_size | PREV_INUSE | NON_MAIN_ARENA);
+	            _int_free(av, old_top, 1);
+	        }
+		      else {
+	            set_head(old_top, (old_size + 2 * SIZE_SZ) | PREV_INUSE);
+	            set_foot(old_top, (old_size + 2 * SIZE_SZ));
+	        }
+	    }
+	    else if (!tried_mmap)
+			    /* 我们至少可以尝试使用 mmap 内存。 */
+		      goto try_mmap;
+	}
+	else{ /* av == main_arena */
+			/* 请求足够的空间以容纳 nb + pad + overhead */
+
+		  size = nb + mp_.top_pad + MINSIZE;
+
+		  /*
+		     如果是连续的，我们可以减去现有的空间，希望与新空间结合。
+		     仅当我们实际上没有获得连续空间时，我们稍后才将其添加回去。
+		   */
+		  if (contiguous(av))
+		  size -= old_size;
+
+		  /*
+		     舍入为页面大小的倍数。
+		     如果 MORECORE 不是连续的，则确保我们只以整页参数调用它。
+		     如果 MORECORE 是连续的，并且这不是第一次调用，那么这会保留前次调用的页对齐。
+		     否则，我们将在下面进行页对齐修正。
+		   */
+		  size = ALIGN_UP(size, pagesize);
+
+		  /*
+		     如果参数太大，以至于看起来为负数，则不要尝试调用 MORECORE。
+		     请注意，由于 mmap 接受 size_t 参数，即使我们无法调用 MORECORE，
+		     在下面的 mmap 可能也会成功。
+		   */
+		  if (size &gt; 0){
+		      brk = (char *)(MORECORE(size));
+		      LIBC_PROBE(memory_sbrk_more, 2, brk, size);
+		  }
+
+		  if (brk != (char *)(MORECORE_FAILURE)){
+		      /* 如果有必要，则调用“morecore”挂钩。 */
+		      void (*hook)(void) = atomic_forced_read(__after_morecore_hook);
+		      if (__builtin_expect(hook != NULL, 0))
+		          (*hook)();
+		  }else{
+		      /*
+		         如果有 mmap，则在 MORECORE 失败或无法使用时尝试使用它作为备用。
+			       在地址空间中存在“空洞”的系统中值得这样做，
+		         因此 sbrk 无法扩展以提供连续空间，但其他地方有空间可用。
+		         请注意，我们忽略 mmap 的最大计数和阈值限制，
+		         因为空间不会被用作分离的 mmap 区域。
+		       */
+		
+		      /* 无法与旧顶部合并，因此将其大小再加回来 */
+		      if (contiguous(av))
+			        size = ALIGN_UP(size + old_size, pagesize);
+
+		      /* 如果我们依赖 mmap 作为备用，那么使用更大的单位 */
+		      if ((unsigned long)(size) &lt; (unsigned long)(MMAP_AS_MORECORE_SIZE))
+				      size = MMAP_AS_MORECORE_SIZE;
+
+		      /* 不要尝试如果 size 超出 0 */
+		      if ((unsigned long)(size) &gt; (unsigned long)(nb)){
+			        char *mbrk = (char *)(MMAP(0, size, PROT_READ | PROT_WRITE, 0));
+
+		          if (mbrk != MAP_FAILED){
+		              /* 我们不需要，也不能使用另一个 sbrk 调用来查找结束 */
+		              brk = mbrk;
+		              snd_brk = brk + size;
+
+		              /*
+		                 记录我们不再拥有连续的 sbrk 区域。
+		                 第一次使用 mmap 作为备用后，我们永远不再依赖连续空间，
+		                 因为这可能会错误地桥接区域。
+		               */
+		              set_noncontiguous(av);
+		          }
+		      }
+		  }
+	
+			if (brk != (char *)(MORECORE_FAILURE)){
+			    if (mp_.sbrk_base == 0)
+			        mp_.sbrk_base = brk;
+		
+			    // 增加系统内存统计信息
+				  av-&gt;system_mem += size;
+
+			    /*
+		       如果 MORECORE 扩展了先前的空间，我们可以同样扩展 top 的大小。
+			    */
+			    if (brk == old_end &amp;&amp; snd_brk == (char *)(MORECORE_FAILURE))
+			        set_head(old_top, (size + old_size) | PREV_INUSE);
+	
+			    else if (contiguous(av) &amp;&amp; old_size &amp;&amp; brk &lt; old_end){
+			        /* 糟糕！有人破坏了我们的空间…不能触及任何东西 */
+			        malloc_printerr(3, &quot;break adjusted to free malloc space&quot;, brk, av);
+			    }
+
+		    /*
+		       否则，做一些调整：
+		     * 如果第一次调用或非连续的，我们需要调用 sbrk 仅仅是为了找出内存的末尾位置。
+		     * 我们需要确保从 malloc 返回的所有块都满足 MALLOC_ALIGNMENT
+		     * 如果有一个间隔的外来 sbrk，我们需要调整 sbrk 请求的大小，
+		        以考虑我们将无法将新空间与 old_top 中的现有空间合并。
+		     * 几乎所有系统内部一次分配整个页面的内存，在这种情况下，我们可能会
+		        用最后一个请求页的整个空间，因此我们现在分配足够的内存以达到页面边界，
+		        这反过来又导致将来的连续调用进行页面对齐。
+		     */
+
+				  else{
+				      front_misalign = 0;
+				      end_misalign = 0;
+				      correction = 0;
+				      aligned_brk = brk;
+			
+				      /* 处理连续的情况 */
+				      if (contiguous(av)){
+				          /* 计算外来 sbrk 作为 system_mem。 */
+				          if (old_size)
+				              av-&gt;system_mem += brk - old_end;
+	
+				          /* 保证从此空间创建的第一个新块的对齐 */
+				          front_misalign = (INTERNAL_SIZE_T)chunk2mem(brk) &amp; MALLOC_ALIGN_MASK;
+				          if (front_misalign &gt; 0){
+		                /*
+		                   跳过一些字节以到达对齐位置。
+		                   我们不需要特别标记这些浪费的前置字节。
+		                   无论如何，它们永远不会被访问，因为初始化后 av-&gt;top 的
+		                   prev_inuse 总是 true（以及从其开头创建的任何块）。
+		                 */
+				              correction = MALLOC_ALIGNMENT - front_misalign;
+				              aligned_brk += correction;
+					        }
+
+			            /*
+			             如果这不是与现有空间相邻的话，那么我们将无法与 old_top 空间合并，
+		               因此必须添加到第二个请求。
+			            */
+				          correction += old_size;
+	
+				          /* 将结束地址扩展到达到页面边界 */
+				          end_misalign = (INTERNAL_SIZE_T)(brk + size + correction);
+				          correction += (ALIGN_UP(end_misalign, pagesize)) - end_misalign;
+	
+				          assert(correction &gt;= 0);
+				          snd_brk = (char *)(MORECORE(correction));
+	
+			            /*
+		               如果无法分配 correction，尝试至少找出当前的 brk。
+		               如果 second sbrk 没有失败，我们假定 space 与 first sbrk 连续。
+		               这是一个安全的假设，除非程序是多线程的但不使用锁，而在第一次
+		               和第二次调用之间发生了外来的 sbrk。
+			             */
+				          if (snd_brk == (char *)(MORECORE_FAILURE)){
+				               correction = 0;
+				               snd_brk = (char *)(MORECORE(0));
+				          }else{
+				               /* 如果有必要，则调用“morecore”挂钩。 */
+				               void (*hook)(void) = atomic_forced_read(__after_morecore_hook);
+				               if (__builtin_expect(hook != NULL, 0))
+				                   (*hook)();
+				          }
+				      }
+
+              /* handle non-contiguous cases */
+				      else{
+				          if (MALLOC_ALIGNMENT == 2 * SIZE_SZ)
+				              /* MORECORE/mmap must correctly align */
+				              assert (((unsigned long) chunk2mem (brk) &amp; MALLOC_ALIGN_MASK) == 0);
+				          else{
+				              front_misalign = (INTERNAL_SIZE_T) chunk2mem (brk) &amp; MALLOC_ALIGN_MASK;
+				              if (front_misalign &gt; 0){
+                          /*
+                             Skip over some bytes to arrive at an aligned position.
+                             We don&#x27;t need to specially mark these wasted front bytes.
+                             They will never be accessed anyway because
+                             prev_inuse of av-&gt;top (and any chunk created from its start)
+                             is always true after initialization.
+                           */
+
+		                  aligned_brk += MALLOC_ALIGNMENT - front_misalign;
+				              }
+				          }
+
+				          /* Find out current end of memory */
+				          if (snd_brk == (char *) (MORECORE_FAILURE)){
+				              snd_brk = (char *) (MORECORE (0));
+				          }
+				      }
+
+              /* Adjust top based on results of second sbrk */
+              if (snd_brk != (char *) (MORECORE_FAILURE)){
+                  av-&gt;top = (mchunkptr) aligned_brk;
+                  set_head (av-&gt;top, (snd_brk - aligned_brk + correction) | PREV_INUSE);
+                  av-&gt;system_mem += correction;
+
+                  /*
+                     If not the first time through, we either have a
+                     gap due to foreign sbrk or a non-contiguous region.  Insert a
+                     double fencepost at old_top to prevent consolidation with space
+                     we don&#x27;t own. These fenceposts are artificial chunks that are
+                     marked as inuse and are in any case too small to use.  We need
+                     two to make sizes and alignments work out.
+                   */
+
+                  if (old_size != 0){
+                      /*
+                         Shrink old_top to insert fenceposts, keeping size a
+                         multiple of MALLOC_ALIGNMENT. We know there is at least
+                         enough space in old_top to do this.
+                       */
+                      old_size = (old_size - 4 * SIZE_SZ) &amp; ~MALLOC_ALIGN_MASK;
+                      set_head (old_top, old_size | PREV_INUSE);
+
+                      /*
+                         Note that the following assignments completely overwrite
+                         old_top when old_size was previously MINSIZE.  This is
+                         intentional. We need the fencepost, even if old_top otherwise gets
+                         lost.
+                       */
+                      chunk_at_offset (old_top, old_size)-&gt;size =
+                        (2 * SIZE_SZ) | PREV_INUSE;
+
+                      chunk_at_offset (old_top, old_size + 2 * SIZE_SZ)-&gt;size =
+                        (2 * SIZE_SZ) | PREV_INUSE;
+
+                      /* If possible, release the rest. */
+                      if (old_size &gt;= MINSIZE){
+                          _int_free (av, old_top, 1);
+                      }
+                  }
+              }
+          }
+      }
+  } /* if (av !=  &amp;main_arena) */
+
+  if ((unsigned long) av-&gt;system_mem &gt; (unsigned long) (av-&gt;max_system_mem))
+    av-&gt;max_system_mem = av-&gt;system_mem;
+  check_malloc_state (av);
+
+  /* finally, do the allocation */
+  p = av-&gt;top;
+  size = chunksize (p);
+
+  /* check that one of the above allocation paths succeeded */
+  if ((unsigned long) (size) &gt;= (unsigned long) (nb + MINSIZE)){
+      remainder_size = size - nb;
+      remainder = chunk_at_offset (p, nb);
+      av-&gt;top = remainder;
+      set_head (p, nb | PREV_INUSE | (av != &amp;main_arena ? NON_MAIN_ARENA : 0));
+      set_head (remainder, remainder_size | PREV_INUSE);
+      check_malloced_chunk (av, p, nb);
+      return chunk2mem (p);
+  }
+
+  /* catch all failure paths */
+  __set_errno (ENOMEM);
+  return 0;
+}
+
+							/* 处理非连续的情况 */
+							else {
+							    if (MALLOC_ALIGNMENT == 2 * SIZE_SZ)
+							        /* MORECORE/mmap 必须确保正确对齐 */
+							        assert (((unsigned long) chunk2mem(brk) &amp; MALLOC_ALIGN_MASK) == 0);
+							    else {
+							        front_misalign = (INTERNAL_SIZE_T) chunk2mem(brk) &amp; MALLOC_ALIGN_MASK;
+							        if (front_misalign &gt; 0) {
+							            /* 跳过一些字节以达到对齐位置。
+							               不需要特别标记这些被浪费的前端字节。
+							               无论如何，它们将不会被访问，因为 av-&gt;top 的 prev_inuse（以及从它开始创建的任何块）
+							               在初始化后总是为 true。 */
+							            aligned_brk += MALLOC_ALIGNMENT - front_misalign;
+							        }
+							    }
+
+							    /* 查找当前内存的末尾 */
+							    if (snd_brk == (char *) (MORECORE_FAILURE)) {
+							        snd_brk = (char *) (MORECORE(0));
+							    }
+							}
+
+							/* 根据第二次 sbrk 的结果调整 top */
+							if (snd_brk != (char *) (MORECORE_FAILURE)) {
+							    av-&gt;top = (mchunkptr) aligned_brk;
+							    set_head(av-&gt;top, (snd_brk - aligned_brk + correction) | PREV_INUSE);
+							    av-&gt;system_mem += correction;
+
+							    /* 如果不是第一次通过，我们要么有一个外来 sbrk 导致的间隙，要么是一个非连续的区域。
+							       在 old_top 处插入一个双栅栏，防止与我们不拥有的空间合并。
+							       这些栅栏是标记为使用中的人工块，无论如何都太小而无法使用。
+							       我们需要两个来使大小和对齐正常。 */
+							    if (old_size != 0) {
+							        /* 收缩 old_top 以插入栅栏，保持大小是 MALLOC_ALIGNMENT 的倍数。
+							           我们知道 old_top 中至少有足够的空间来做到这一点。 */
+							        old_size = (old_size - 4 * SIZE_SZ) &amp; ~MALLOC_ALIGN_MASK;
+							        set_head(old_top, old_size | PREV_INUSE);
+
+							        /* 请注意，以下分配会在 old_size 之前是 MINSIZE 时完全覆盖 old_top。
+							           这是故意的。我们需要栅栏，即使 old_top 否则可能会丢失。 */
+							        chunk_at_offset(old_top, old_size)-&gt;size = (2 * SIZE_SZ) | PREV_INUSE;
+							        chunk_at_offset(old_top, old_size + 2 * SIZE_SZ)-&gt;size = (2 * SIZE_SZ) | PREV_INUSE;
+			
+							        /* 如果可能，释放剩余的部分。 */
+							        if (old_size &gt;= MINSIZE) {
+							            _int_free(av, old_top, 1);
+							        }
+							    }
+							}
+					}
+			}
+	}
+
+	if ((unsigned long) av-&gt;system_mem &gt; (unsigned long) (av-&gt;max_system_mem))
+	    av-&gt;max_system_mem = av-&gt;system_mem;
+
+	check_malloc_state(av);
+	
+	/* 最后，进行分配 */
+	p = av-&gt;top;
+	size = chunksize(p);
+	
+	/* 检查上述分配路径之一是否成功 */
+	if ((unsigned long) (size) &gt;= (unsigned long) (nb + MINSIZE)) {
+	    remainder_size = size - nb;
+	    remainder = chunk_at_offset(p, nb);
+	    av-&gt;top = remainder;
+	    set_head(p, nb | PREV_INUSE | (av != &amp;main_arena ? NON_MAIN_ARENA : 0));
+	    set_head(remainder, remainder_size | PREV_INUSE);
+	    check_malloced_chunk(av, p, nb);
+	    return chunk2mem(p);
+	}
+
+	/* 捕获所有失败路径 */
+	__set_errno(ENOMEM);
+	return 0;
+}
+</code></pre></details></li></ul><h2 id="1730427e-38bb-8011-ab98-f977a73f7798" class="">（三）第二层调用</h2><p id="18f0762e-f935-48e3-a0fc-4b108f06d032" class="">一般来说，如果是mainthread就用sbrk，如果是nomainthread就用mmap</p><h3 id="4ca41cbf-4bf9-4fcb-9126-b3cf793002f2" class="">1-brk&amp;sbrk函数</h3><p id="f573740e-9b70-4d05-b28a-8c7f10f78f4e" class="">【定义】</p><p id="0957518d-a5b5-4911-bb4a-e8b59b268d02" class="">对于堆的操作，操作系统提供了 brk 函数，glibc 库提供了 sbrk 函数，brk是系统调用 而sbrk不是  ，sbrk调用了brk</p><p id="26009f8b-6826-4635-8be6-45bc5e1d4c4f" class="">内核维护一个进程控制块（PCB），该结构体中维护两个指针：start_brk和brk，他们分别表示堆块的开始地址和结束地址</p><p id="0274f9ab-127a-417f-9308-66d03aaa3cc1" class="">【函数使用】</p><p id="a40acb68-6ea8-4c44-ba51-fe3dfd93211b" class=""><strong>sbrk函数</strong><div class="indented"><p id="9ad17043-4455-40bd-bb7f-051108667c2a" class="">定义：传参0时可以获取当前brk指针的值，传参num时可以将当前brk指针的值增加拓展num字节(传参整数是增加，传参负数是减少)</p><p id="3b4043d4-deff-4a28-980a-fe4fcdaf5bec" class="">返回值：若成功，brk()会返回0，否则返回-1。</p></div></p><p id="b3ee1d86-9f32-4ffc-8fe5-ca59afd33222" class=""><strong>brk函数</strong><div class="indented"><p id="f279747c-db8e-4d60-b211-4d3f051cbe49" class="">定义：可以改变brk指针内存储的地址（即堆结束地址，又叫堆顶），传参多少就把brk设置为多少</p><p id="5a8f5fb4-fe43-4319-98ca-3310bb00947f" class="">返回值：若成功，brk()会返回0，否则返回-1。</p></div></p><p id="dfe3bb29-f262-4d04-9da3-edcf19f7bfc9" class=""><strong>示例</strong><div class="indented"><p id="0a080e39-d00f-40d7-8d2d-c9f50b73a2bf" class="">同样是将堆地址拓展4096字节，有以下两种写法</p><ul id="45cd3515-c8dc-4a8f-8e85-0c9abfdbe89d" class="toggle"><li><details open=""><summary>1、使用sbrk函数进行拓展</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4c07a8bc-7429-4c79-bb63-be7c159baa7a" class="code"><code class="language-C">#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    void* original_brk = (void*)sbrk(0);  // 获取当前堆顶地址
+    printf(&quot;Original break: %p\n&quot;, original_brk);
+
+    if (sbrk(4096) != (void*)-1) {  // 扩展堆顶地址4096字节
+        void* updated_brk = (void*)sbrk(0);  // 获取更新后的堆顶地址
+        printf(&quot;Updated break: %p\n&quot;, updated_brk);
+    } else {
+        printf(&quot;Failed to update break.\n&quot;);
+    }
+
+    return 0;
+}</code></pre></details></li></ul><ul id="fa30bbc8-1c5b-4359-b644-2667271a1869" class="toggle"><li><details open=""><summary>2、使用brk函数进行拓展</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="16deeac6-c414-48cd-902e-8b510433a0cb" class="code"><code class="language-C">#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    void* new_brk = (void*)sbrk(0);  // 获取当前堆顶地址
+    printf(&quot;Original break: %p\n&quot;, new_brk);
+
+    if (brk(new_brk + 4096) == 0) {  // 将堆顶地址扩展4096字节
+        void* updated_brk = (void*)sbrk(0);  // 获取更新后的堆顶地址
+        printf(&quot;Updated break: %p\n&quot;, updated_brk);
+    } else {
+        printf(&quot;Failed to update break.\n&quot;);
+    }
+
+    return 0;
+}</code></pre></details></li></ul></div></p><h3 id="b09e81ba-83f1-48d4-b0fa-a67d810b1181" class="">2-mmap&amp;munmap函数</h3><p id="7cbd9d69-d1b8-44b8-bce3-8a3b9e86543f" class="">详见：</p><figure id="a0ceee36-061f-464d-a55d-f074daa91180" class="link-to-page"><a href="../mmap%E6%AE%B5%20a0ceee36061f464da55df074daa91180.html"><img class="icon" src="https://www.notion.so/icons/document_red.svg"/>mmap段</a></figure></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -1,0 +1,806 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>碎片块整理合并&amp;堆初始化、块对齐机制</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1700427e-38bb-8003-bb5c-e969196ab655" class="page sans"><header><img class="page-cover-image" src="https://www.notion.so/images/page-cover/woodcuts_sekka_1.jpg" style="object-position:center 9.999999999999998%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🦨</span></div><h1 class="page-title">碎片块整理合并&amp;堆初始化、块对齐机制</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1730427e-38bb-800d-8f83-c32c26a2f25e" class="">你的长夏，永不凋谢</blockquote><h1 id="16f0427e-38bb-8090-9be8-c96a487b9c38" class="">一、碎片块整理合并&amp;堆初始化的机制</h1><h3 id="1840427e-38bb-8069-badd-d17b2f1c7cbe" class="">1-结构</h3><p id="1840427e-38bb-80b4-8807-fc6ce4987517" class="">块头的prev_size域和size域的P标志位，就是为了“日常整理碎片块机制”服务（注意，P标志位不为malloc_consolidate函数服务）。</p><h3 id="7cd073a6-e92a-42df-a64a-5293561ae13e" class="">2-机制</h3><p id="e81bb4df-ceb7-4a0d-b161-cd6aa13fd980" class="">一共有两个机制被用于碎片块的整理合并：</p><p id="9d1144a6-7f1a-4ca9-b54a-783126b7f4d7" class=""><strong>1、“日常整理碎片块机制”</strong><div class="indented"><p id="16e0427e-38bb-8057-b9e5-ffca4a74ff4c" class="">当free时，如果被释放的chunk是fastchunk之外的类型，则<mark class="highlight-blue_background">“使其尝试吞并物理相邻的前后一个块”，</mark>具体流程如下：</p><p id="16e0427e-38bb-8028-af6f-d1eccb438502" class="">（1）先尝试合并该freechunk前空闲块</p><p id="f0891b64-2897-442e-8ee4-9454116ecdee" class="">（2）然后对该freechunk后空闲块做判断：<div class="indented"><p id="16e0427e-38bb-80ef-b2d2-c452c282485b" class="">如果后面的空闲块是topchunk，则把整个合并得到的块并入topchunk</p><p id="2c506861-c156-4279-8522-cee520f03a45" class="">如果后面的空闲块是某个正常的freechunk，则把最后合并得到的块放入unsortedbin中</p></div></p></div></p><p id="3e59970f-1824-485d-941f-bf19629e5be1" class=""><strong>2、malloc_consolidate函数，一个是专门用来做fastbin碎片整理的函数，同时还有初始化堆的功能</strong><div class="indented"><blockquote id="16e0427e-38bb-80b6-8650-d77bfb6fdc00" class="">关于该函数，有如下三种被调用情境：<p id="16e0427e-38bb-807f-9f25-d868422cb921" class="">（1）malloc申请一个大chunk，但是topchunk不够用时，会调用该函数函数扩大topchunk</p><p id="a1694fff-660b-4e46-8b05-609e829fc92a" class="">（2）mclloc申请一个chunk时，如果不是fastchunk或者smallchunk，会调用该函数来尝试整理出更多big chunk</p><p id="16e0427e-38bb-8085-b330-f28644551bc4" class="">（3）malloc第一次被使用时，会调用该函数来初始化堆</p></blockquote><p id="9651cb48-d920-42e1-bf69-1ddfc93d9559" class="">【相关代码】</p><blockquote id="ae33c15c-5ebf-4db1-9829-e5749f1d31b4" class="">以下这段代码来自glibc2.23<p id="16f0427e-38bb-8066-a285-c2aadb7b4237" class="">地址：<a href="https://elixir.bootlin.com/glibc/glibc-2.23.90/source/malloc/malloc.c#L1800">https://elixir.bootlin.com/glibc/glibc-2.23.90/source/malloc/malloc.c#L1800</a></p></blockquote><ul id="84f5827c-c0e7-42b8-95fd-c01dfb0956ca" class="toggle"><li><details open=""><summary>这里是用于对fastbin做合并整理碎片的malloc_consolidate函数的相关代码</summary><p id="16e0427e-38bb-80b3-9284-ed16b767bcc5" class=""><strong>【函数介绍】</strong></p><p id="16e0427e-38bb-806f-a82d-e5067cbbbefc" class="">1、用于清理fastbins中持有的内存块</p><p id="16e0427e-38bb-801f-baf8-cfa9996f4b0b" class="">2、由于它在第一次调用malloc时需要被调用，因此它也是触发初始化代码的完美位置</p><p id="16e0427e-38bb-8068-9cfd-ec062e98b5d1" class=""><strong>【执行逻辑】</strong></p><p id="9d55b9b2-86f1-4b86-82ce-414192a41706" class="">其执行逻辑是：<div class="indented"><p id="aea6911f-0029-45da-8334-c5c7f9494cc8" class="">若fastbin未初始化，则初始化之，并结束该函数（这段代码只在第一次malloc时被触发）</p><p id="baddad82-7a98-4cea-95dd-46369d852fdd" class="">若fastbin已初始化，则遍历fastbin中的每一个块，对它们进行尝试前后一层合并操作，具体步骤如下↓：<div class="indented"><p id="b0e33b9e-f4cb-4b52-89dd-70c297c24367" class="">1、将当前chunk物理相邻的下一个块的PREV_INUSE置为1</p><p id="d8bd09aa-e385-4739-aa7d-76dd77cd5551" class="">2、与当前chunk物理相邻的上一块尝试合并，再与当前chunk物理相邻的下一块尝试合并<div class="indented"><p id="b281f445-92d5-4025-a2e1-9c1e4dc26692" class="">如果遇到的下一块是topchunk，则将其并入topchunk中</p><blockquote id="adcd812f-8886-4abc-b6ae-fe7338bf1825" class="">这里物理相邻的上下块不一定是fastchunk，无所谓，也都可以合</blockquote></div></p><p id="ad3bd515-bdcf-42b5-867f-001f32746830" class="">3、不管是否完成合并，都会把fastbin或者完成合并以后的bin放到unsortedbin中</p></div></p></div></p><p id="16e0427e-38bb-8083-8e4b-c9c4be237edc" class=""><strong>【函数代码】</strong></p><p id="16e0427e-38bb-80e9-b54a-c21422f2c46f" class="">变量初始化：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="16e0427e-38bb-8086-8861-e1bc1881969a" class="code"><code class="language-C">static void malloc_consolidate(mstate av){// av 是 mstate 类型的指针，用于维护内存分配器的状态信息。
+	mfastbinptr* fb; // 当前正在合并的fastbin 
+	mfastbinptr maxfb; // 最后一个fastbin（用于循环控制） 
+	mchunkptr p; // 当前正在合并的块 
+	mchunkptr nextp; // 下一个要合并的块 
+	mchunkptr unsorted_bin; // 未排序的bin头 
+	mchunkptr first_unsorted; // 要链接的块 
+
+	// 这些与free()中的使用方式相同 
+	mchunkptr nextchunk;
+	INTERNAL_SIZE_T size;
+	INTERNAL_SIZE_T nextsize;
+	INTERNAL_SIZE_T prevsize;
+	int nextinuse;
+	mchunkptr bck;
+	mchunkptr fwd;</code></pre><p id="16e0427e-38bb-806b-9bb9-e500c31eb7f6" class="">清理fastchunk的逻辑：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="3e76a701-7842-466e-a57b-75ed936174b9" class="code"><code class="language-C">//###这里是一个大的if，如果global_max_fast不为0，就表示av已经初始化，则执行清理fastchunk的逻辑
+	if (get_max_fast() != 0) {
+    // 清空 fastbins
+    clear_fastchunks(av);
+
+    // 获取未排序的 bin 头
+    unsorted_bin = unsorted_chunks(av);
+
+    // 从fast bin中移除每个块并进行合并，然后放入unsorted bin中，之所以不是放入smallbin或largebin也是基于unsortedbin的一个类似于延迟绑定的思想
+    maxfb = &amp;fastbin(av, NFASTBINS - 1);  // 指向最后一个 fastbin 的指针
+    fb = &amp;fastbin(av, 0);                 // 指向第一个 fastbin 的指针
+    do {// 循环遍历所有 fastbins	
+      // 从 fastbin 中取出一个内存块
+      p = atomic_exchange_acq(fb, 0);
+      if (p != 0) {
+        do {
+          // 检查当前内存块是否在使用中
+          check_inuse_chunk(av, p);
+          nextp = p-&gt;fd;  // 获取下一个 fastbin 内存块
+
+          // 稍微简化了合并内存块的代码，类似于 free() 函数中的合并代码
+          size = p-&gt;size &amp; ~(PREV_INUSE | NON_MAIN_ARENA);
+          nextchunk = chunk_at_offset(p, size);
+          nextsize = chunksize(nextchunk);
+
+          // 如果前一个块是空闲块，则合并前一个块和当前块
+          if (!prev_inuse(p)) {
+            prevsize = p-&gt;prev_size;
+            size += prevsize;
+            p = chunk_at_offset(p, -((long)prevsize));
+            unlink(av, p, bck, fwd);
+          }
+
+          // 如果下一个块不是堆顶块，则尝试合并下一个块和当前块
+          if (nextchunk != av-&gt;top) {
+            nextinuse = inuse_bit_at_offset(nextchunk, nextsize);
+
+            if (!nextinuse) {
+              size += nextsize;
+              unlink(av, nextchunk, bck, fwd);
+            } else
+              clear_inuse_bit_at_offset(nextchunk, 0);
+
+            // 将当前块插入未排序的 bin 中
+            first_unsorted = unsorted_bin-&gt;fd;
+            unsorted_bin-&gt;fd = p;
+            first_unsorted-&gt;bk = p;
+
+            // 如果块大小不在 smallbin 范围内，则将 fd_nextsize 和 bk_nextsize 置为 NULL
+            if (!in_smallbin_range(size)) {
+              p-&gt;fd_nextsize = NULL;
+              p-&gt;bk_nextsize = NULL;
+            }
+
+            set_head(p, size | PREV_INUSE);  // 设置当前块的头部大小，并标记为已使用
+            p-&gt;bk = unsorted_bin;
+            p-&gt;fd = first_unsorted;
+            set_foot(p, size);  // 设置当前块的脚部大小
+          }
+
+          // 如果下一个块是堆顶块，则直接合并当前块和下一个块，并将当前块设置为堆顶块
+          else {
+            size += nextsize;
+            set_head(p, size | PREV_INUSE);
+            av-&gt;top = p;
+          }
+
+        } while ((p = nextp) != 0);
+      }
+    } while (fb++ != maxfb);  // 循环遍历所有 fastbins	</code></pre><p id="16f0427e-38bb-8085-aa02-d6041eb29f34" class="">初始化堆：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="16f0427e-38bb-8020-a43b-cec0b240f91d" class="code"><code class="language-C">	} else {//###这里是从那个大if来的，如果global_max_fast为0，就表示av还没有被初始化，则直接走到这里为其进行初始化即可~
+		malloc_init_state(av);
+		check_malloc_state(av);
+	}
+}</code></pre><blockquote id="16f0427e-38bb-807d-aaa1-d9a3f25bba20" class="">其中，malloc_init_state函数代码如下：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="16f0427e-38bb-80d7-adfa-c5cd0f7df5ec" class="code"><code class="language-C">/*
+   初始化一个 malloc_state 结构。
+	 该函数仅在 malloc_consolidate 函数内部调用。
+ */
+static void malloc_init_state (mstate av){ // av 是 mstate 类型的指针，用于维护内存分配器的状态信息。
+  int i;
+  mbinptr bin; // mbinptr 是指向内存块分类链表的指针
+
+  // 1、初始化bin数组，使其各个元素循环自指 
+  for (i = 1; i &lt; NBINS; ++i){ // NBINS 是分类的数量，从索引1开始遍历至最后一个分类
+      bin = bin_at (av, i); // 获取第 i 个分类的指针
+      bin-&gt;fd = bin-&gt;bk = bin; // 设置每个分类的前向和后向指针都指向自己，形成环状链表
+    }
+
+	// 2、设置malloc_state的其他域
+#if MORECORE_CONTIGUOUS // 如果定义了 MORECORE_CONTIGUOUS 宏，表示内存是连续分配的
+  if (av != &amp;main_arena) // 如果当前不是主分配区，则设置为非连续分配
+#endif
+  set_noncontiguous (av); // 标记分配区为非连续的
+
+  if (av == &amp;main_arena) // 如果是主分配区
+    set_max_fast (DEFAULT_MXFAST); // 设置默认的最大快速分配大小
+
+  av-&gt;flags |= FASTCHUNKS_BIT; // 在标志中设置快速块位，表示可以使用快速分配路径
+
+	// 3、初始化topchunk
+  av-&gt;top = initial_top (av); // 初始化顶部块，即最后未分配的内存区域
+}</code></pre></blockquote></details></li></ul></div></p><h1 id="be237387-1211-4153-be10-16b3c1c11ca5" class="">二、malloc大小对齐机制</h1><p id="4fa56876-1184-4c06-ad6c-754a255aa2e0" class="">malloc用以下函数来进行大小对齐</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1840427e-38bb-807d-b90a-e88914d16998" class="code"><code class="language-Plain Text">// request2size：把用户申请的大小，转换为_int_malloc中实际要申请的块大小。
+//    用户程序要申请的大小，如果小于MINSIZE，则返回MINSIZE。
+//    如果大于MINSIZE，则加上3*SIZE_SZ（每个SIZE_SZ的大小相当于一个指针大小）的大小，然后再将其末三位清零。
+#define request2size(req)                                         \
+  (((req) + SIZE_SZ + MALLOC_ALIGN_MASK &lt; MINSIZE)  ?             \
+   MINSIZE :                                                      \
+   ((req) + SIZE_SZ + MALLOC_ALIGN_MASK) &amp; ~MALLOC_ALIGN_MASK)</code></pre><blockquote id="1840427e-38bb-800a-86db-c9db7f759133" class="">在这一个规则下，如果是x32系统<p id="1840427e-38bb-8029-ae4f-c3fd22a020fb" class="">申请的是0x1D~0x24 B，得到0x28 B</p><p id="1840427e-38bb-80a7-9090-f680a52d1ce3" class="">申请的是0x25~0x2 B，得到0x30 B</p></blockquote><p id="1840427e-38bb-80bc-89da-c5f544052b1b" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
