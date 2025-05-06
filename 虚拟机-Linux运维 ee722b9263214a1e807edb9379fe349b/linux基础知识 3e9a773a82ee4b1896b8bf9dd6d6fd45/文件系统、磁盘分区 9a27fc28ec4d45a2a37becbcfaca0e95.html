@@ -1,0 +1,723 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>文件系统、磁盘分区</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="9a27fc28-ec4d-45a2-a37b-ecbcfaca0e95" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/document_gray.svg"/></div><h1 class="page-title">文件系统、磁盘分区</h1><p class="page-description"></p></header><div class="page-body"><h1 id="08928e16-1a87-46b5-8dd2-c1553da9edd3" class="">一、相关基本概念</h1><h3 id="24ac8474-c858-4ab9-b95b-0da4d7903025" class="">1-文件系统结构</h3><p id="f389dec7-3fe1-424b-81e0-6d8089d8ca29" class="">一个电脑可以装多个磁盘，一个磁盘可以分四个分区且装一个文件系统。</p><p id="563e963e-ac7d-4c75-994f-355a44a4e82b" class="">所以就是例如：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0aaae5b8-5438-4f6d-84bc-c5c2fb1ca1e5" class="code"><code class="language-Plain Text">/dev/sda1：磁盘1的分区1
+/dev/sda2：磁盘1的分区2
+/dev/sda3：磁盘1的分区3
+/dev/sda4：磁盘1的分区4
+#------------------------
+/dev/sdb1：磁盘2的分区1
+/dev/sdb2：磁盘2的分区2
+#------------------------
+/dev/sr0：光驱设备</code></pre><h3 id="41d010d3-f9de-4fbd-b76c-2740ee5cd4bd" class=""><strong>2-文件系统与分区方式</strong></h3><p id="d70f5624-fa54-48af-8a2a-af4e935399da" class=""><strong>文件系统：</strong><div class="indented"><p id="d70b5d9d-166d-45cd-897b-eb90041507cd" class="">【定义】</p><p id="389db16b-6c58-4da6-9adb-8585f489a9c0" class="">作用于硬盘用来管理文件的系统</p><p id="d7069bec-4d7d-42c3-a455-ded5bcd64d7e" class="">其功能是：保存文件的数据+属性</p><p id="10a90f09-61d9-4a05-b123-a096e676653d" class="">【结构】</p><p id="2731265b-7202-4b41-983f-ac0151aeb951" class="">其中，文件系统会将文件的数据和属性分开存储：<div class="indented"><p id="06fd9a18-9c3e-4611-b7cb-93b032220823" class="">文件数据保存在data block（即数据块）中，块的大小和数量在格式化后就已经确定不能更改，文件大小以块为单位对齐，也就是不能把两个文件放在同一个块里</p><p id="354e928c-0268-4dba-95c0-f998bf8cb659" class="">文件属性则保存在inode（即i节点）中，记录了文件的创建修改时间，所有者，读写权限等（不含文件名）</p><p id="4bd04d8a-97fb-419f-a4d1-b91a2d3dbe77" class="">此外还有一个super block用来记录整个文件系统的信息，如块的总数，已经使用的块的个数</p><blockquote id="20a356f1-d11d-4ce0-a7fd-eb98bbaa3095" class="">注意，目录也用data block描述，其中存放了该目录下一级的所有子目录和子文件的文件名</blockquote></div></p><p id="b1df7dd2-eca7-4f20-be46-b49002fcea3e" class="">【文件系统碎片整理】</p><p id="db1a6612-6509-4cf5-b605-4ee6fe0a0d64" class="">其原理是把一个大文件的几个块整理到物理地址相邻的地方，从而实现提升其读写速度。</p><p id="85cefd05-36d1-44ab-a994-1ae5b8299d21" class="">【常见文件系统】</p><p id="2c8acbad-3780-4a68-9d3d-764b8c7cb0da" class="">XFS ：<div class="indented"><p id="f2d475b3-92d6-4529-9d12-3cecd7d67ae8" class="">是一种高性能的文件系统，最初由 SGI 开发，现在由 Linux 社区维护。它在处理大文件和大分区时表现出色。适用于大型数据存储和高性能服务器环境。</p></div></p><p id="58d9d537-1570-4448-8105-2598fa3edf57" class="">ext系列：<div class="indented"><p id="8c365bd9-1058-4390-b7e5-414143cdbffe" class="">从ext到ext2到ext3到ext4一脉相承，其中最新版的ext4引入了许多新特性，包括更快的文件系统检查、更大的文件和分区支持、更快的写入性能、更好的文件碎片整理等。</p><p id="4affcf2d-8a94-4d8e-9421-db40c061fd77" class="">适用于通用用途的计算机，是目前比较主流的linux文件系统。</p></div></p></div></p><p id="88165d45-8f42-460d-9fd5-72eb4d08f8b5" class=""><strong>sda、sdb磁盘：</strong><div class="indented"><p id="0e741a23-17f6-41e0-aefc-fe889936023a" class="">linux用/dev/sda来标识其接入的第一个磁盘驱动，用/dev/sdb来标识其接入的第二个磁盘驱动，以此类推</p><p id="bd24b763-b7ee-4987-84d2-6d4761e585f3" class="">其中，sd表示“SCSI或SATA硬盘”，如果是hd则表示IDE硬盘</p></div></p><p id="2db40386-ca9a-4032-baf4-b64c569c4520" class=""><strong>sda1、sda2分区：</strong><div class="indented"><p id="37a7ce09-8d21-426b-924c-69b5b5a9d133" class="">一个磁盘可以分4个大分区，表示方式例如：/dev/sda1、/dev/sda2、/dev/sda3、/dev/sda4</p><p id="a4e57dbb-fd74-459e-a595-da8c191620bb" class="">这其中可以把这四个分区都作为主分区，也可以分三个主分区一个做扩展分区</p><p id="9b5c08f7-bc13-44ef-a4c4-140cce885ecb" class="">然后可以再在扩展分区里分出多个逻辑分区，表示为例如：sda5、sda6、sda7…</p></div></p><p id="580beff9-0f57-44e9-aa0b-6f9d716c280c" class=""><strong>sr0、cdrom附加设备盘：</strong><div class="indented"><p id="081b0b04-9114-4ac3-95d5-da2234f3a34b" class="">linux用/dev/sr0来表示光驱设备（通常是DVD或CD-ROM驱动器）</p><p id="6585949a-caeb-455a-8673-7addfc59ac41" class="">然后它会再起一个别名，如/dev/cdrom，然后软链接向/dev/sr0，用这个别名的好处是更方便记忆</p></div></p><ul id="967b6dae-7f7b-49dc-ad4d-abf323ff6c53" class="toggle"><li><details open=""><summary>示例如下：</summary><p id="7905b337-cd00-438f-914b-a072c79275e8" class="">这样的分区表：</p><figure id="6b156626-cf6b-499e-a4dd-7bad9f27a7b0" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled.png"><img style="width:624px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled.png"/></a></figure><p id="661d44d6-1be4-4b36-ad8c-9149c6049ef4" class="">对应的结构如下：</p><figure id="5b4ce3ef-3345-4d30-827a-eb904c2d6058" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%201.png"><img style="width:576px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%201.png"/></a></figure></details></li></ul><p id="77f1a621-9db8-42e4-89a2-0a1eb4dd114a" class=""><strong>【常见分区类型】</strong></p><p id="91d0ae1a-46f6-4790-a7a7-b6f2e7fb1ad4" class=""><strong>/分区：</strong><div class="indented"><p id="135654b4-f3aa-4401-9aba-3340048facd0" class="">即根分区，用于挂载/</p></div></p><p id="97a7afc5-5c1f-417e-9a5f-cb1bd3ff02be" class=""><strong>/boot分区：</strong><div class="indented"><p id="2280308c-3cf4-4fd0-8c72-9378b064d42e" class="">用于挂载/boot</p><p id="33a6f48c-f77c-4267-a5a8-e41fa9219fbe" class="">存放引导操作系统的文件，用于开机启动</p></div></p><p id="dfa9458b-2914-4d75-8d2f-d474cf33a2fa" class="">SWAP<strong>分区：</strong><div class="indented"><p id="79ad5538-617e-4ba7-9d15-3f9749f7fa4a" class="">将一部分磁盘空间设置为“交换分区”，可以实现“拓展内存大小”的作用</p><p id="8ec9e3c6-bb8d-4c01-bcec-2db6b573d9b0" class="">其原理是：<div class="indented"><p id="80330c0d-92bb-4fc0-9a1a-85d057312d1d" class="">当物理内存不够用时，os会从物理内存中取出一部分用不上的数据先暂时放到交换分区中</p></div></p><blockquote id="4f144566-1a3b-4d3c-bf11-3b8642aa9b28" class="">一般建议将交换分区的大小设置为物理内存的1~2倍。</blockquote></div></p><p id="2baa3a2c-b23e-42b3-a179-67904345c10f" class=""><strong>/opt分区：</strong><div class="indented"><p id="ee7c5f0d-e385-4167-9424-8c5e01c32209" class="">用于挂载/opt</p><p id="752b5e4e-d485-4146-8b59-023d3a6a7d70" class="">其通常被规划用于安装和管理不包括在操作系统核心或标准软件库中的软件包（即一些附加组件&amp;第三方应用程序）</p></div></p><blockquote id="0a33cfef-e7fb-40d6-b1cb-72f33eaa3391" class="">其中，linux系统必须要有根分区和boot分区才能运行，其他的分区可以不需要</blockquote><h1 id="66ee0681-eb20-4654-91f8-c29a45d67d53" class="">二、磁盘分区</h1><h3 id="aa594930-cc34-44c0-9bce-e140a6fd86d5" class="">1-<strong>定义</strong></h3><p id="fc40d4f4-f57c-486e-a2f1-5aa4201abb22" class="">磁盘分区独立于linux的文件系统结构，但是可以设置将文件系统的那些目录对应在哪些分区中</p><p id="d692f0fd-03fd-4873-ae4e-5b6c7e37616f" class="">对linux系统进行磁盘分区，有以下意义：<div class="indented"><p id="3ace5028-4289-40ad-b0fe-6d1776fe834c" class="">1、数据隔离：分区之间数据隔离，提高安全性</p><p id="d172fe9d-bd99-44dc-8fc7-8c6667edde9b" class="">2、任务对应：比如有的分区专门用来挂载，有的分区专门用来缓存等等</p><p id="72ba7c56-fd85-441b-aa0b-47a8d6db4322" class="">3、性能优化：不同的分区可以设置不同“簇”大小等配置，以适应其对应的任务</p></div></p><h3 id="2d697259-ccd9-4084-b9ae-048e98aea755" class="">2-结构</h3><p id="a220ef80-8fa7-43c5-b133-d3b59ae287dd" class="">一般来说，按照内存从小到大相贴顺延下去，分区的顺序为：</p><p id="4cd78337-b699-4c47-a4f7-128f73ac67ec" class="">1、boot分区</p><p id="ac3af0cf-9f10-4338-b28c-302b4b7a44cd" class="">2、swap分区</p><p id="fc56eca0-9e3f-4afd-bf91-4509e630c24d" class="">3、根分区</p><h3 id="2ae4e609-acf9-4a1c-a647-23c37c906ef6" class="">3-<strong>fdisk工具</strong></h3><p id="764a7f73-550d-4f3a-ba14-8158684dab55" class="">【定义】</p><p id="fd76e79c-df9e-4ef1-b34e-c325c17dc39f" class="">是一个linux的磁盘分区管理工具</p><p id="436f7a6c-caca-4035-ad59-ffe841d406a7" class="">【相关指令】</p><blockquote id="25f179cb-9d19-47da-8b06-1f413d283cd6" class="">因为linux系统必须要有根分区和boot分区才能运行，所以建议不要随意删除和移动这两个分区<p id="83377cff-80f7-4eac-9578-407983900483" class="">这里建议在进行操作时，只进行以下操作：</p><p id="a0069d83-5da7-4cf5-a117-183da26dbb95" class="">1、添加硬盘设备时，将其作为一个新分区或划入根分区</p><p id="2df2a266-c8a4-4b83-ae13-bd36b18d2a2f" class="">2、硬盘阵列都挂载在根分区，此时有一个硬盘损坏了，要求将其地址移出根分区</p></blockquote><p id="60eac59d-cae2-43c9-a5d4-0016cbb0a00e" class=""><strong>1、查看当前的磁盘分区：</strong><div class="indented"><p id="2df1da17-220b-4fa5-9198-719cfafca1dd" class="">查看磁盘的分区：<code>fdisk -l</code></p><ul id="a0fb6456-14c6-4d5f-a8db-797a513e8e95" class="toggle"><li><details open=""><summary>结果对应的意义如下：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a5521031-1987-444d-aa8c-4563762bffcc" class="code"><code class="language-Shell">Disk /dev/sda: 42.9 GB, 42949672960 bytes, 83886080 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: dos
+Disk identifier: 0x000b4e3d
+
+Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048      616447      307200   83  Linux
+/dev/sda2          616448     8744959     4064256   82  Linux swap / Solaris
+/dev/sda3         8744960    83886079    37570560   83  Linux</code></pre><p id="05a1b7e1-de09-4f22-8389-a24b7163bca8" class="">我们当前的硬盘设备只有一个，即<code>/dev/sda</code>，它被分为了三个分区：/dev/sda1、/dev/sda2和/dev/sda3</p><p id="83b6568b-28b1-4602-98ea-6660ea22b223" class="">当前系统一个块的大小是512B。</p><p id="b347fc0a-a4ee-434c-8364-25a7c86d7e0c" class="">该磁盘被分为三个分区：</p><ul id="5b4bc24e-ba39-432e-999d-44b8b021efe9" class="bulleted-list"><li style="list-style-type:disc"><code>/dev/sda1</code>：启动分区，大小为<code>307200</code>块，文件系统类型为<code>Linux</code>。</li></ul><ul id="f5d883f9-b3d0-4697-a1cf-42ab1da92fbc" class="bulleted-list"><li style="list-style-type:disc"><code>/dev/sda2</code>：交换分区，大小为<code>4064256</code>块，文件系统类型为<code>Linux swap / Solaris</code>。</li></ul><ul id="2cd76229-b3a5-408e-b70f-625e0a08dacb" class="bulleted-list"><li style="list-style-type:disc"><code>/dev/sda3</code>：主分区，大小为<code>37570560</code>块，文件系统类型为<code>Linux</code>。</li></ul></details></li></ul><p id="72d63cc4-5ba4-4f59-9fef-87e87a9f1a73" class="">查看各个分区所使用的文件系统类型：<code>df -Th</code></p><ul id="795fdce8-8f16-4c76-878e-875e8b2ba24e" class="toggle"><li><details open=""><summary>结果对应的意义如下：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="fdbc4eb5-c9da-4e59-ab97-7ea840a1c920" class="code"><code class="language-Shell">Filesystem     Type      Size  Used Avail Use% Mounted on
+devtmpfs       devtmpfs  1.9G     0  1.9G   0% /dev
+tmpfs          tmpfs     1.9G     0  1.9G   0% /dev/shm
+tmpfs          tmpfs     1.9G   13M  1.9G   1% /run
+tmpfs          tmpfs     1.9G     0  1.9G   0% /sys/fs/cgroup
+/dev/sda3      xfs        36G  4.4G   32G  13% /
+/dev/sda1      xfs       297M  163M  134M  55% /boot
+tmpfs          tmpfs     378M   24K  378M   1% /run/user/1000</code></pre><p id="2163de62-7f7b-4074-9b48-950f139ad8b1" class="">/dev/sda3 是一个 xfs 类型的分区</p><p id="ca46b09a-dc2a-4ab8-8040-54eee1e64adf" class="">/dev/sda1 是另一个 xfs 类型的分区</p><p id="e522a3a5-691c-47bf-90af-2cb7fb3b735f" class="">devtmpfs、tmpfs 等是虚拟文件系统，它们在内存中创建，不是磁盘分区。</p></details></li></ul></div></p><p id="af784b4f-8a64-4ee2-acda-e4499acd278c" class=""><strong>2、分区的增加、删除、类型修改</strong><div class="indented"><p id="8804664b-168e-41ff-9989-9139d15d631b" class="">（1）进入该磁盘<div class="indented"><p id="b7a81c0f-024a-42d5-bde6-3d9bfd207600" class=""><code>sudo fdisk /dev/sda</code></p></div></p><p id="245f32bb-ceba-4e53-b0b3-26428c6a8fae" class="">（2）删除现有分区&amp;创建新分区<div class="indented"><p id="8ee6404a-9018-4306-8cb7-e1551e738be3" class="">按d进入删除模式，输入分区号回车删除指定分区</p><p id="576bd187-fde3-4495-9225-7214be583f6f" class="">按n进入创建模式，输入分区号+类型选primary+起始地址（有提示）+大小回车创建新分区</p><ul id="5ba67e23-a455-4f63-af07-dd541bf9deb6" class="toggle"><li><details open=""><summary>创建过程如下</summary><figure id="2e139cf7-3d78-4fcd-a17a-804869f8369b" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%202.png"><img style="width:432px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%202.png"/></a></figure></details></li></ul></div></p><p id="e9b90698-99aa-4a7f-af45-32e5a5981e03" class="">（3）修改分区的类型<div class="indented"><p id="efd2b415-67b5-42ef-bfb2-d08be2088ca2" class="">输入 t 进入类型修改模式，输入分区号修改指定分区的类型，其中：</p><p id="8e7f3476-d2cf-4482-870f-eb2077c8d073" class="">82为linux swap类型、83为linux文件系统类型，像是根分区、OPT分区用这种类型即可</p><blockquote id="0049b5b6-6aab-4b18-aed4-62986c5ccd9d" class="">此处的数字均为16进制，也就是说，82其实就是0x82</blockquote></div></p><p id="6b750a56-81dc-4b55-8419-ad884e9f1d0f" class="">（4）保存并退出<div class="indented"><p id="d0bb7d83-84e5-48ea-881e-183ed378aada" class="">输入 w ，以保存并退出fdisk。</p></div></p></div></p><p id="fd1c8e3a-0dd6-491f-a7a0-673f5b88944b" class=""><strong>3、格式化并挂载这些分区：</strong><div class="indented"><ul id="66051c2b-4725-458f-839b-6877b7ce36e6" class="toggle"><li><details open=""><summary>建议把OPT分区格式化成ext4类型，指令如下：</summary><p id="4876f04c-09fd-4a73-97cc-4cbfff8f452a" class="">取消挂载：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="adc74041-3d03-4c94-bd49-bd6c8ef47131" class="code"><code class="language-Shell">sudo umount /dev/sda3</code></pre><p id="78db4fcb-026c-44ee-98f1-4f61b4c51c71" class="">然后格式化：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="f82d88cc-61de-494c-a2dd-ff36d2cdda20" class="code"><code class="language-Shell">sudo mkfs.ext4 /dev/sda3</code></pre></details></li></ul><ul id="82d2e268-557e-40c9-a1f2-ba4b44200faa" class="toggle"><li><details open=""><summary>至于swap分区则不需要指定类型，直接格式化即可，指令如下：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9378598c-b928-44b1-aeb0-7f383ef34fcd" class="code"><code class="language-Shell">sudo mkswap /dev/sda4</code></pre><p id="194e089a-305e-41ba-9fea-dda386634304" class="">然后需要以下命令激活swap分区：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="77683c31-11a1-45f2-b553-6aaec8a12331" class="code"><code class="language-Shell">sudo swapon /dev/sda4</code></pre></details></li></ul><ul id="2fe2af29-65d5-4e33-a8f4-2ecb42722fcf" class="toggle"><li><details open=""><summary>然后更新<code>/etc/fstab</code>文件以确保分区在启动时能够正确挂载：</summary><blockquote id="a2033efd-ff0b-4d8c-8a1d-6dfc1e233ed8" class="">该文件设定了boot时要进行的挂载策略</blockquote><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="3fd2be64-40d3-4d2a-811c-84424e312c90" class="code"><code class="language-Shell">su
+chmod a+rwx /etc/fstab
+vim /etc/fstab</code></pre><p id="3dc4df21-89ee-4370-afb9-9d3c142c40e0" class="">然后写入类似这样的格式：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="820b0e47-ed74-4a88-ac8b-a8e3d032f849" class="code"><code class="language-Shell">/dev/sda2    /       ext4    defaults 0 1
+/dev/sda3    /opt    ext4    defaults 0 2
+/dev/sda4    none    swap    sw       0 0</code></pre><blockquote id="9cea9dc1-27df-49b4-b961-c9633c160b5a" class="">关于最后三列：<ul id="4e6df773-32a0-46ca-8179-7d2a47ba77b8" class="bulleted-list"><li style="list-style-type:disc"><code>defaults</code>：这是用于指定挂载选项的字段，其中 defaults 通常包括一些默认的挂载选项，如读写权限等。</li></ul><ul id="c1c00fed-d662-4c65-a69e-4ef76f3011d0" class="bulleted-list"><li style="list-style-type:disc"><code>0</code>：这是用于备份目的的字段，通常设置为 0，表示不需要备份。</li></ul><ul id="9630c126-19b8-4915-b3a6-6e4b14e61aa2" class="bulleted-list"><li style="list-style-type:disc"><code>2</code>：这是用于检查顺序的字段，通常设置为 2，表示在文件系统检查时应该进行检查。</li></ul></blockquote></details></li></ul></div></p><p id="6f18decc-081d-42ae-8c17-5b92671921b1" class="">【示例】</p><blockquote id="cef63d98-c666-450a-88eb-5033dae007d0" class="">模拟在centos7环境下添加新磁盘空间，并将其划分为\opt区</blockquote><ul id="8dc18908-033f-4a5c-a7e7-855084492635" class="toggle"><li><details open=""><summary>过程如下：</summary><p id="91c9221a-9759-42cc-a64f-1af2c27c3cd8" class="">1、df –hT查看系统文件系统信息<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="35d5505b-3284-4b94-83cb-2ed5163b4038" class="code"><code class="language-Shell">[root@localhost zaijiu]# df -Th
+Filesystem     Type      Size  Used Avail Use% Mounted on
+devtmpfs       devtmpfs  1.9G     0  1.9G   0% /dev
+tmpfs          tmpfs     1.9G     0  1.9G   0% /dev/shm
+tmpfs          tmpfs     1.9G   13M  1.9G   1% /run
+tmpfs          tmpfs     1.9G     0  1.9G   0% /sys/fs/cgroup
+/dev/sda3      xfs        36G  5.1G   31G  15% /
+/dev/sda1      xfs       297M  163M  134M  55% /boot
+tmpfs          tmpfs     378M   36K  378M   1% /run/user/1000
+tmpfs          tmpfs     378M     0  378M   0% /run/user/0</code></pre></div></p><p id="13cf0e2f-6165-4603-97ec-343a4d4d453a" class="">2、关机，添加新硬盘<div class="indented"><figure id="b18c9224-80af-402a-881d-2c3e5a8d53a6" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%203.png"><img style="width:432px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%203.png"/></a></figure><p id="c6c20a02-7e09-4ca9-9b83-f34473141528" class="">添加一个5G的新磁盘</p></div></p><p id="a9e29ab1-47f6-4a88-844f-77b927495db1" class="">3、使用fdsik将新加的sdb赋一个主分区<div class="indented"><p id="6cbba470-bfd7-4872-b650-65b4a151dd4a" class="">fdisk -l可以看到我们刚刚给他搞了个5G的新磁盘还没有分区</p><figure id="1f9df091-90e2-4750-a745-1e176b850b09" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%204.png"><img style="width:480px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%204.png"/></a></figure><p id="bf0576c6-25e5-4a67-88f0-34b49bd3030a" class="">为其创建新分区创建为sdb1</p><figure id="8676ad36-5f6f-4e88-b804-948718caab7b" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%205.png"><img style="width:528px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%205.png"/></a></figure></div></p><p id="a59dfeff-b47a-499c-916a-f3a623f380cf" class="">4、激活之<div class="indented"><p id="ad06ec43-874b-4db1-a5a7-856c3b7eb528" class="">激活分区信息表：</p><p id="dde036a3-92c0-43e5-b331-ff8b3fe6aec4" class=""><code>partprobe /dev/sdb1</code></p><p id="cb01b34e-721b-42ef-97ff-6c23a73eec03" class="">格式化并将其文件系统设置为ext4格式：</p><p id="998bebdf-ac05-482a-b8d9-b0d0ae2a218b" class=""><code>mkfs.ext4 /dev/sdb1</code></p></div></p><p id="6e94c7d2-4476-4dcd-b895-fe55102dd9be" class="">5、挂载之<div class="indented"><p id="9a71f61a-68bb-4cdf-9645-c73f188ee7fc" class="">创建目录：</p><p id="418773da-a21e-4829-8dc8-3d288910a6ed" class=""><code>mkdir /opt</code></p><p id="7a0d8dc0-8990-48cd-8d5a-b11e67e0dcbd" class="">查看开机挂载文件：</p><p id="136c67ad-f9e6-4710-86e7-a2bcde09afa7" class=""><code>vim /etc/fstab</code></p><p id="c8056abd-777a-4939-99ca-19324a2c9365" class="">写入：</p><p id="723f34e5-1057-4fbe-a86a-d993eae03dff" class=""><code>/dev/sdb1    /opt    ext4    defaults 0 2</code></p></div></p><p id="837e5743-5a64-4e82-806e-9711b9a22824" class="">6、重启查看是否成功挂载<div class="indented"><p id="fe9689c5-7384-4e0c-82ca-d9d8e8e03c46" class="">重启：</p><p id="78c33d0f-76d7-49d0-b2da-c163cba99a7a" class=""><code>sudo reboot</code></p><p id="f1a0c08a-8b62-4f04-aefd-b6af5bcc44e7" class="">df -hT查看系统文件系统信息：</p><figure id="ba0c3f3d-26f9-477a-b98a-e6b0050ca419" class="image"><a href="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%206.png"><img style="width:384px" src="%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95/Untitled%206.png"/></a></figure></div></p></details></li></ul><p id="b3cad232-4fb7-427f-9e1e-aabb931c7fdf" class="">更多示例操作，参考：<a href="https://blog.csdn.net/m0_60444349/article/details/122654263">https://blog.csdn.net/m0_60444349/article/details/122654263</a></p><h1 id="534e4431-294f-4b18-80a2-c29de6659670" class="">三、挂载</h1><p id="d8f87663-9c7e-4f21-b78e-304446899c63" class="">【定义】</p><p id="99b68670-a654-4493-a94d-fc4aa979cebd" class="">用于把一个外部文件系统挂载到到 Linux 文件系统层次结构中，以便访问它们</p><p id="b77f2666-893a-4ba9-a78e-00bdc03aa28c" class="">【命令】</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0c905937-4d43-4eab-9884-0c4c34477f3d" class="code"><code class="language-Shell">mount [选项] 外部文件系统 挂载点</code></pre><p id="263dc59f-c119-4ddf-93b1-9dc72f4e8129" class="">【选项】</p><p id="99c416d9-04ab-4bfb-8c31-975601c038aa" class="">一些常见的选项包括：<div class="indented"><p id="c6abf6e5-30a5-4d14-b62c-344eb7877d1c" class=""><code>-t 文件系统类型</code>：指定要挂载的文件系统的类型，例如 ext4、ntfs、nfs 等。</p><p id="1e8dc96f-772c-46a0-a97d-7459889da793" class=""><code>-o 选项</code>：指定文件系统的挂载选项，例如读写权限、用户权限等。</p></div></p><p id="0c098c76-d530-4e68-98a3-6445d49670e5" class="">【示例】														</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="be3cf5d7-4ddd-48df-88b3-be6adf349195" class="code"><code class="language-Shell">mount /dev/sdX /mnt/mydisk #将硬盘分区/dev/sdX（这里是刚插进去的u盘）挂载到linux的/mnt/mydisk目录</code></pre><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e6ad834b-1123-49c8-94fb-a8e3dfb8744d" class="code"><code class="language-Shell">mount -t nfs 192.168.1.100:/share /mnt/nfsshare #挂载一个共享文件夹</code></pre><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0a4fce1b-eea6-4e48-b3cf-71100bb78605" class="code"><code class="language-Shell">umount /mnt/mydisk：取消挂载</code></pre><p id="97bfe4c4-5642-465a-9187-af3966756b21" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
