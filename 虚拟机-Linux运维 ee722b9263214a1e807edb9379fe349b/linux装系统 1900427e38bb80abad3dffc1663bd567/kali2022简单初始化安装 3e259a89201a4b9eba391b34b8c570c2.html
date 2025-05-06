@@ -1,0 +1,740 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>kali2022简单初始化安装</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="3e259a89-201a-4b9e-ba39-1b34b8c570c2" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1470058869958-2a77ade41c02?ixlib=rb-4.0.3&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🌿</span></div><h1 class="page-title">kali2022简单初始化安装</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="979148aa-283d-4548-90a6-0e59fd87d5e0" class=""><mark class="highlight-gray">愿你有好运气，如果没有，愿你在不幸中学会慈悲。愿你被很多人爱，如果没有，愿你在寂寞中学会宽容。愿你一生一世每天都可以睡到自然醒。</mark></blockquote><p id="bca70c7c-7a7d-46f4-8a7f-0e6a6719e585" class="">本篇旨在让读者快速安装好最基础的linux环境，以kali2022为例</p><h1 id="f2e957f4-7c78-4a7a-9399-80a34f664eaa" class="">1、创建kali虚拟机</h1><p id="bfa0a0c5-65eb-41a2-8bc5-ba5186e28861" class="">1、下载vmware<div class="indented"><p id="73783ac9-90f5-4064-93d1-54c73e0e51b2" class="">从官网下载vmware，然后去百度搜索激活码，多试几次就成功了</p></div></p><p id="4c3c77cc-6df2-4ec3-a08e-241abe8aed29" class="">2、镜像文件下载<div class="indented"><p id="5ba703cb-7cd7-4965-b2d3-12e8031092ab" class="">建议下载kali2022，地址：<a href="http://old.kali.org/kali-images/kali-2022.4/">http://old.kali.org/kali-images/kali-2022.4/</a></p><figure id="d9c59837-722a-4eb1-9be0-af699f102fea" class="image"><a href="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/Untitled.png"><img style="width:576px" src="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/Untitled.png"/></a></figure><ul id="4d2b9122-b571-48a5-9cf2-d761d031d89d" class="toggle"><li><details open=""><summary>其中涉及的注意事项</summary><p id="a55908d8-a789-45fe-bfd4-f370d36bb161" class="">下载.iso后缀的</p><p id="f43030de-81db-4a04-9f30-ca237aff3e96" class="">不要下载微缩的内核版，因为那里面会缺少很多像vim、cat这样的工具</p><p id="61bdd8ea-c6e5-4b31-a3be-3d32b553dba2" class="">不要下torrent，那个是联网下载安装器，会装很久</p><p id="e3f448d2-a243-4a88-aa0d-4f59f75ce7c1" class="">不要下everything版，那个很大很臃肿</p><p id="fb7bbda2-e677-4c39-89f3-3480e693e0df" class="">下在D盘自己找得到的地方，最好是全英文路径</p><p id="5ec4b478-19d4-435c-8c22-2061a2af8b1c" class="">不要把.iso文件删掉</p></details></li></ul><ul id="d5aed425-aa6f-45eb-ad16-b3434e837cce" class="toggle"><li><details open=""><summary>其他操作系统的下载</summary><p id="65dfdbb6-c1e4-4278-b268-4e361c0ecadf" class="">centos7，建议从这里下载：<a href="http://mirrors.aliyun.com/centos/7/isos/x86_64/">centos-7-isos-x86_64阿里源</a></p><blockquote id="3c3a5b9e-5004-4e95-b2ab-021ea5c49c17" class="">不要去官网下，那里太慢了</blockquote><p id="6b1c3daa-a97d-46dd-93bd-b49916cdf1d8" class="">下这个：</p><figure id="e14f4e29-35b7-4b54-8aeb-44ddb9cd94b2" class="image"><a href="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/Untitled%201.png"><img style="width:336px" src="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/Untitled%201.png"/></a></figure></details></li></ul></div></p><p id="657cee9e-97f9-45ba-b598-0dab30da399d" class="">3、虚拟机创建<div class="indented"><p id="58d7a689-2d34-40f5-b056-87e568f5958b" class="">直接点开vmware，然后创建虚拟机即可</p><ul id="c720d722-4ff6-4152-bd16-f6872e7e353a" class="toggle"><li><details open=""><summary>其中，相关配置选择如下：</summary><p id="32d1fcb0-a4d9-4a10-ad23-5522a5949aeb" class=""><strong>路径：</strong><div class="indented"><p id="34074075-89d5-46f8-8adb-4fcefdd3455f" class="">iso文件和虚拟机配置文件路径建议都采用全英文！</p></div></p><p id="56e057ca-7c4e-4e07-be3a-94ca004a80c8" class=""><strong>操作系统选项：</strong><div class="indented"><p id="443a32fe-67fb-489d-89bb-2b2ec828be8b" class="">kali的话对应的vmware里的操作系统选项是ubantu64位</p></div></p><p id="d993128b-18c1-401c-bbd7-d1c8cd3ae455" class=""><strong>配置：</strong><div class="indented"><p id="55ad6fad-24b4-47b6-9651-d4a388f9b493" class="">建议使用：2cpu，1核，4G内存，50G存储空间</p><blockquote id="2b1454fc-8d20-4d56-bcb5-97d5f384a68c" class="">其他地方默认，网络模式NAT和桥接都可以</blockquote></div></p><p id="cd5f88b2-0e7e-45f7-ba13-e9fe4a58b8aa" class=""><strong>用户名密码：</strong><div class="indented"><p id="303db419-85f1-4606-a163-fed3d78d4d14" class="">root和root即可，防止忘记</p><blockquote id="dfbb0f2a-d9bb-49b8-a291-21fede223295" class=""><mark class="highlight-gray">有一次帮新生创建虚拟机，他就输了他喜欢的密码，结果自己把密码给忘了</mark></blockquote></div></p><p id="baabe31f-ce45-4d22-8b1f-725526efb201" class=""><strong>语言环境：</strong><div class="indented"><p id="a3440735-d7fe-44df-b11d-e08e8ef89f56" class="">kali2022中可以直接选中文</p><ul id="ba746bb0-0787-472e-88d4-32dd127bfc29" class="toggle"><li><details open=""><summary>对于其他操作系统的建议</summary><p id="03bf0f65-9b2d-4c72-bb80-b817ba443775" class="">其他操作系统建议使用中文地区但使用英文作为系统语言，同时输入法使用英文</p><p id="63dd5660-e078-48d1-a674-861be6995a0e" class="">因为这可以避免很多因为字符集问题导致的乱码现象</p><blockquote id="db4235ea-9744-47e2-8248-e5548833d857" class=""><mark class="highlight-gray">目前来说，使用ubantu22（或者是ubantu16？忘了。）时，xftp会出现中文乱码现象，kali2022xftp不会中文乱码，kali2019只要系统环境选中文，一进系统就乱码</mark></blockquote></details></li></ul></div></p></details></li></ul></div></p><h1 id="3d86c0ef-6a3d-4eb8-ac4c-2b8b8ad6fbc1" class="">2、root用户初始化</h1><p id="ba111026-1b42-4e90-9fcf-3cdbebbf64f9" class="">刚创建的虚拟机还没有root用户，需要用以下操作初始化root：</p><p id="b31d8016-d1ea-49bc-b015-0edf14b1e014" class="">代码：sudo passwd root<br/>密码设置为：1<br/></p><h1 id="9036607f-5d1a-4a1b-bc84-b26f9d4497d7" class="">3、apt换源</h1><h3 id="1880427e-38bb-80a0-b5e7-c790223e3b73" class="">1-操作</h3><blockquote id="ed56c478-327d-4014-a55a-9600c959114a" class="">这里还是对kali2022的换源</blockquote><p id="b71ec67d-a72f-4774-b49a-b55d5eae2cb2" class="">1、备份原来的源配置文件<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b52af6de-7237-436a-8e97-e2a581c11525" class="code"><code class="language-Shell">sudo cp /etc/apt/sources.list /etc/apt/sources.list.bat #sources.list是apt的一个配置文件，记录了apt服务器地址</code></pre></div></p><p id="6e8c8e1a-1c7f-4af9-ba7d-c9a3256040d0" class="">2、逛官方镜像站<div class="indented"><p id="1880427e-38bb-80c2-b6e9-e9f3c9d0e5ca" class="">进入清华大学镜像站官网：<a href="https://mirror.tuna.tsinghua.edu.cn/">https://mirror.tuna.tsinghua.edu.cn/</a></p><p id="1880427e-38bb-8087-b57f-e2574b8c2a88" class="">搜索kali，点击“?”进入相关教程：</p><figure id="1880427e-38bb-8085-9391-f06fe2552dd7" class="image"><a href="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/image.png"><img style="width:685.9583129882812px" src="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/image.png"/></a></figure><p id="1880427e-38bb-8031-9b59-cacfb1341c81" class="">可以看到要做的事情：</p><figure id="1880427e-38bb-80a8-8bea-ec82a442fd27" class="image"><a href="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/image%201.png"><img style="width:685.9861450195312px" src="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/image%201.png"/></a><figcaption>需要注意的是，最后面这个non-free-firmware好像在一些比较老的版本里面还下不了，<mark class="highlight-red"><strong>无需理会相关报错即可</strong></mark></figcaption></figure><ul id="2fe1df51-216b-496e-b1b4-5a5153ced465" class="toggle"><li><details open=""><summary>其中，一些关键字的解释</summary><ul id="85ccc0b7-d002-4b8c-b464-9e2fc8f92041" class="bulleted-list"><li style="list-style-type:disc">deb 开头的行用于指定二进制软件包的源。deb-src 开头的行用于指定源代码软件包的源。</li></ul><ul id="16b1fbea-d50e-4c82-9a5f-96f882f55c55" class="bulleted-list"><li style="list-style-type:disc">main, restricted, universe, 和 multiverse 是软件包组的组成部分，它们代表不同的软件包类别：<ul id="3a57ee24-46b3-4f91-898b-81dc80601eab" class="bulleted-list"><li style="list-style-type:circle"><mark class="highlight-default"><code>main</code></mark><mark class="highlight-default">：包含Kali官方支持的自由软件。</mark></li></ul><ul id="ae908646-a5bd-4702-bc60-a19528e23c6c" class="bulleted-list"><li style="list-style-type:circle"><mark class="highlight-default"><code>non-free</code></mark><mark class="highlight-default">：包含非自由软件，通常包括一些有限支持的软件包。</mark></li></ul><ul id="6b2c948d-3790-4fe3-be54-ec02a449b853" class="bulleted-list"><li style="list-style-type:circle"><mark class="highlight-default"><code>contrib</code></mark><mark class="highlight-default">：包</mark>含依赖于非自由软件的自由软件包。</li></ul></li></ul></details></li></ul></div></p><p id="1880427e-38bb-8051-9270-dbc3f58ccfd7" class="">3、修改源配置文件<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="83e0f7c5-04db-40fd-8eb1-fe741fe107e8" class="code"><code class="language-C">$ su
+$ chmod a+rwx /etc/apt/sources.list
+$ vim /etc/apt/sources.list</code></pre><p id="1880427e-38bb-8053-bb15-d21daa51f00d" class="">把教程中要求复制的代码复制在官方源前面(<mark class="highlight-red"><strong>注意不要删掉官方源，这样镜像源找不到的包他会默认再回到官方源去找！</strong></mark>)。</p><ul id="1880427e-38bb-8016-97b9-fe86ca61acbc" class="toggle"><li><details open=""><summary>更多可以用的源</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-806e-a921-e4aacb96a548" class="code"><code class="language-Plain Text"># 官方源(国外的太慢不推荐)
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+
+#中科大-*
+deb http://mirrors.ustc.edu.cn/kali kali-rolling main non-free contrib
+deb-src http://mirrors.ustc.edu.cn/kali kali-rolling main non-free contrib
+
+#阿里云
+deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+
+#清华大学
+deb http://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free
+deb-src https://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free
+
+#浙大
+deb http://mirrors.zju.edu.cn/kali kali-rolling main contrib non-free
+deb-src http://mirrors.zju.edu.cn/kali kali-rolling main contrib non-free
+
+#东软大学-*
+deb http://mirrors.neusoft.edu.cn/kali kali-rolling/main non-free contrib
+deb-src http://mirrors.neusoft.edu.cn/kali kali-rolling/main non-free contrib
+
+#重庆大学
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+deb-src http://http.kali.org/kali kali-rolling main non-free contrib</code></pre></details></li></ul></div></p><p id="fdc6081b-59cf-4d65-9ea3-4cc82c2d450c" class="">4、获取软件包的更新信息<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5c614cac-18cf-4602-812a-3939aaaf51ab" class="code"><code class="language-Shell">apt update
+apt-get update</code></pre><blockquote id="e9f0bf9b-8d4b-4c72-9281-e180df5876fc" class="">注意，该指令并不会实际地去更新那些软件包，而是会更新软件包的索引信息</blockquote></div></p><h3 id="1880427e-38bb-8033-8237-f65a443c995d" class="">2-其他</h3><ul id="4a1308bb-a15f-482a-8492-05434938ea08" class="toggle"><li><details open=""><summary>一些相关报错的处理：</summary><ul id="d23f3e80-7060-47fe-8a48-d97ef9af428f" class="toggle"><li><details open=""><summary>问题1：报错xxx在xxx中被配置了多次</summary><p id="63f4e9a1-8fad-4021-8d70-1739e0f328c3" class="">报错信息如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="738fc4e2-adde-4f3d-bcf8-554cfa1b6feb" class="code"><code class="language-C">W: 目标 Packages (stable/binary-all/Packages) 在 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:1 和 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:3 中被配置了多次
+W: 目标 Translations (stable/i18n/Translation-zh_CN) 在 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:1 和 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:3 中被配置了多次
+W: 目标 Translations (stable/i18n/Translation-zh) 在 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:1 和 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:3 中被配置了多次
+W: 目标 Translations (stable/i18n/Translation-en) 在 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:1 和 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:3 中被配置了多次
+W: 目标 Contents-deb (stable/Contents-all) 在 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:1 和 /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-kali-rolling.list:3 中被配置了多次</code></pre><p id="c8654edb-b469-42e4-baef-c875c44daa89" class="">处理：</p><p id="ec9423de-575a-40ff-a5e8-7ddfb933d797" class="">这里好像是docker仓库配置出错</p><p id="8dbc11ab-fed2-4e5b-8adc-9e794756a080" class="">用vim打开这里提到的那些文件，将相关配置声明内容注释掉</p></details></li></ul><ul id="156a6bc0-a2f4-4add-b92c-4ada11d88687" class="toggle"><li><details open=""><summary>问题2：有时候使用了镜像源后，一些包会装不到</summary><p id="20a40089-e25c-4ce7-a4db-197c13ad03a3" class="">【分析】</p><p id="e7429fa2-c9d1-459a-b1bf-059a4ab54da8" class="">可能是源里面的内容不全，或者是源最近出问题了</p><p id="752f90c4-36d7-4025-808c-1179fd25e37b" class="">【解决】</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="f3d895a8-b5fb-443f-8f03-50de6cbfea3c" class="code"><code class="language-Shell">$ vim /etc/apt/sources.list</code></pre><p id="94169184-e21a-4fb0-a9e7-4c5c332a831f" class="">在配置列表里面追加写入</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="010e31be-4d0e-4109-ab5f-b8366ef72a29" class="code"><code class="language-Shell">#常规源：
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+#清华源：
+deb https://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free
+deb-src https://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free</code></pre><p id="775f51e4-a5ff-4f10-9294-e91a882e4d91" class="">然后更新缓存</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9a176b0b-048d-43eb-9b63-1b7a4f6f21d7" class="code"><code class="language-Shell">sudo apt-get update</code></pre></details></li></ul><ul id="75682422-5350-4b02-b83a-d67a97b3d8b4" class="toggle"><li><details open=""><summary>问题3：仓库xxx没有没有 Release 文件</summary><p id="149e3b71-9897-4844-8e23-fa6ffc2ada91" class="">报错信息如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5d87510e-a058-44a0-8919-73f5a54b1ffc" class="code"><code class="language-Python">E: 仓库 “https://download.docker.com/linux/ubuntu kali-rolling Release” 没有 Release 文件。
+N: 无法安全地用该源进行更新，所以默认禁用该源。</code></pre><p id="1ce43fe3-4e45-4928-94e0-0064b372a8f7" class="">分析：</p><p id="e77c74cd-dd99-4b10-ad33-69a02ce5c2ca" class=""><mark class="highlight-default">尝试从 </mark><mark class="highlight-default"><code>https://download.docker.com/linux/ubuntu</code></mark><mark class="highlight-default"> 更新 Docker 时，因为 Kali Linux 使用的是 </mark><mark class="highlight-default"><code>kali-rolling</code></mark><mark class="highlight-default"> 版本，而该 URL 并不支持 Kali Linux，导致无法找到相应的 Release 文件。</mark></p></details></li></ul><ul id="1880427e-38bb-801f-94fc-c44f2f033367" class="toggle"><li><details open=""><summary>问题4：没有合法的证书</summary><figure id="1880427e-38bb-80e8-b682-e97e28aed462" class="image"><a href="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/image%202.png"><img style="width:653.9444580078125px" src="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/image%202.png"/></a></figure><p id="1880427e-38bb-80f5-b9c3-e29184a93dc6" class="">解决：手动下一个证书~</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-80a0-9d44-fb4c8aaf07f3" class="code"><code class="language-Shell">wget -q -O - https://archive.kali.org/archive-key.asc | apt-key add -</code></pre></details></li></ul></details></li></ul><ul id="21698833-d5e1-40e8-b571-b02d98012fe4" class="toggle"><li><details open=""><summary>关于其他linux版本的换源：</summary><p id="b71781db-2520-41c7-ac52-b574e5fe5a6c" class="">ubantu换源详细教程：<a href="https://zhuanlan.zhihu.com/p/251009600">https://zhuanlan.zhihu.com/p/251009600</a></p></details></li></ul><ul id="78332f51-3f67-4745-a527-c9ad902df133" class="toggle"><li><details open=""><summary>其他kali源：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="fca2779b-1143-40e1-9747-19381593ac30" class="code"><code class="language-Shell">#官方源：有时候你发现换谁id源都不好使，你可以直接换回官方源，然后挂个梯子发现还是官方源最好用
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+#阿里云
+deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+#清华大学
+deb http://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free
+deb-src https://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free
+#浙大
+deb http://mirrors.zju.edu.cn/kali kali-rolling main contrib non-free
+deb-src http://mirrors.zju.edu.cn/kali kali-rolling main contrib non-free
+#东软大学
+deb http://mirrors.neusoft.edu.cn/kali kali-rolling/main non-free contrib
+deb-src http://mirrors.neusoft.edu.cn/kali kali-rolling/main non-free contrib
+#重庆大学
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+deb-src http://http.kali.org/kali kali-rolling main non-free contrib</code></pre></details></li></ul><h1 id="31c2df02-f93d-4316-ac42-82e57422f5ef" class="">4、拍个快照</h1><p id="c9466e2f-08fe-4e3c-82a4-40e6d25a05b0" class="">拍摄快照：</p><figure id="207f18bc-8820-4317-8023-e609d9a9eac1" class="image" style="text-align:left"><a href="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/Untitled%202.png"><img style="width:288px" src="kali2022%E7%AE%80%E5%8D%95%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%89%E8%A3%85%203e259a89201a4b9eba391b34b8c570c2/Untitled%202.png"/></a></figure><h1 id="1d0dcfa1-0619-4174-929e-aead3d813345" class="">五、虚拟机和主机的复制粘贴</h1><p id="1582b64f-db6a-44b7-84a3-ee9091f0cc33" class="">一般来说高版本的虚拟linux都支持直接粘贴主机的文本内容，如果是不支持的话，可以运行putty.exe程序建立shell，然后鼠标右键点击对话框就是粘贴</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

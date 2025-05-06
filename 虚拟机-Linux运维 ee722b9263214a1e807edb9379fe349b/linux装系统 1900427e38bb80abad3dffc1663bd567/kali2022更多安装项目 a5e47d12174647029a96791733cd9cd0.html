@@ -1,0 +1,701 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>kali2022更多安装项目</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="a5e47d12-1746-4702-9a96-791733cd9cd0" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">🍂</span></div><h1 class="page-title">kali2022更多安装项目</h1><p class="page-description"></p></header><div class="page-body"><p id="43675688-519e-4bd6-bb11-fb2f7e6e870a" class="">本篇旨在根据具体的使用需求装配对应需求的环境，以kali2022为例</p><h1 id="1f04db88-bd8d-45db-a387-1386647045f9" class="block-color-blue_background">pwn环境</h1><h3 id="0d983831-a3f1-406d-af12-5b081cdd96bb" class="">1、安装python3</h3><ul id="5ae63cf6-2756-4fca-9af5-4c0fc7c46c63" class="toggle"><li><details open=""><summary>以下方法适用于kali和ubantu：</summary><p id="d30d4962-facc-4ac3-b02d-02a58cd4e842" class="">$ su</p><p id="49960764-854a-43b3-b064-317df242d19f" class="">$ apt install python3.10<br/>$ apt install python3-pip<br/></p><blockquote id="bfce2218-f147-46f1-8c1d-0ff3899281b9" class="">如果失败，可以试试：<figure id="54d62b55-d2e4-49ac-be0b-2de74c8f568d" class="image" style="text-align:left"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Image.png"><img style="width:288px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Image.png"/></a></figure></blockquote></details></li></ul><ul id="6a588b1e-0d9b-4f76-8136-af773ec72519" class="toggle"><li><details open=""><summary>以下方法适用于centos7：</summary><p id="ea88573b-ebea-4ad1-9eb4-b13ff00a3944" class="">1、在开始安装之前我们需要先安装Python基础依赖包：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="8e4f2cd3-2883-4a4a-ab3a-7317f5217afa" class="code"><code class="language-Shell">yum -y install zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz xz-devel libffi-devel</code></pre><p id="1be522e2-9f00-4e76-b66d-3cb092da694c" class="">创建目录</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d8e43576-c56c-4989-8dd0-4c73dc765536" class="code"><code class="language-Shell">mkdir -p /usr/local/python3</code></pre><p id="e420ea12-8b96-45fa-a995-300f64541f83" class="">下载安装包</p><p id="59cd4fcf-2723-4c1d-9d15-e25c8feeda7d" class="">wget <a href="https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tgz">https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tgz</a></p><p id="b5711948-4557-4c99-9bf8-1cfcfc47c61b" class="">解压安装包</p><p id="2688af38-d7b5-4f2f-b729-00c13fe6496b" class="">tar -xvf Python-3.7.6.tgz</p><p id="cf3273ec-2d8f-442a-87e1-310ed1e186dd" class="">编译安装Python</p><p id="bc465c82-c735-4b5e-aa0b-269289d5a6cc" class="">cd Python-3.7.6 &amp;&amp; ./configure --prefix=/usr/local/python3 &amp;&amp; make &amp;&amp; make install</p><p id="977e2e75-e314-43d4-9142-2a304b7d7804" class="">2、然后因为原操作系统中已经有老版本python，我们需要为其安装新版本python，就会遇到使用python3命令时可能会调用到老版本python的问题，有以下两个解决方案：</p><p id="db598e92-ecbf-4dd4-9993-51ffea1f37ef" class="">1、直接创建Python3软链，利用命令 Python3 调用新版本python，与自带python不冲突；<br/>2、覆盖现有Python，使其指向新安装的Python，利用命令 python 便可调用新版本python；<br/></p><p id="3da0fecc-4091-4df5-969d-fb89d52f0dfc" class="">其中第二种方案详见<a href="https://zhuanlan.zhihu.com/p/431873516">CentOS7升级Python3版本 - 知乎 (zhihu.com)</a></p><p id="5152759a-969d-4ecd-b4c1-6e642c6f116b" class="">本文介绍第一种解决方案：</p><p id="b296ac84-2bb5-4d66-8325-510f4555de24" class="">在/usr/bin路径下创建python3软链，指向已安装的python3</p><p id="87c70d72-2323-4f39-b8c4-84b5939610d3" class="">ln -s /usr/local/python3/bin/python3 /usr/bin/python3</p><p id="77055b45-bb7e-4a83-a088-d27e9925cb16" class="">在/usr/bin路径下创建pip3软链，指向已安装的pip3</p><p id="d3cd4d73-fe7c-4a8f-8fbf-0f7a57f29730" class="">ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3</p><p id="55ed08e3-a3e2-4550-9f3e-a095545b1926" class="">配置完成之后，此时系统中存在两个python版本：命令<strong>python</strong>对应的仍是默认2.7版本；命令<strong>python3</strong>则对应新安装的3.6版本：</p><p id="f4d05664-7529-4bb5-9ad1-7fdc1693df19" class="">[root@ZabbixServer]# python<br/>Python 2.7.5 (default, Aug  7 2019, 00:51:29)<br/>[GCC 4.8.5 20150623 (Red Hat 4.8.5-39)] on linux2<br/>Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.<br/></p><p id="0590c6aa-b110-41de-80e5-23b2cd30bd11" class="">&gt;&gt;&gt;exit();<br/>[root@ZabbixServer]# python3<br/>Python 3.6.4 (default, Jun 15 2020, 16:17:18)<br/>[GCC 4.8.5 20150623 (Red Hat 4.8.5-39)] on linux<br/>Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.<br/>&gt;&gt;&gt;exit();<br/>[root@ZabbixServer]#<br/></p><p id="56cbc048-4015-4b02-b7c9-ee03cb827176" class="">当然，我们通过 python3 -V 和 pip3 -V也可以查看对应版本了：</p><p id="6253c386-c591-4a29-a24c-9308e993f202" class="">[root@ZabbixServer ~]# python3 -V<br/>Python 3.6.4<br/>[root@ZabbixServer ~]# pip3 -V<br/>pip 9.0.1 from /usr/local/python3/lib/python3.6/site-packages (python 3.6)<br/>[root@ZabbixServer ~]#<br/></p></details></li></ul><h3 id="7ae6355f-78f0-4652-a259-931335fed354" class="">2、下载pwntools和glibc等库</h3><p id="4e87443d-2535-44bc-b64a-ad793e7049e4" class="">下载pwntools：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6230636d-88f2-4b22-b47d-16cd4226ce27" class="code"><code class="language-Shell">pip3 install -ihttps://pypi.tuna.tsinghua.edu.cn/simple--trusted hostpypi.tuna.tsinghua.edu.cn pwntools</code></pre><h3 id="7ac7128f-7349-4d28-9929-699cb27c9adc" class="">3、安装gdb和pwndbg</h3><blockquote id="4a57de95-b794-4576-85ba-e4a4b2cc3179" class="">centos环境下不能下载pwndbg，所以如果想要解pwn题的话，极其不推荐centos作为其虚拟机环境。另一个gdb加强工具是peda，不过其功能比起pwndbg差很多，最致命的地方在于peda不能够查看栈，但peda查看堆的工具可以作为pwndbg的补充</blockquote><p id="320dad91-2a71-4475-a32e-bceb91009b3d" class="">pwndbg：</p><h1 id="a95e11a7-c063-4635-b9d6-6a6d9c9c0804" class="block-color-blue_background">常用拓展</h1><h3 id="9634ff80-5994-4633-bc2c-76a8983eabbd" class="">1、给虚拟机挂梯子</h3><blockquote id="7a0eb30a-7f54-43c0-b651-80b7348c3bd7" class="">以主机使用clash作为代理程序为例</blockquote><p id="0bcb3625-a60d-4ff0-9f2f-ca48c74fb172" class="">1、主机开局域网代理</p><p id="2077688c-59f7-4cff-8869-008681a0efaf" class="">主机梯子选这个：</p><figure id="b43f5337-89fd-47a9-b01f-6784f37107a7" class="image" style="text-align:left"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled.png"><img style="width:528px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled.png"/></a></figure><p id="541a9d1e-8e12-49e0-8a13-ea1f44ab4eb1" class="">2、虚拟机设置代理</p><ul id="6be6b8f4-a4d6-470f-aa44-2f0bbbab0844" class="toggle"><li><details open=""><summary>方法1-通过自拟脚本设置shell的代理</summary><p id="e75622e7-950e-4a2a-b2d8-41e1f9ffbcb4" class="">然后再给虚拟机设置代理路径</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="fef402ac-92d7-44c7-a418-f2204daf4d7d" class="code"><code class="language-C">$ cd /etc/profile.d  
+$ vim proxy.sh</code></pre><p id="6922af9e-a8a9-46ce-b2ba-3d1c4080918c" class="">内容编辑为：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="96038761-1f37-4b11-be61-1d5097f85863" class="code"><code class="language-C">export proxy=&quot;http://192.168.11.1:7890&quot;
+export http_proxy=$proxy
+export https_proxy=$proxy
+export HTTP_PROXY=$proxy
+export HTTPS_PROXY=$proxy</code></pre><blockquote id="f1c8e934-c3da-45ac-a2af-18d47ab44052" class="">其中，192.168.11.1替换为您的主机向虚拟机开放的ip，7890是主机的clash的代理端口，主机的所有要被代理的请求都是发送到该端口</blockquote><p id="5e2f4800-abd3-4418-9af1-4151ce332af8" class="">2、执行脚本文件</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="73819174-4b75-498c-b3fc-bf9ba848d51a" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">sourch proxy.sh</code></pre><p id="e2b1fc2d-28fb-4fb9-ae74-794c6ae8eef1" class="">3、检查网络代理服务器是否成功</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="82c1531b-b0e9-486e-b64f-d8076b2f40b7" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">curl www.google.com</code></pre><p id="ef53d442-5133-4465-8dc0-b5339b46aefa" class="">4、<a href="https://so.csdn.net/so/search?q=%E9%85%8D%E7%BD%AEgit&amp;spm=1001.2101.3001.7020">配置git</a>hub网络代理</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="94ef9f2e-fad5-4327-b198-3bbc12c1718f" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">git config --global http.https://github.com.proxy socks5://192.168.43.71:7890</code></pre></details></li></ul><ul id="219ba001-6481-48a4-ae86-f0d7f29a6444" class="toggle"><li><details open=""><summary>方法2-通过proxychains工具实现为任意指定程序挂代理</summary><blockquote id="a13dae0f-c04f-40a3-b7fb-a58d6825ac6c" class="">其原理就是对指定程序的部分sockets相关API函数进行了hook，让程序的 sockets 数据走 SOCKS/HTTP 代理。</blockquote><p id="727f2a6d-651b-45ff-9700-c47d84734509" class="">先安装proxychains工具，在kali2022下直接输入以下命令即可：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="539d8ad7-0c04-416a-b225-ff4f863f2dd0" class="code"><code class="language-PHP">sudo apt-get install proxychains</code></pre><p id="17742e1e-a30c-4b8d-ad02-bb5b42b6feb2" class="">然后：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e2f0f8a8-8155-45b4-9c2b-2ece22153fdb" class="code"><code class="language-PHP">sudo chmod a+rwx /etc/proxychains.conf
+vim /etc/proxychains.conf</code></pre><p id="f0695aae-ea9d-4980-9bf9-2307b14b952b" class="">最后一行：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="8eef85d4-9bcf-40a9-8f73-77218856bdb7" class="code"><code class="language-PHP">[ProxyList]
+socks5  127.0.0.1 1086</code></pre><p id="71b3cb98-3812-4dce-81aa-0531ed6139c7" class="">这里改为：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="53666cd6-e5db-4ff4-a16f-f961bdcdc5b4" class="code"><code class="language-PHP">[ProxyList]
+http 192.168.11.1 7890</code></pre><blockquote id="5a5a47e9-3146-4972-ab27-d58f495f0139" class="">这里192.168.11.1改为您的主机向虚拟机开放的IP（要选那个192.168开头的，意思是子网，然后要选那个.1结尾的，意思是虚拟路由器好像），且注意，这里只能设置一条规则不知道为啥<p id="d8f814fe-2751-424b-87c1-c6b31c3a9cc8" class="">这里之所以要填http，是因为clash和主机之间是使用http隧道传输技术进行传输</p></blockquote><p id="cc66eb39-acb3-4b3b-8cfa-2fddd2335062" class="">然后就是使用，在shell中要使用某个应用程序时加上proxhchains4前缀即可，如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="62da3f3b-7ae7-4c5c-84a3-4b98d459ca49" class="code"><code class="language-PHP">$ proxychains4 curl www.google.com</code></pre><p id="bbf2c324-9bce-4a55-9e36-71ef06055adc" class="">↑然后这个例子顺便copy进去测试一下看看是否成功~</p><p id="f50a0988-febc-4f2f-91dd-75f3a68ca2ca" class="">
+</p></details></li></ul><h3 id="2eac502f-1148-4bfe-a1d4-53ac85c96d82" class="">2、设置SSH实现XFTP共享文件</h3><p id="08274372-1ee9-48ca-a2af-2a57b8dbc4ac" class="">（1）发生无法连接问题，一般是因为虚拟机的ssh服务有问题，在虚拟机输入以下命令：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="3c37e338-57cf-49b1-b3c2-f092257decf9" class="code"><code class="language-Shell">$ sudo apt install openssh-server
+$ sudo systemctl restart ssh # 重启ssh</code></pre><p id="802ed895-7534-4bf3-999a-9a771d50d435" class="">通过查看22端口来验证是否成功：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4c9049d9-e9bc-42ea-a0e7-fd11305a174f" class="code"><code class="language-Shell">$ netstat -tlnp | grep 22</code></pre><p id="3f4fbe7e-6e37-4c73-ac9a-e290bef539d1" class="">（2）xftp中文乱码问题<div class="indented"><p id="e008b8b4-b4b7-472d-9b0a-696018666ae0" class="">不好解决，遇到了建议直接改环境语言设置改成纯英文</p></div></p><h3 id="d5333593-e795-4eaf-a65d-5c3fae996ced" class="">3、中文输入法（可选）</h3><p id="881ea9a2-5429-4d27-bede-421b94e196ff" class="">建议是用全英环境，但如果确实要使用中文输入法，可以采用以下方法：</p><ul id="c778e41a-15dc-40d8-9d95-6e465c007f2f" class="toggle"><li><details open=""><summary>本方法只适用于kali，且需要虚拟机连梯子：</summary><p id="315df031-db5c-48da-a906-73a692932825" class="">apt-get install ibus ibus-pinyin#需要开梯子下载</p><p id="cd2a24eb-7ee7-4dac-9dbf-e0d632d75aec" class="">然后在右上角会出现语言的选项</p><p id="bbb2c346-a07e-4b2d-8f86-a5f8f172e0e3" class=""><strong>切换中英文</strong>：按shift即可</p></details></li></ul><ul id="2944f135-a134-4483-9df5-624cf27a4168" class="toggle"><li><details open=""><summary>本方法适用于所有系统</summary><p id="ba0badb1-c01a-49df-965b-0008b3baa5b6" class="">在搜狗官网下载搜狗拼音输入法</p></details></li></ul><h3 id="176db839-5dde-48ef-899c-616d3152380d" class="">4、磁盘分区（centos7）</h3><p id="f5fb5335-bb69-4ea8-84e2-302ffa529350" class="">参考：</p><figure id="9a27fc28-ec4d-45a2-a37b-ecbcfaca0e95" class="link-to-page"><a href="../linux%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%203e9a773a82ee4b1896b8bf9dd6d6fd45/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E3%80%81%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA%209a27fc28ec4d45a2a37becbcfaca0e95.html"><img class="icon" src="https://www.notion.so/icons/document_gray.svg"/>文件系统、磁盘分区</a></figure><h3 id="f705f3b7-ad15-4169-b12b-499f1ed583a7" class="block-color-default">5、JDK环境</h3><blockquote id="ce8e96e0-df5a-4214-bb3f-2557e23e3fee" class="">这里以centos7为例：</blockquote><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1290d82e-7e32-4b4f-b9a3-ff317eb3a17e" class="code"><code class="language-Shell">sudo yum install java-11-openjdk  #安装
+java -version  #验证是否安装成功</code></pre><p id="8ec1bbf4-5a1f-4d9d-9360-2ed76c083c0f" class="">编辑环境变量相关配置文件：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6d145244-70a2-4bd9-a485-1f2bc263ca2f" class="code"><code class="language-Shell">vim /etc/profile
+#写入：
+export JAVA_HOME=/usr/local/jdk1.8.0_XXX   # 修改为你的 JDK 安装路径
+export PATH=$JAVA_HOME/bin:$PATH
+#更新缓存：
+source /etc/profile</code></pre><h3 id="bfd88c4e-1d7a-4b37-b483-c633bd62d86f" class="">6、为虚拟机连接摄像头</h3><figure id="72afc4b0-6062-404d-b671-382ffc494dd1" class="image" style="text-align:left"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%201.png"><img style="width:624px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%201.png"/></a></figure><p id="390b1b1f-42e0-4d4e-b2af-c00fd5b536eb" class="">验证：yum install cheese，然后cheese</p><figure id="1587b0d9-c20a-4404-980e-4da455ef9317" class="image" style="text-align:left"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%202.png"><img style="width:192px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%202.png"/></a></figure><ul id="6d53a6e2-894e-4550-895c-e60be93f913f" class="toggle"><li><details open=""><summary>相关报错的解决方案：</summary><p id="878c8867-75a0-4a4c-ad1f-57e538589f18" class=""><strong>接入摄像头但不能用</strong></p><p id="015c2f24-f458-4af6-9671-622488e53dc7" class=""><strong>分析</strong></p><p id="a96b5b24-2d07-46b2-82f3-db56baad40b0" class="">可能是vmware获取摄像头相关的服务被禁用</p><p id="8bfaf0a9-b320-4eac-9c37-73c3fd87f467" class="">或者可能是USB兼容性选择不对</p><p id="e972db15-6682-4726-b076-827dc15d43c4" class=""><strong>解决</strong></p><p id="4d7590ed-9d88-416d-9d89-49328695ccb9" class="">首先wins+R输入<code>services.msc</code> 打开本地服务列表，确保 VMware USB Arbitration Service服务开启</p><p id="72ba8d30-3689-42fd-a874-69854ed51c09" class="">然后点虚拟机设置，把USB兼容性选择u3.1：</p><figure id="29ce59b1-7fce-40b6-8540-2af228f9e0c6" class="image"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%203.png"><img style="width:384px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%203.png"/></a></figure><p id="17752adf-6db2-49a4-beed-ccd245dab1a2" class="">然后重新点这个接入摄像头：</p><figure id="b1868bee-bb12-4b56-80fe-225de0544832" class="image" style="text-align:left"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%201.png"><img style="width:576px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%201.png"/></a></figure></details></li></ul><h1 id="fb0b2b83-108a-49f5-a4ff-dd6d372b371e" class="block-color-blue_background">其他</h1><h3 id="1a1f0010-678c-4e9e-8c4f-d78bc124ef00" class="">1、更新gcc</h3><ul id="8e8a20cf-a4aa-4517-bcd8-d0c6af54ff95" class="toggle"><li><details open=""><summary>以下方式适合centos7</summary><ol type="1" id="3ca5fc8e-5b98-460a-a89a-5359337c8929" class="numbered-list" start="1"><li>确保你的系统已连接到Internet，并使用root权限登录。</li></ol><ol type="1" id="56905fdb-26d1-4074-aad8-304b84c05778" class="numbered-list" start="2"><li>运行以下命令来安装EPEL（Extra Packages for Enterprise Linux）存储库，它包含了很多社区维护的软件包，其中包括更新的GCC版本： <code>yum install -y epel-release</code></li></ol><ol type="1" id="81ff9480-262a-4db1-970b-0e9d0b0d2378" class="numbered-list" start="3"><li>添加devtoolset-9存储库，它包含GCC 9.x系列的新版本。运行以下命令： <code>yum install -y centos-release-scl</code></li></ol><ol type="1" id="9a6d417c-a374-4c0b-a6d3-30b1d3543552" class="numbered-list" start="4"><li>安装GCC 9以及其他相关的工具和库。运行以下命令： <code>yum install -y devtoolset-9-gcc devtoolset-9-gcc-c++ devtoolset-9-binutils</code></li></ol><ol type="1" id="30f5551d-ab7d-4fe4-b276-1c33bcecdd66" class="numbered-list" start="5"><li>使用scl命令启用devtoolset-9环境变量。运行以下命令： <code>scl enable devtoolset-9 bash</code></li></ol><ol type="1" id="1a48925d-98e9-4fe8-8031-acb652cee2fd" class="numbered-list" start="6"><li>验证GCC版本是否已更新。运行以下命令： <code>gcc --version</code> 如果你看到输出显示GCC的版本号为9.x，则说明你已经成功地升级了GCC版本。<br/>2、保留该修改（设置环境变量）<br/></li></ol><ol type="1" id="c04d6ca7-34b7-467d-939a-46e37c8038b8" class="numbered-list" start="7"><li>打开shell配置文件，例如~/.bashrc或~/.profile： <code>vi ~/.bashrc</code></li></ol><ol type="1" id="fff8a83a-0181-4de2-b3b9-e9a71e8725ea" class="numbered-list" start="8"><li>在文件末尾添加以下行（假设您安装的gcc位于/opt/rh/devtoolset-9/root/usr/bin目录下）： <code>export PATH=/opt/rh/devtoolset-9/root/usr/bin:$PATH</code></li></ol><ol type="1" id="28d81c26-618f-4746-b317-00596ec92357" class="numbered-list" start="9"><li>保存并关闭文件。</li></ol><ol type="1" id="3478301f-77ff-474b-99c7-b6ca373a1d5b" class="numbered-list" start="10"><li>执行以下命令以使更改立即生效： <code>source ~/.bashrc</code></li></ol></details></li></ul><blockquote id="d3cb0693-a63d-42e5-9457-8fc0c1ccc978" class="">如果上述操作还解决不了问题，建议是放弃centos7转投kali怀抱，以此一劳永逸</blockquote><blockquote id="753c4e00-7897-4b90-9e51-7364faf34e82" class="">centos7对于gcc的配置很容易出问题，而且也不支持pwndbg，这也是我为什么很不推荐pwner使用sentos7的主要原因！</blockquote><h3 id="71216338-3675-4f73-b61e-3335bad611c0" class="">2、开telnet服务器</h3><blockquote id="bec3217e-c475-455b-920d-a2e39b209dfe" class="">telnet是允许用户远程登录到主机的一个协议，但由于其不安全性，<mark class="highlight-blue">已经被更安全的SSH所替代</mark><p id="b0dac027-00c5-4154-8037-679907231d66" class="">在win系统里面，只能是比较低版本的才能开telnet</p></blockquote><ul id="4c6adcaf-7db3-456a-bf74-2b1eb136d479" class="toggle"><li><details open=""><summary>以下方法适用于centos7：</summary><p id="141037ea-d103-4c02-b6a9-81cf9d95858c" class="">先下载xinetd和telnet<br/>yum install -y xinetd<br/>yum install telnet*<br/>然后，重启xinetd服务<br/>service xinetd restart<br/>然后确认一下telnet服务是否开启成功：<br/>service xinetd restart<br/></p></details></li></ul><ul id="001dc4d2-e9d0-48ff-bff7-950c661c4458" class="toggle"><li><details open=""><summary>windows如何作为telnet客户端</summary><p id="8f7115f6-5931-4c60-a8e6-11cfe1665a2b" class="">在控制面板搜索“程序”，进入后：</p><figure id="221aa3f5-e281-408b-96c2-4dd0f5e5159a" class="image"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%204.png"><img style="width:384px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%204.png"/></a></figure><p id="a70bd975-3252-4cd6-a390-5ef3d76cde9b" class="">运行以下指令：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c532c22a-d63a-4c43-8001-5339a83c237c" class="code"><code class="language-Python">Telnet 192.168.11.154 23</code></pre></details></li></ul><p id="c63ee2b0-6e8f-4f75-bc23-882b4f22e8fc" class="">【问题】</p><ul id="208e6c25-cdf7-406e-811c-beb7946315ec" class="toggle"><li><details open=""><summary>cmd：&#x27;telnet&#x27; 不是内部或外部命令，也不是可运行的程序或批处理文件。</summary><p id="4a86084e-3c56-4636-92b2-eee60e82d316" class="">是全局变量问题，在设置里面搜索“环境变量”，增加一个：</p><figure id="00e12716-662c-40d4-ab65-504e03dca8c1" class="image"><a href="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%205.png"><img style="width:432px" src="kali2022%E6%9B%B4%E5%A4%9A%E5%AE%89%E8%A3%85%E9%A1%B9%E7%9B%AE%20a5e47d12174647029a96791733cd9cd0/Untitled%205.png"/></a></figure></details></li></ul><h3 id="38a9139d-a241-4399-bdde-3461b559c137" class="">3、为某个软件设置桌面快捷方式（可选）</h3><p id="d4b966f6-fded-43a5-ba6b-f3886cb578d7" class="">【目录&amp;文件】</p><p id="8d70176f-8a7f-4a2d-8bfb-9a9028f3a1e3" class="">按住ctrl+shift 然后用鼠标左键拖动到你的桌面目录文件即可（注意不是直接拖动到桌面）<br/>同样你可以使用这种方式在任意地方创建该文件或目录的快捷方式。<br/></p><p id="26f0ee75-291b-4b9d-9c51-10d3800333cb" class="">【软件】</p><p id="42cea393-e3cb-48de-9f03-756960a02d24" class="">在图像界面下按照/usr/share/applications/这个路径打开文件目录，或者在终端运行$ nautilus /usr/share/applications/<br/>这个文件夹下存放着已下载的各种软件的桌面快捷方式（后缀为.desktop），找到需要创建的快捷方式的软件，复制该文件到桌面，再赋予其执行权限即可。<br/></p><p id="315ceb76-45c2-4223-89d5-b8ffcd3e5f8b" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
