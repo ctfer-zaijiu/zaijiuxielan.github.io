@@ -1,0 +1,703 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>【PWN技】PWN基本解题流程</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="169f6164-2d29-4c14-a81b-d635c1a857d3" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1583329550487-0fa300a4cd1a?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/chess-rook_gray.svg"/></div><h1 class="page-title">【PWN技】PWN基本解题流程</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1147a6e4-580b-4da4-9a4f-38f707c5801a" class="">我见青山多妩媚，料青山，见我应如是。</blockquote><h1 id="c84018f9-6948-4312-8dc5-39fe21354371" class="">一、基本解题流程</h1><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">0-对程序进行分析</summary><div class="indented"><blockquote id="a5dcd21f-eaa1-4337-baf6-3c0f084c349a" class="">首先是拷贝程序，宿主机一份，虚拟机一份</blockquote><p id="74586d57-c06e-45aa-afa8-3af4c00bf344" class=""><strong>1、安全机制的开关情况</strong><div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6d5a62f3-9a3e-47bf-a922-a23754456b09" class="code"><code class="language-Shell">checksec --file=&quot;./Recho&quot;
+seccomp-tools dump ./Recho</code></pre></div></p><p id="97754502-3208-4e50-844e-7beefa999978" class=""><strong>2、IDA了解程序基本逻辑</strong><div class="indented"><p id="c208ea72-a1ab-4f37-923c-17891ab4a8e3" class="">先简单跑一遍程序</p><p id="94fa7f85-bf80-4647-a1d9-6c9ee24b1b22" class="">然后打开IDA：</p><p id="b2c2f0b9-76b3-4e11-b25b-192d420940c3" class="">（1）了解程序的基本逻辑</p><p id="7828aee6-edcd-48d8-a7db-1ecf7552c780" class="">（2）看是否有后门：<div class="indented"><ul id="5b64b2c2-86f4-4afa-ac00-b4993ad3c1a5" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-blue">是否有system()函数、execve()函数</mark></li></ul><ul id="a5842862-236b-43de-b3e7-80d6cde8fd1b" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-blue">是否有“binsh”字符串</mark></li></ul><ul id="cedbf98d-a71c-489d-87aa-3c17921ab106" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-blue">是否有“flag”字符串</mark></li></ul><blockquote id="10f73036-a2d9-4716-a311-b4df24691589" class="">建议用这个来搜索👇，不要用shift+f12，那个不好用<figure id="ce73aa0e-c3a0-451f-888d-292ecefde969" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled.png"><img style="width:144px" src="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled.png"/></a></figure></blockquote><ul id="b64aa04e-9025-4827-b9b9-7cbb662edf75" class="toggle"><li><details open=""><summary>其中“flag”字符串利用方式如下</summary><p id="87344b16-a3e9-47d1-89d1-5d83ab800ddb" class="">通过syscall形成open传参”flag”从而将flag写入buffer，再劫持write进行输出</p></details></li></ul></div></p><p id="594bc64a-e775-4968-a7ea-d26a7c1d4d0b" class="">（3）点开一个C标准函数，如果不是到plt表而是到该函数实现代码处，就说明是静态链接</p></div></p><p id="674e6a78-eb09-40a8-bb54-8e40acbcca2c" class=""><strong>3、找gadget</strong><div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="7fa41d22-ed24-400f-b4ad-1db562bf4903" class="code"><code class="language-Shell">$ ROPgadget --binary ./shaokao --only &quot;syscall&quot;
+$ PORgadget --binary ./shaokao --only &quot;pop|ret&quot;
+$ objdump -d ret2reg | grep *%eax
+</code></pre></div></p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">1-找到一个劫持程序的”入口点“</summary><div class="indented"><p id="468e1f16-1a00-425c-ab0c-a04c4bea1bb6" class="">这里根据入口点的类型，可以分为两类题型：</p><p id="60d84f13-bc06-4c51-a783-31e680133e10" class=""><strong>1、堆题：</strong><div class="indented"><p id="89dcb67f-534d-4b11-bdb3-6644c0654c7f" class="">堆溢出类</p><p id="b8ef0919-d530-4914-a81f-8024d46dbec9" class="">UAF类</p></div></p><p id="e5827bc8-d4cd-4cef-afc7-87b83dce90ed" class=""><strong>2、栈题：</strong><div class="indented"><p id="781e20fb-0f59-4028-bfcf-7214c00156e8" class="">栈溢出类(gets、read、strcpy)</p><p id="4d2f13b7-0efd-4a09-b5bc-8ae01f8cd34c" class="">格式化字符串类</p><blockquote id="e4894526-6985-422f-b72f-bc7efd2ab49c" class="">思考溢出利用方式以及对应要用到的偏移量</blockquote></div></p></div></details><details open=""><summary style="font-weight:600;font-size:1.25em;line-height:1.3;margin:0">3-getshell</summary><div class="indented"><blockquote id="9f9e031d-39b3-4b15-b2c7-43acb613350b" class="">这里有常见的两种达到getshell这一步的方式：<p id="bc4f714c-a374-4cf9-bd50-d82c2682b53f" class="">1、修改got表</p><p id="279a7c76-b946-46bd-a18f-8ceb2c77414c" class="">2、ret2libc</p><p id="37c29d99-998f-453b-b1af-550ed1ceb536" class="">在getshell这一步中，则有两种得到flag的方式：</p><p id="f4a3bb08-58f0-4271-9770-2ff83f4ffb94" class="">1、常规方式：execve(”/bin/sh”)、onegadget</p><p id="df6edaa6-7002-4c75-9663-b33bde58655b" class="">2、非常规方式：orw</p></blockquote><h3 id="76c69142-6038-448a-bbf3-eae52e69b4a9" class="block-color-teal_background">(1)常规方式：execve(”/bin/sh”)</h3><blockquote id="55d0cd8c-37e5-49b4-99b3-aec2cdd81e3a" class="">或者是onegadget，参考：<figure id="c7f4255c-da84-4379-8d90-7aeb464521b3" class="link-to-page"><a href="%E3%80%90gadget%E3%80%91%E6%97%A0%E9%9C%80%E2%80%9Dbinsh%E2%80%9C%EF%BC%8C%E5%8F%AA%E8%A6%81ret2libc%E5%8D%B3%E5%8F%AF%E4%B8%80%E9%94%AEgetshell%E7%9A%84one-gadge%20c7f4255cda8443798d907aeb464521b3.html"><img class="icon" src="https://www.notion.so/icons/airplane_gray.svg"/>【gadget】无需”binsh“，只要ret2libc即可一键getshell的one-gadget</a></figure></blockquote><p id="09e2d109-5d72-4c94-9b99-3f5099b504e4" class=""><mark class="highlight-teal_background"><strong>1—-获得”/bin/sh”</strong></mark></p><p id="cda2abb5-d42c-4ce6-9429-d9ea410a8431" class="">有以下几种获得方式：</p><p id="ed10a2a2-5436-4a16-9c1b-b8b75c601b41" class="">1、程序自带（一些简单题）</p><p id="75d80f00-861f-4e4a-a4ee-0e19922801cc" class="">2、libc因有尽有，这需要ret2libc</p><p id="01792539-56fb-4de7-8336-ccf2f64ad011" class="">3、控制程序在bss上写入“binsh”，这需要程序有足够大的bss段<strong>（常用！有绕过ASLR方法）</strong></p><ul id="1a7eab2f-8fbc-471e-bda9-12ae03d19035" class="toggle"><li><details open=""><summary><mark class="highlight-red">关于“方式3”有以下两种实现方式</mark></summary><h3 id="3d2d4096-aa05-49c3-b7fa-9b76bbe426a3" class="">1-静态链接下，单条ROP链不需要read</h3><blockquote id="0ba408b6-92b2-42bd-9809-6da2a718a45a" class="block-color-teal">条件：静态链接或有很多gadget地址</blockquote><p id="9a270fbf-f986-49f9-963d-167490d8d0f8" class="">【原理】</p><p id="24002450-a347-4c1c-af38-0bc4da28a990" class="">需要这条核心gadget：<code>mov qword ptr [rsi], rax ; ret</code>这条gadget会把rax里面的值写到rsi所指向的地址处。</p><p id="13f587e1-4883-491b-90eb-99b3a5257d6f" class="">所以我们可以形成这样的一条ROP链：</p><p id="84008938-b756-4667-bf98-38948f2543dc" class="">1、劫持执行gadget设置rsi指向@ .data</p><p id="dee72344-6d19-4871-931b-db5c52bcf9ba" class="">2、劫持执行gadget设置rax的内容为b&#x27;/bin//sh&#x27;</p><p id="63f112b8-caa4-465c-9fe0-79d7b699a654" class="">3、劫持执行gadget设置把rax里面的值写到rsi所指向的地址处</p><p id="4b5a3deb-9fc7-4d7c-b40f-9d75a6b1d6c5" class="">4、劫持执行gadget设置rsi指向@ .data+8</p><p id="0c895bd8-a4b0-4ea6-8a90-3bcec3d76c24" class="">5、劫持执行gadget设置rax的内容为b’\0’</p><p id="dd623792-0260-4e62-a60d-8493c0408fc3" class="">6、劫持执行gadget设置把rax里面的值写到rsi所指向的地址处</p><p id="6461e8ab-6202-4847-9278-654bca1ff421" class="">7、劫持程序执行system函数</p><p id="65ac5643-a5a8-4981-9824-fb4d8221cc4b" class="">【操作】</p><p id="0310c9e4-730a-4274-b6c5-253d94f7b8e7" class="">在静态链接有很多gadgets的程序，可以尝试收集相关gadget形成以下代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4db3edee-f627-4836-944f-83a4f21a6cca" class="code"><code class="language-Python">p += pack( 0x000000000040a67e) # pop rsi ; ret
+p += pack( 0x00000000004e60e0) # @ .data
+p += pack( 0x0000000000458827) # pop rax ; ret
+p += b&#x27;/bin//sh&#x27;
+p += pack( 0x000000000045af95) # mov qword ptr [rsi], rax ; ret
+p += pack( 0x000000000040a67e) # pop rsi ; ret
+p += pack( 0x00000000004e60e8) # @ .data + 8
+p += pack( 0x0000000000447339) # xor rax, rax ; ret  把rax设置为0
+p += pack( 0x000000000045af95) # mov qword ptr [rsi], rax ; ret</code></pre><blockquote id="8d22bd3b-5a3b-4267-9ce6-627e6600855d" class="">这段代码所需要的核心gadget的查看相关指令：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="01dc3edd-ed5e-4429-a6b7-4c4ec1594ebd" class="code"><code class="language-Shell">ROPgadget --binary ./pwntest --opcode &quot;xor rax, rax ; ret&quot;
+ROPgadget --binary ./pwntest --opcode &quot;mov qword ptr [rsi], rax ; ret&quot;</code></pre></blockquote><ul id="4c732268-6a99-4a18-9acf-b52e43466e3b" class="toggle"><li><details open=""><summary>示例</summary><p id="b73059ae-eb1b-441d-8499-8e78f89648eb" class="">参考以下题目：</p><figure id="568f8d24-53c2-4a28-9376-c2e7fb34b798" class="link-to-page"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E5%A4%84%E7%90%86%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E7%9A%84%E7%A8%8B%E5%BA%8F%20568f8d2453c24a289376c2e7fb34b798.html"><span class="icon">🔗</span>【知识介绍】处理静态链接的程序</a></figure></details></li></ul><h3 id="fd39684a-a3ad-49da-9527-ccbf596944de" class="">2-动态链接下，单条ROP链需要read实现写入“binsh”</h3><blockquote id="a887a2c9-d6a8-4a7c-9121-e17a9644c25f" class="block-color-red">这里需要一个可以read到的地址，在ASLR下需要先想办法泄露一个bss基址</blockquote><p id="0b9ada28-6031-49ac-8b02-8623c08f2a52" class="">先来一条ROP链实现：执行read然后把retaddr覆写为getshell语句</p><p id="30cfc1df-95fd-4fc7-8a9e-a5a0faacf49f" class="">然后再send向read写入“binsh”</p><h3 id="b01a466a-2bde-48dc-abbd-5f093548974c" class="">3-栈迁移，然后在迁移后的栈上面写入binsh</h3><blockquote id="22d3345e-4899-4210-9cab-3cdb0ba01d50" class="block-color-red">可以解决有ASLR的情况！</blockquote><p id="1b2dd486-321e-4c06-a922-44397914fee2" class="">无ASLR下，直接进行栈迁移，然后在迁移后的栈上写binsh即可</p><p id="f3760a6d-bfe9-4c0d-bc8a-849afcdb9879" class="">在ASLR下，可以先执行write泄露bss基址，然后栈迁移到bss然后在栈上面溢出写“binsh”~</p></details></li></ul><p id="87d17a2d-290f-4787-a627-95e3a700d2c6" class="">4、控制程序在栈上写入“binsh”，这需要绕过ASLR获得栈基址</p><ul id="061b4339-2652-4684-b65d-38a9aa2da7ee" class="toggle"><li><details open=""><summary><mark class="highlight-red">关于“方式4”有以下两种实现方式</mark></summary><p id="b1bb0d11-a85e-4e8e-a1a1-f9275cbcd4ff" class=""><strong>1、通过ROP链劫持程序泄漏栈上某处的地址</strong><div class="indented"><p id="aabff112-e177-44eb-b47e-60f322513a75" class="">往栈上写入“/bin/sh”</p><p id="ea53752b-cc6a-4f5f-b1b0-aab808564d3d" class="">然后当我们想要用栈上的”/bin/sh”时，只需要求“二者地址之差+泄漏出的地址”就可以得到“/bin/sh”地址</p></div></p><p id="7f25d051-b515-4a29-8593-c9bb99c3c040" class=""><strong>2、观察某个函数执行完后，是否有某个寄存器正好指向栈上某位置的</strong><div class="indented"><p id="1e3a5a03-ed39-45fd-807b-59ba1baa0096" class="">往栈上写入”/bin/sh”</p><p id="8d471e9b-3faa-48a6-89f3-74e2a328bf7d" class="">这样当我们想要用栈上的”/bin/sh”时，只需要通过gadgets劫持程序实现以下操作：</p><p id="9f3c66b0-d4df-459d-a8eb-6c3b891119aa" class="">1、将那个指向栈的指针加上“原本指向处和binsh处的地址之差”</p><p id="562cc351-237b-4524-a0f8-004bccbb6597" class="">2、然后将那个指向栈的指针的值赋值给到execve要用到的传参寄存器</p></div></p></details></li></ul><p id="a811c3b9-91ec-4e2e-a496-558b27e1b111" class=""><mark class="highlight-teal_background"><strong>2—-选择系统调用方式</strong></mark></p><blockquote id="d1bd60b6-3122-4624-8eb2-0e286e087166" class="">选择以下几种系统调用方式之一：</blockquote><ul id="ba57437d-60e1-4380-8c78-554d95cd758f" class="toggle"><li><details open=""><summary><strong>1、syscall指令（</strong><mark class="highlight-red_background"><strong>含寄存器的设置方法！</strong></mark><strong>）</strong></summary><p id="2f27a63d-244d-47ca-8cf8-0f5bcdecc1ed" class="">【定义】<br/>设置<br/><code>eax</code>寄存器为系统调用号，然后执行<code>syscall</code>指令。这种方式可以用来调用任何系统调用</p><p id="2739c40a-e5de-47c2-8418-bc4e4cf7bffd" class="">我们可以通过这种方式以进行execve系统调用。</p><p id="8c9a6f2c-a89c-47ae-b011-25232147a47f" class="">【使用场景】</p><p id="e82aff1c-d296-402b-8a98-9fdec427f31b" class="">一般用于不能ret2libc、找不到execve语句，<mark class="highlight-teal">但elf中可以由ropgadget找到syscall语句</mark>的情况</p><p id="cfc0adb8-2ec0-4947-8899-3380cb35c4b3" class="">这里还有一种方式（4）可以用于不能ret2libc、找不到execve、syscall语句，但是<mark class="highlight-teal">可以修改GOT表</mark>的情况</p><p id="0b9c6e14-d1b6-401a-b320-487f188b3578" class="">【实现过程】</p><p id="d0340b47-2ed4-421c-b12a-50866014a211" class=""><mark class="highlight-blue">（1）获得syscall系统调用的地址，并最终ret2该地址</mark><div class="indented"><p id="95c93ddd-4c45-4531-a515-96dfb7bf8db7" class="">获得其地址：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0c52494e-ce66-4588-9185-7f6f6c4bb3cd" class="code"><code class="language-Shell"># 在elf文件中查找syscall系统调用
+ROPgadget --binary ./pwntest | grep &#x27;syscall&#x27;</code></pre><ul id="2e8b5e20-db3a-4752-930e-d22dcc1bcf75" class="toggle"><li><details open=""><summary>或者在ida里面搜索</summary><p id="36bcf192-10df-447e-a155-6168a8d4b116" class="">syscall 的机器码是 <strong>0F 05</strong></p><figure id="b29b2780-85b6-4bef-9100-044d5fbb6ec5" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled%201.png"><img style="width:144px" src="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled%201.png"/></a></figure><figure id="773ebc05-3d34-4e4c-af85-515a0962a753" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled%202.png"><img style="width:240px" src="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled%202.png"/></a></figure></details></li></ul><p id="fbe32566-3b8a-4792-8be2-10ca8214101c" class="">ret2该地址有以下两种方法实现：<div class="indented"><p id="0f461799-d749-46db-8252-2b1c2d34b5e5" class="">方法1：rop链最后的ret_addr</p><p id="a560170b-4c65-4263-b4d6-29cce7888031" class="">方法2：修改got表</p></div></p></div></p><p id="ea3f74f9-4cac-4d0a-a03f-dfd192ea0a77" class="block-color-red_background"><mark class="highlight-blue">（2）设置调用号rax=59（x64下）;11（x32下）以执行execve</mark><div class="indented"><p id="3314fb45-ec77-4d7b-b3f2-6acedf2b762d" class="">有以下几种设置方式：</p><p id="da9bea4d-89b4-48a0-9bf2-6cf167c3e775" class=""><strong>{1}read函数法</strong><div class="indented"><blockquote id="fb119965-3dae-4bfc-a543-defb43b501e5" class="">条件：read函数<p id="eb0122db-12ed-4639-bb69-607509a8380f" class="">意义：设置系统调用号rax+进行系统调用</p></blockquote><p id="f0912d41-02ea-4b31-a844-9be70153ba5e" class="">劫持程序执行read函数</p><p id="a1a56367-6e38-4a43-bb56-02037cb3fe82" class="">然后向read函数输入n个字符，这样read返回时rax就被设置为了n，而rax又可以作为系统调用号，所以这时控制read函数ret2syscall语句就可以实现控制程序执行任意系统调用</p><blockquote id="746cb9ec-2301-4138-be4f-a314df9e89b4" class="">注意：必须用send方法不能用sendline，否则会多读1字节(或者是write)!</blockquote></div></p><p id="319c670c-8c7d-4158-a347-cfbca3b9bc2f" class=""><strong>{2}通过xor rax,rax;ret;和add rax,1;ret这两个gadgets多次调整rax</strong></p><p id="6801c725-895e-4523-9190-b35b140d3074" class=""><strong>{3}通过使用pop rax;ret这个gadgets</strong></p></div></p><p id="9d3ad94c-b1e4-436b-9e8d-3203b8d073a8" class=""><mark class="highlight-blue">（3）设置execve的传参为”/bin/sh“</mark><div class="indented"><blockquote id="461ad080-9156-49b1-b247-dde09a28158e" class="">其中：<p id="5e81ce75-be4c-403d-900d-ff67b1469c47" class="">x32的系统调用第一个传参是：ebx</p><p id="054a9415-b288-4cac-83f2-f8ad3e7aeb92" class="">x64的系统调用第一个传参是：rdi</p></blockquote><p id="3f56a667-1fc1-464b-9f5a-0f3be30fb818" class="">这里必须要用到gadgets！找gadgets语句如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5329dc7d-ca2f-4fc5-8a02-6556d40a6b9c" class="code"><code class="language-Shell"># x64下：找pop rdi|ret的gadget
+ROPgadget --binary your_executable_file --only &quot;pop rdi ; ret&quot;
+# 找_lib_csu_init的通用gadget
+ROPgadget --binary ./pwntest --only &quot;__libc_csu_init&quot;</code></pre></div></p><p id="28d20980-a920-4371-940b-b2a4dd7b9a5d" class=""><mark class="highlight-blue">（4）特殊方式-介绍一种通过修改got地址，在不ret2libc的情况下可以用到syscall的方式</mark><div class="indented"><blockquote id="5485b5f3-9211-479a-a0db-0697deee5683" class="">这里需要用到alarm函数做为示例，有些其他函数也可以实现但且不表</blockquote><p id="d8fea916-78e2-42c3-a7cf-fccc8f2625a0" class="">libc中的alarm函数代码如下：</p><figure id="f016ff56-f9c4-4a59-9223-60d5d38e0943" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled%203.png"><img style="width:432px" src="%E3%80%90PWN%E6%8A%80%E3%80%91PWN%E5%9F%BA%E6%9C%AC%E8%A7%A3%E9%A2%98%E6%B5%81%E7%A8%8B%20169f61642d294c14a81bd635c1a857d3/Untitled%203.png"/></a></figure><p id="6f99213b-4429-4ef2-98fe-9643709fe5cc" class="">这里的syscall是在alarm偏移5的位置，也就是说，无论在ASLR下alarm的地址怎么变，这个偏移为5都不会变。</p><p id="c72d6121-64da-486e-b032-33e4f76deac0" class="">所以我们只要在符号解析完成后，通过gadgets将got表中的alarm地址+5，就可以实现将alarm变为syscall！</p><ul id="334be6b0-4646-423c-b0f5-49b44e7a1edf" class="toggle"><li><details open=""><summary>实现过程</summary><p id="8751b82f-008e-46c6-9eb2-f4c6607fa64d" class="">搜索增加got表的gadgets：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e338a21b-d7f3-49e8-b795-855567ab7e82" class="code"><code class="language-Shell">ROPgadget --binary 文件名 --only &quot;add|ret&quot;</code></pre><p id="701654dd-eda8-4a1d-b3d8-6937302e5879" class="">这里的ROP链劫持思路是：<div class="indented"><p id="d96a0e81-8ea8-4088-859b-3d0f1c48716b" class="">1、执行pop rax;给他一个5</p><p id="33fb829d-01bc-425e-a713-d78d416af53c" class="">2、执行pop rdi;给他一个alarm@got</p><p id="f665f01b-7d81-49c0-8ff4-82a53f15d61d" class="">3、执行add [rdi],al;从而使alarm@got的值+5</p></div></p><p id="0267c781-e011-4ba5-bbe0-722134b46a03" class="">这样就得到了syscall</p></details></li></ul></div></p></details></li></ul><ul id="23017959-b25b-4592-b4de-692a06312953" class="toggle"><li><details open=""><summary><strong>2、使用0x80中断代替syscall</strong></summary><p id="77cfc92a-0daf-4012-ae65-e7bd75b18ea8" class="">【定义】</p><p id="ab2325dd-c462-42b1-ae4b-4bf5f0788f57" class="">0x80中断是一种向前兼容的设计，其作用同syscall指令。</p><p id="f56b6740-6306-4676-bb0d-5831d5993e9b" class="">我们用0x80中断也是为了进行execve系统调用</p><p id="148bf523-c666-428a-b5d6-4323d4dc957a" class="">【使用场景】</p><p id="30013370-727f-4ba8-abd9-49d57105d6ab" class=""><mark class="highlight-teal">在seccomp禁用syscall下</mark></p><p id="64e5d0aa-3d8e-4388-beb0-b5d5c0e310ec" class="">【实现过程】</p><p id="9eb624e9-9b08-49e7-8722-63706b462142" class=""><mark class="highlight-blue">（1）获得0x80中断的地址</mark><div class="indented"><p id="4a145409-49e7-4ed9-8a71-4abed4b90f21" class="">在IDA搜索<code>int 0x80</code>汇编语句</p></div></p><p id="2d4b808c-f96b-48d2-94fc-1f9798f8b022" class=""><mark class="highlight-blue">（2）设置调用号rax=59（x64下）;11（x32下）以执行execve</mark><div class="indented"><p id="78a96573-43f0-4785-a4df-7bcf546dca45" class="">参考”1”</p></div></p><p id="15858c3e-74ac-4e58-88b3-3fb25644f683" class=""><mark class="highlight-blue">（3）设置execve的传参为”/bin/sh“</mark><div class="indented"><p id="85affa5a-3c7a-4ede-9ec6-af904d538b23" class="">参考“1”</p></div></p></details></li></ul><ul id="3279bad8-6e2f-4d05-962b-2643bcef7801" class="toggle"><li><details open=""><summary><strong>3、调用C标准函数system函数</strong></summary><p id="19f3b552-dc92-4ea2-926f-e921430d7049" class="">【定义】</p><p id="d721718c-7a93-4343-b9c4-046f7a812d0a" class="">该函数的底层实现是调用execve系统调用</p><p id="13949f90-03e7-4c86-b8d6-4cd967486c1a" class="">【使用场景】</p><p id="7b884847-4e05-4b97-90db-681b49d76393" class="">能够在IDA中搜索到syste函数</p><p id="5bb80c36-1d5c-4238-8acf-57d593ff0e8e" class="">【实现过程】</p><p id="38c5f663-6e25-4d7e-befa-707635d04879" class=""><mark class="highlight-blue">（1）获得system函数地址</mark><div class="indented"><p id="21a8fc41-445e-42de-bf3d-c6c5932edbd2" class="">在IDA中搜索该函数</p></div></p><p id="87aca225-0c45-4219-97e7-797330b8f73c" class=""><mark class="highlight-blue">（2）设置该函数的传参为”/bin/sh“</mark><div class="indented"><ul id="8fc2ca88-eef4-41cc-886a-74597c3d5a46" class="bulleted-list"><li style="list-style-type:disc">x64系统下：<p id="84637203-aa5b-457c-8987-4b054ad2eaa5" class="">通过gadget控制rdi寄存器的值</p></li></ul><ul id="24f1593c-edb0-491e-afe6-a40355d67b8e" class="bulleted-list"><li style="list-style-type:disc">x32系统下：<p id="0c625358-1ac8-40b4-bb4b-25afc2773bb4" class="">构建以下栈帧即可</p></li></ul></div></p></details></li></ul><ul id="699e2ea4-0dfe-414f-92d3-8b827b1fdf6a" class="toggle"><li><details open=""><summary><strong>4、使用linux的execve系统调用</strong></summary><p id="67a130e9-9ee3-45ff-8d36-a62ab518e1ca" class="">【定义】</p><p id="e051ac0b-791e-4463-862c-472c82babb76" class="">该系统调用用来使程序执行一个新的程序</p><p id="0caebf47-431c-4686-a950-5da4a2b4d2ea" class="">我们就用该系统调用来使程序执行”/bin/sh”！</p><p id="7c2b1b3a-246c-41f4-bd1d-5cb2c8617940" class="">【操作】</p><p id="6941ffc2-bbd7-4057-ac3e-934276853726" class=""><mark class="highlight-blue">（1）获得execve系统调用地址</mark><div class="indented"><p id="2e9ea793-bbb0-47d3-aaa5-b1c6229a3da5" class="">使用ROPgadget工具搜索：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="130ec757-7d23-4bd1-a7d6-ad46ccc5cafc" class="code"><code class="language-Shell">ROPgadget --binary ./pwntest --only &quot;execve&quot;</code></pre></div></p><p id="e589522d-44e2-485e-ad03-2a0fcd5f4ed2" class=""><mark class="highlight-blue">（2）设置该函数的传参为“/bin/sh”</mark><div class="indented"><ul id="d53dc16e-14a6-4f7a-bf19-b316fbf17331" class="bulleted-list"><li style="list-style-type:disc">x64系统下：<p id="25989e0e-ab1e-4d40-b50d-df1f0d605fed" class="">通过gadget控制rdi寄存器的值</p></li></ul><ul id="f800bc64-b8d4-4ab0-b37b-3353184dfdea" class="bulleted-list"><li style="list-style-type:disc">x32系统下：<p id="c9294f7c-6858-414d-bf0c-ab9768f5858f" class="">构建以下栈帧即可</p></li></ul><p id="663cdb7c-a2ae-4fa9-9617-a098a60bdf7e" class="">
+</p></div></p></details></li></ul><p id="9ea4fad1-509f-40ed-a551-d644c5b7149a" class="">修改got表，将某个正常的函数改成指向execve实现劫持执行系统调用</p><h3 id="12a90cad-29d3-4725-9283-b04790fcae18" class="block-color-purple_background">(2)非常规方式：open(”flag”)</h3><p id="d408b5f4-08b3-42e8-b91f-00c39182bbb1" class=""><mark class="highlight-purple_background"><strong>1—-获得”flag”</strong></mark></p><p id="87ee900c-0669-4381-afe0-286076bcc998" class="">有以下几种获得方式：</p><p id="9eebb3d8-d429-4f4a-bf0f-a78f06199ee0" class="">1、写入“flag”，参考“常规方式”</p><p id="791b760a-af96-4e6a-bce3-4727e98823e8" class="">2、程序自带</p><p id="1a7dc03f-30c9-4528-b9f5-89ed28757fd0" class=""><mark class="highlight-purple_background"><strong>2—-选择系统调用方式</strong></mark></p><ul id="3ae22711-6045-4c09-9d55-c42b21f9deea" class="toggle"><li><details open=""><summary><strong>1、syscall指令</strong></summary><p id="6cc639fb-8a86-4416-87eb-d26a5cde4803" class="">同上，只要把系统调用号改一下即可：</p><p id="63454973-50a8-4ad3-b55e-7099d8e94981" class="">x64下：</p><table id="820466ea-53d5-4b56-8d09-8ed96fcaa957" class="simple-table"><tbody><tr id="9edb4c47-4833-4c08-b912-a7db0a16e2ce"><th id="Q{BD" class="simple-table-header-color simple-table-header">read</th><td id="ZeL[" class="">0</td></tr><tr id="b98f8775-7762-421c-a16d-078206fe791a"><th id="Q{BD" class="simple-table-header-color simple-table-header">write</th><td id="ZeL[" class="">1</td></tr><tr id="d2b8ed89-3907-4e2a-80a6-19753bf146fc"><th id="Q{BD" class="simple-table-header-color simple-table-header">open</th><td id="ZeL[" class="">2</td></tr></tbody></table></details></li></ul><ul id="0c684a42-f8d0-44b6-9136-6a6d6ededf9b" class="toggle"><li><details open=""><summary>2、原elf中的open、read、write函数</summary></details></li></ul><p id="158ea882-adbc-435d-8e66-c9ecc783763d" class="">
+</p></div></details></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

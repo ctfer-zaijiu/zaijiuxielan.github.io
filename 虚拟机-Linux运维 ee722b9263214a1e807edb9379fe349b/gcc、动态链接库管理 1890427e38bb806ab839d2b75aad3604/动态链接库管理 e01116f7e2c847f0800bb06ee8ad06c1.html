@@ -1,0 +1,1902 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>动态链接库管理</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="e01116f7-e2c8-47f0-800b-b06ee8ad06c1" class="page sans"><header><img class="page-cover-image" src="https://www.notion.so/images/page-cover/rijksmuseum_rembrandt_1642.jpg" style="object-position:center 60%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🫦</span></div><h1 class="page-title">动态链接库管理</h1><p class="page-description"></p></header><div class="page-body"><h1 id="1880427e-38bb-8071-97f0-e8fa3f70e334" class="">一、总览</h1><p id="1880427e-38bb-809d-893a-f5d0eb01f778" class="">为了使程序能够使用 我们指定版本的glibc库运行，我们需做到以下：</p><p id="1880427e-38bb-8029-9c19-c95d8c50d176" class="">1、在当前os中下载安装指定版本的glibc库</p><p id="1880427e-38bb-80b1-b2a8-db60bb633171" class="">2、设置LD_LIBRARY_PATH环境变量</p><h1 id="1880427e-38bb-80d8-ad50-d2000c118c88" class="">二、方案1：在kali系统中管理多个版本的glibc(不推荐)</h1><blockquote id="1880427e-38bb-8074-8fcf-f8d9fc682670" class="">此处以kali为例 </blockquote><h3 id="1880427e-38bb-80c9-8193-c415857d64cd" class="">1-在操作系统中下载安装某种版本的glibc</h3><ul id="1880427e-38bb-80a8-9ab0-c4a452f17587" class="toggle"><li><details open=""><summary>1、下载编译安装 glibc 所需的必要软件包：</summary><p id="18e0427e-38bb-808b-8956-d01bec99af44" class="">（1）先下一些依赖的工具<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-803d-a453-e1aa30c53282" class="code"><code class="language-Plain Text">sudo apt update
+sudo apt install build-essential libssl-dev libgdbm-dev libdb-dev libexpat-dev libncurses5-dev libbz2-dev zlib1g-dev gawk bison</code></pre></div></p><p id="18e0427e-38bb-8071-9e11-f704f59bbff6" class="">（2）然后下glibc版本对应的gcc：<div class="indented"><blockquote id="18e0427e-38bb-8079-8e9f-f3433944a6d6" class="">gcc版本太高会导致一些编译问题，<mark class="highlight-blue">因为glibc2.23是2016年出的，所以我们安装2016年往前两年左右发布版本的gcc即可，也就是gcc4.9</mark><p id="1900427e-38bb-802b-a5f2-ecb86abee282" class="">如果还是遇到编译问题，那就再一点一点地降低gcc版本做尝试，<mark class="highlight-blue">注意重试时要rm-rf删除make目录！</mark></p></blockquote><p id="18e0427e-38bb-8010-bbb8-dd71281bd05c" class="">{1} 我们现在这个对应表里面，找到glibc2.23对应的年份，以及这个年份下对应的gcc：<div class="indented"><p id="18e0427e-38bb-80a0-b49a-fd26988b2fab" class="">这里是各个版本glibc、gcc对应的发布时间，详情见：<a href="https://www.cnblogs.com/lightdb/p/6254046.html">https://www.cnblogs.com/lightdb/p/6254046.html</a></p><figure id="18e0427e-38bb-801f-bd2e-f36cf4a84036" class="image" style="text-align:left"><a href="gcc%E7%AE%A1%E7%90%86%201890427e38bb804aa397fe5cc98ece45/image.png"><img style="width:192px" src="gcc%E7%AE%A1%E7%90%86%201890427e38bb804aa397fe5cc98ece45/image.png"/></a></figure></div></p><p id="18e0427e-38bb-8006-b85f-d81d9a4ca575" class="">{2} 安装gcc<div class="indented"><p id="18e0427e-38bb-80e6-9305-ef0c710ca05e" class="">先将source.list源配置中的版本代号改为xenial，即16.04版</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="18e0427e-38bb-803e-95b4-f58475a6d791" class="code"><code class="language-Plain Text">vim /etc/apt/sources.list
+
+# 写入
+deb http://mirrors.aliyun.com/ubuntu/ xenial  main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ xenial-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse
+# 退出
+:wq
+
+# 下载 更新源列表信息
+sudo apt-get update
+
+# 如果报错GPG公钥缺失，则添加确实的公钥，然后再更新一遍列表。
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+sudo apt-get update</code></pre><p id="18e0427e-38bb-80d0-8ff2-e0ac3af9afb2" class="">然后安装gcc-4.9</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="18e0427e-38bb-80a1-b5c6-dd49c730c51e" class="code"><code class="language-Plain Text"># 安装
+apt-cache search gcc-4.9
+apt-get install gcc-4.9
+apt-get install g++-4.9
+
+# 查看安装结果
+dpkg -L gcc-4.9
+# 可以看到安装在了：/usr/bin/gcc-4.9</code></pre><p id="18e0427e-38bb-8036-89ec-fd7fb0c275a0" class="">然后设置“gcc”指令对应的程序，通过ubantu内置的工具update-alternatives来设置：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="18e0427e-38bb-804a-884f-c1e72b0f51f9" class="code"><code class="language-Plain Text"># 1、查看以前的优先级设置
+sudo update-alternatives --config gcc
+
+# 2、设置优先级
+# 设置多个版本的gcc可供选择。80，60数字代表的是不同版本的优先级，默认最大数字版本的优先级。--slave: 这个选项允许你同时维护一组相关的符号链接，确保它们都指向同一组版本。例如，如果你切换 GCC 的版本，G++ 的版本也会相应改变。
+ls /usr/bin/*gcc*
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 80 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 60 --slave /usr/bin/g++ g++ /usr/bin/g++-11
+
+# 3、查看是否设置完成
+gcc --version
+</code></pre></div></p><blockquote id="18e0427e-38bb-8008-aa4d-c316494a6e87" class="">更多，参考：<figure id="1890427e-38bb-804a-a397-fe5cc98ece45" class="link-to-page"><a href="gcc%E7%AE%A1%E7%90%86%201890427e38bb804aa397fe5cc98ece45.html"><span class="icon">🎋</span>gcc管理</a></figure></blockquote></div></p></details></li></ul><ul id="1880427e-38bb-80a9-9ee4-d3e331149580" class="toggle"><li><details open=""><summary>2、下载glibc源码，解压，安装</summary><p id="1880427e-38bb-80a4-86e8-e432dd6972bf" class="">（1）先来到官网找到相关安装包的名字：<div class="indented"><p id="1880427e-38bb-802b-be96-f3343da1493e" class="">地址：<a href="https://ftp.gnu.org/gnu/glibc/">https://ftp.gnu.org/gnu/glibc/</a></p><figure id="1880427e-38bb-80c0-b80f-f88129fc60c8" class="image"><a href="%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E7%AE%A1%E7%90%86%20e01116f7e2c847f0800bb06ee8ad06c1/image.png"><img style="width:768px" src="%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E7%AE%A1%E7%90%86%20e01116f7e2c847f0800bb06ee8ad06c1/image.png"/></a></figure></div></p><p id="1880427e-38bb-8054-86c9-d9668bd93773" class="">（2）下载解压<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-804a-9344-dd5ada7443d4" class="code"><code class="language-Shell">wget https://ftp.gnu.org/gnu/glibc/glibc-2.23.tar.xz
+tar -xvf glibc-2.23.tar.xz
+chmod a+rwx glibc-2.23</code></pre></div></p><p id="1880427e-38bb-8034-be58-d7ebbc360af4" class="">（3）编译，安装<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-8018-bfd6-d123932da8fe" class="code"><code class="language-Shell">cd glibc-2.23
+mkdir build
+cd build
+../configure --prefix=/usr/local/glibc-2.23
+make -j4
+sudo make install</code></pre><blockquote id="1880427e-38bb-80d3-abd4-ea1cf6022883" class="">这里指定安装到：/usr/local/glibc-2.23</blockquote><ul id="1890427e-38bb-8026-87d0-eb0c237bcfe2" class="toggle"><li><details open=""><summary>其中，关于这个构建相关的文件，注释如下</summary><ul id="1890427e-38bb-80a5-bdce-fb5ca9fce38f" class="toggle"><li><details open=""><summary>Makefile：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1890427e-38bb-80ce-b34a-cd06febcd656" class="code"><code class="language-Plain Text"># 版权所有 (C) 1991-2016 自由软件基金会, Inc.
+# 此文件是GNU C库的一部分。
+
+# *********************************/
+#	安装操作
+# *********************************/
+ifneq (,)
+这个Makefile需要GNU Make。
+endif
+
+# 包含配置文件
+include Makeconfig
+
+# 这是默认目标；它会生成除测试之外的所有内容。
+.PHONY: all
+all: lib others
+
+# 如果AUTOCONF变量不是no，则执行以下autoconf-it定义的操作
+ifneq ($(AUTOCONF),no)
+
+define autoconf-it
+@-rm -f $@.new # 尝试删除新生成的临时文件
+$(AUTOCONF) $(ACFLAGS) $&lt; &gt; $@.new # 使用autoconf处理输入文件并输出到临时文件
+chmod a-w$(patsubst %,$(comma)a+x,$(filter .,$(@D))) $@.new # 修改临时文件权限
+mv -f $@.new $@ # 将临时文件重命名为目标文件
+endef
+
+# 当configure、%/configure或%/preconfigure文件更新时自动调用autoconf-it宏
+configure: configure.ac aclocal.m4; $(autoconf-it)
+%/configure: %/configure.ac aclocal.m4; $(autoconf-it)
+%/preconfigure: %/preconfigure.ac aclocal.m4; $(autoconf-it)
+
+endif # $(AUTOCONF) = no
+
+.NOTPARALLEL: # 我们不希望在这里并行运行任何操作。
+
+# 这些是在每个子目录中通过制作它们来完成的目标。
++subdir_targets := ...
+
+headers := ... # 定义了要处理的头文件列表
+echo-headers: subdir_echo-headers # 定义了一个名为echo-headers的目标
+
+# 头文件位于include目录中。
+subdir-dirs = include
+vpath %.h $(subdir-dirs) # 指定了.h文件的搜索路径
+
+install-others = $(inst_includedir)/gnu/stubs.h # 定义了其他需要安装的内容
+install-bin-script = # 安装的二进制脚本为空
+
+ifeq (yes,$(build-shared))
+headers += gnu/lib-names.h # 如果构建共享库，则在头文件列表中添加gnu/lib-names.h
+endif
+
+include Makerules # 包含Makerules文件
+
+ifeq ($(build-programs),yes)
+others: $(addprefix $(objpfx),$(install-bin-script)) # 如果构建程序，则将install-bin-script添加到others目标
+endif
+
+install: subdir_install # 安装也包括来自子目录的内容
+
+install-headers: install-headers-nosubdir # 显式依赖关系，使得`make install-headers&#x27;可以工作
+
+# 确保动态链接器在libc之前被安装。
+$(inst_slibdir)/libc-$(version).so: elf/ldso_install
+
+.PHONY: elf/ldso_install
+elf/ldso_install:
+	$(MAKE) -C $(@D) $(@F) # 切换到对应目录并执行指定的目标
+
+# 如果可能的话，使用`ldconfig&#x27;程序为共享库创建链接。
+# 如果我们不能更新/etc/ld.so.cache，忽略错误。
+ifeq (no,$(cross-compiling))
+# 如果构建共享库，则执行以下操作
+ifeq (yes,$(build-shared))
+install: install-symbolic-link # 安装目标依赖于install-symbolic-link
+.PHONY: install-symbolic-link # 声明install-symbolic-link为目标，防止与文件名冲突
+install-symbolic-link: subdir_install # install-symbolic-link依赖于subdir_install
+	$(symbolic-link-prog) $(symbolic-link-list) # 使用symbolic-link-prog创建符号链接
+	rm -f $(symbolic-link-list) # 删除临时符号链接列表
+
+install:
+	-test ! -x $(elf-objpfx)ldconfig || LC_ALL=C \ # 检查是否存在ldconfig，并设置环境变量LC_ALL为C
+	  $(elf-objpfx)ldconfig $(addprefix -r ,$(install_root)) \ # 运行ldconfig并添加安装根目录前缀
+				$(slibdir) $(libdir) # ldconfig处理的目录
+ifneq (no,$(PERL)) # 如果Perl可用
+ifeq (/usr,$(prefix)) # 如果安装前缀是/usr
+ifeq (,$(install_root)) # 如果没有指定安装根目录
+	LD_SO=$(ld.so-version) CC=&quot;$(CC)&quot; $(PERL) scripts/test-installation.pl $(common-objpfx) # 运行测试脚本
+endif
+endif
+endif
+endif
+endif
+
+# 构建子目录中的库对象，不使用ranlib。
+lib-noranlib: subdir_lib
+
+ifeq (yes,$(build-shared))
+# 从PIC对象库构建共享对象。
+lib: $(common-objpfx)libc.so $(common-objpfx)linkobj/libc.so
+endif # $(build-shared)
+
+# 这是一个方便的脚本，用于运行任何动态链接程序以进行当前libc构建的测试。
+$(common-objpfx)testrun.sh: $(common-objpfx)config.make \
+			    $(..)Makeconfig $(..)Makefile
+	(echo &#x27;#!/bin/sh&#x27;; \ # 创建shell脚本头部
+	 echo &#x27;builddir=`dirname &quot;$$0&quot;`&#x27;; \ # 获取构建目录路径
+	 echo &#x27;GCONV_PATH=&quot;$${builddir}/iconvdata&quot; \&#x27;; \ # 设置GCONV_PATH环境变量
+	 echo &#x27;exec $(subst $(common-objdir),&quot;$${builddir}&quot;,\ # 执行替换后的命令
+			    $(test-program-prefix)) $${1+&quot;$$@&quot;}&#x27;; \
+	) &gt; $@T # 输出到临时文件
+	chmod a+x $@T # 赋予执行权限
+	mv -f $@T $@ # 移动临时文件为最终文件
+postclean-generated += testrun.sh # 添加到清理生成文件列表
+
+others: $(common-objpfx)testrun.sh # others目标依赖于testrun.sh脚本
+
+# Makerules在每个子目录中创建一个名为`stubs&#x27;的文件，该文件包含每个定义在该目录中作为存根的函数的`#define __stub_FUNCTION&#x27;。
+# 在这里，我们将所有这些组合成&lt;gnu/stubs.h&gt;。
+
+subdir-stubs := $(foreach dir,$(subdirs),$(common-objpfx)$(dir)/stubs) # 遍历子目录生成stubs文件列表
+
+ifndef abi-variants
+installed-stubs = $(inst_includedir)/gnu/stubs.h # 定义默认安装的stubs.h位置
+else
+installed-stubs = $(inst_includedir)/gnu/stubs-$(default-abi).h # 根据ABI变体定义安装位置
+
+# 处理ABI变体相关的stubs.h生成逻辑
+$(inst_includedir)/gnu/stubs.h: $(+force)
+	$(make-target-directory)
+	{ \
+	 echo &#x27;/* This file is automatically generated.&#x27;;\ # 注释说明此文件自动生成
+	 echo &quot;   This file selects the right generated file of \`__stub_FUNCTION&#x27; macros&quot;;\ # 文件用途描述
+	 echo &#x27;   based on the architecture being compiled for.  */&#x27;; \
+	 echo &#x27;&#x27;; \
+	 $(foreach h,$(abi-includes), echo &#x27;#include &lt;$(h)&gt;;&#x27;) \ # 包含相关头文件
+	 echo &#x27;&#x27;; \
+	 $(foreach v,$(abi-variants),\
+	 $(if $(abi-$(v)-condition),\
+	 echo &#x27;#if $(abi-$(v)-condition)&#x27;; \ # 条件编译
+	 echo &#x27;# include &lt;gnu/stubs-$(v).h&gt;&#x27;); \ # 包含特定ABI变体的stubs
+	 $(if $(abi-$(v)-condition),echo &#x27;#endif&#x27;;) \
+	 rm -f $(@:.d=.h).new$(v); \
+	 ) \
+	} &gt; $(@:.d=.h).new # 写入新文件
+	mv -f $(@:.d=.h).new $(@:.d=.h) # 重命名新文件
+
+install-others-nosubdir: $(installed-stubs) # 安装其他不需要子目录处理的目标
+endif
+
+# stubs.h仅在构建库时才需要，因此简化了复杂的安装过程，只在顶级`make install&#x27;的最后一部分生成它。它依赖于subdir_install，这将遍历所有子目录；每个子目录的subdir_install依赖于该子目录的stubs文件。
+$(installed-stubs): include/stubs-prologue.h subdir_install
+	$(make-target-directory)
+	@rm -f $(objpfx)stubs.h
+	(sed &#x27;/^@/d&#x27; $&lt;; LC_ALL=C sort $(subdir-stubs)) &gt; $(objpfx)stubs.h # 生成stubs.h
+	if test -r $@ &amp;&amp; cmp -s $(objpfx)stubs.h $@; \ # 比较新旧stubs.h
+	then echo &#x27;stubs.h unchanged&#x27;; \ # 若相同则提示未更改
+	else $(INSTALL_DATA) $(objpfx)stubs.h $@; fi # 否则安装新文件
+	rm -f $(objpfx)stubs.h
+
+# 从Texinfo源文件生成文档的Info或DVI文件。
+.PHONY: info dvi pdf html
+info dvi pdf html:
+	$(MAKE) $(PARALLELMFLAGS) -C manual $@ # 在manual目录下运行make，根据目标生成相应格式的文档
+
+# 对于每个目标，使其依赖于每个子目录DIR下的DIR/target。
+$(+subdir_targets): %: $(addsuffix /%,$(subdirs))
+
+# 计算所有这些目标的列表。
+all-subdirs-targets := $(foreach dir,$(subdirs),\
+				 $(addprefix $(dir)/,$(+subdir_targets)))
+
+# 每个目标的操作是进入目录并在此处构建目标。
+$(all-subdirs-targets):
+	$(MAKE) $(PARALLELMFLAGS) $(subdir-target-args) $(@F)
+
+define subdir-target-args
+subdir=$(@D)$(if $($(@D)-srcdir),\
+-C $($(@D)-srcdir) ..=`pwd`/,\
+-C $(@D) ..=../)
+endef
+
+.PHONY: $(+subdir_targets) $(all-subdirs-targets)
+
+# ################################/
+# 安装完后的清理操作
+# ################################/
+
+# 各种程度清理的目标。
+
+.PHONY: clean realclean distclean distclean-1 parent-clean parent-mostlyclean \
+	tests-clean
+
+# 所有清理目标的子例程。
+parent-mostlyclean: common-mostlyclean # common-mostlyclean在Makerules中定义。
+	-rm -f $(foreach o,$(object-suffixes-for-libc),\
+		   $(common-objpfx)$(patsubst %,$(libtype$o),c)) \
+	       $(addprefix $(objpfx),$(install-lib))
+parent-clean: parent-mostlyclean common-clean
+
+postclean = $(addprefix $(common-objpfx),$(postclean-generated)) \
+	    $(addprefix $(objpfx),sysd-dirs sysd-rules) \
+	    $(addprefix $(objpfx),sysd-sorted soversions.mk soversions.i)
+
+clean: parent-clean
+# 通过这种方式而不是将`subdir_clean&#x27;作为此目标的依赖项来完成，以便在处理子目录之前删除libc.a，并且当libc.a即将被删除时，子目录不会尝试从中移除对象文件。
+	@$(MAKE) subdir_clean no_deps=t
+	-rm -f $(postclean)
+mostlyclean: parent-mostlyclean
+	@$(MAKE) subdir_mostlyclean no_deps=t
+	-rm -f $(postclean)
+
+tests-clean:
+	@$(MAKE) subdir_testclean no_deps=t
+
+# 特殊测试相关目标。
+tests-special += $(objpfx)c++-types-check.out $(objpfx)check-local-headers.out
+ifneq ($(CXX),no)
+
+vpath c++-types.data $(+sysdep_dirs)
+
+# ################################/
+# 安装完后的检查、测试操作
+# ################################/
+
+# 检查C++类型兼容性。
+$(objpfx)c++-types-check.out: c++-types.data scripts/check-c++-types.sh
+	scripts/check-c++-types.sh $&lt; $(CXX) $(filter-out -std=gnu11 $(+gccwarn-c),$(CFLAGS)) $(CPPFLAGS) &gt; $@; \
+	$(evaluate-test)
+endif
+
+# 检查本地头文件。
+$(objpfx)check-local-headers.out: scripts/check-local-headers.sh
+	AWK=&#x27;$(AWK)&#x27; scripts/check-local-headers.sh \
+	  &quot;$(includedir)&quot; &quot;$(objpfx)&quot; &lt; /dev/null &gt; $@; \
+	$(evaluate-test)
+
+# 安装头文件检查（如果Perl可用）。
+ifneq ($(PERL),no)
+installed-headers = argp/argp.h assert/assert.h catgets/nl_types.h \
+		    crypt/crypt.h ctype/ctype.h debug/execinfo.h \
+		    dirent/dirent.h dlfcn/dlfcn.h elf/elf.h elf/link.h \
+		    gmon/sys/gmon.h gmon/sys/gmon_out.h gmon/sys/profil.h \
+		    grp/grp.h gshadow/gshadow.h iconv/iconv.h iconv/gconv.h \
+		    $(wildcard inet/netinet/*.h) \
+		    $(wildcard inet/arpa/*.h inet/protocols/*.h) \
+		    inet/aliases.h inet/ifaddrs.h inet/netinet/ip6.h \
+		    inet/netinet/icmp6.h intl/libintl.h io/sys/stat.h \
+		    io/sys/statfs.h io/sys/vfs.h io/sys/statvfs.h \
+		    io/fcntl.h io/sys/fcntl.h io/poll.h io/sys/poll.h \
+		    io/utime.h io/ftw.h io/fts.h io/sys/sendfile.h \
+		    libio/stdio.h libio/libio.h locale/locale.h \
+		    locale/langinfo.h locale/xlocale.h login/utmp.h \
+		    login/lastlog.h login/pty.h malloc/malloc.h \
+		    malloc/obstack.h malloc/mcheck.h math/math.h \
+		    math/complex.h math/fenv.h math/tgmath.h misc/sys/uio.h \
+		    $(wildcard nis/rpcsvc/*.h) nptl_db/thread_db.h \
+		    sysdeps/nptl/pthread.h sysdeps/pthread/semaphore.h \
+		    nss/nss.h posix/sys/utsname.h posix/sys/times.h \
+		    posix/sys/wait.h posix/sys/types.h posix/unistd.h \
+		    posix/glob.h posix/regex.h posix/wordexp.h posix/fnmatch.h\
+		    posix/getopt.h posix/tar.h posix/sys/unistd.h \
+		    posix/sched.h posix/re_comp.h posix/wait.h \
+		    posix/cpio.h posix/spawn.h pwd/pwd.h resolv/resolv.h \
+		    resolv/netdb.h $(wildcard resolv/arpa/*.h) \
+		    resource/sys/resource.h resource/sys/vlimit.h \
+		    resource/sys/vtimes.h resource/ulimit.h rt/aio.h \
+		    rt/mqueue.h setjmp/setjmp.h shadow/shadow.h \
+		    signal/signal.h signal/sys/signal.h socket/sys/socket.h \
+		    socket/sys/un.h stdio-common/printf.h \
+		    stdio-common/stdio_ext.h stdlib/stdlib.h stdlib/alloca.h \
+		    stdlib/monetary.h stdlib/fmtmsg.h stdlib/ucontext.h \
+		    sysdeps/generic/inttypes.h sysdeps/generic/stdint.h \
+		    stdlib/errno.h stdlib/sys/errno.h string/string.h \
+		    string/strings.h string/memory.h string/endian.h \
+		    string/argz.h string/envz.h string/byteswap.h \
+		    $(wildcard sunrpc/rpc/*.h sunrpc/rpcsvc/*.h) \
+		    sysvipc/sys/ipc.h sysvipc/sys/msg.h sysvipc/sys/sem.h \
+		    sysvipc/sys/shm.h termios/termios.h \
+		    termios/sys/termios.h termios/sys/ttychars.h time/time.h \
+		    time/sys/time.h time/sys/timeb.h wcsmbs/wchar.h \
+		    wctype/wctype.h
+		    
+# 添加一个特殊的测试目标，用于检查编译器生成的开始和结束符号。
+tests-special += $(objpfx)begin-end-check.out
+
+# 使用Perl脚本检查安装头文件中的开始和结束符号，并将结果输出到指定文件。
+$(objpfx)begin-end-check.out: scripts/begin-end-check.pl
+	$(PERL) scripts/begin-end-check.pl $(installed-headers) &gt; $@; \ # 执行Perl脚本并重定向输出
+	$(evaluate-test) # 评估测试结果
+
+# 定义一个宏，用于总结测试结果，排除通过或预期失败的测试。
+define summarize-tests
+@egrep -v &#x27;^(PASS|XFAIL):&#x27; $(objpfx)$1 || true # 排除通过或预期失败的测试信息
+@echo &quot;Summary of test results$2:&quot; # 打印测试结果摘要
+@sed &#x27;s/:.*//&#x27; &lt; $(objpfx)$1 | sort | uniq -c # 统计每种测试结果的数量
+@! egrep -q -v &#x27;^(X?PASS|XFAIL|UNSUPPORTED):&#x27; $(objpfx)$1 # 确保所有测试都已被处理
+endef
+
+# 转换特殊测试的目标路径为其不包含目录部分的名字。
+tests-special-notdir = $(patsubst $(objpfx)%, %, $(tests-special))
+
+# 构建所有特殊测试。
+tests: $(tests-special)
+	$(..)scripts/merge-test-results.sh -s $(objpfx) &quot;&quot; \ # 合并子目录下的测试结果
+	  $(sort $(tests-special-notdir:.out=)) \ # 对测试结果进行排序
+	  &gt; $(objpfx)subdir-tests.sum
+	$(..)scripts/merge-test-results.sh -t $(objpfx) subdir-tests.sum \ # 合并所有测试结果
+	  $(sort $(subdirs) .) \
+	  &gt; $(objpfx)tests.sum
+	$(call summarize-tests,tests.sum) # 总结测试结果
+
+# 构建额外的测试。
+xtests:
+	$(..)scripts/merge-test-results.sh -t $(objpfx) subdir-xtests.sum \ # 合并额外测试的结果
+	  $(sort $(subdirs)) \
+	  &gt; $(objpfx)xtests.sum
+	$(call summarize-tests,xtests.sum, for extra tests) # 总结额外测试的结果
+
+# realclean目标与distclean类似，但允许子目录区分它们之间的差异。
+realclean distclean: parent-clean
+# 这样做是为了确保libc.a在处理子目录之前被移除，防止子目录尝试从即将被删除的libc.a中移除对象文件。
+	@$(MAKE) distclean-1 no_deps=t distclean-1=$@ avoid-generated=yes \ # 执行distclean-1操作
+		 sysdep-subdirs=&quot;$(sysdep-subdirs)&quot;
+	-rm -f $(postclean) # 移除清理后的文件
+
+# distclean和realclean的子例程。
+distclean-1: subdir_$(distclean-1)
+	-rm -f $(config-generated) # 移除生成的配置文件
+	-rm -f $(addprefix $(objpfx),config.status config.cache config.log) # 移除配置状态、缓存和日志文件
+	-rm -f $(addprefix $(objpfx),config.make config-name.h config.h) # 移除其他配置相关文件
+ifdef objdir
+	-rm -f $(objpfx)Makefile # 如果定义了objdir，则移除Makefile
+endif
+	-rm -f $(sysdep-$(distclean-1)) # 移除系统依赖相关的文件
+
+# 为Emacs用户生成TAGS文件。
+.PHONY: TAGS
+TAGS:
+	scripts/list-sources.sh | sed -n -e &#x27;/Makefile/p&#x27; \ # 列出源文件
+	  $(foreach S,[chsSyl] cxx sh bash pl,\ # 包含特定后缀的文件
+		    $(subst .,\.,-e &#x27;/.$S$.in$*$$/p&#x27;)) \ # 替换.为转义字符
+	| $(ETAGS) -o $@ - # 生成TAGS文件
+
+# 创建分发tar文件。
+.PHONY: dist dist-prepare
+
+generated := $(generated) stubs.h # 添加生成的stubs.h到生成列表
+
+files-for-dist := README INSTALL configure ChangeLog NEWS # 需要包含在分发包中的文件
+
+# 再生相关内容，然后检查这些内容是否已经提交。
+dist-prepare: $(files-for-dist)
+	conf=`find sysdeps $(addsuffix /sysdeps,$(sysdeps-add-ons)) \ # 查找所有configure文件
+		   -name configure`; \
+	$(MAKE) $$conf &amp;&amp; \ # 重新生成configure文件
+	git diff --stat HEAD -- $^ $$conf \ # 检查是否有未提交的更改
+	| $(AWK) &#x27;{ print; rc=1 } END { exit rc }&#x27; # 如果有更改则退出非零
+
+%.tar: FORCE
+	git archive --prefix=$*/ $* &gt; $@.new # 使用git archive创建新的tar文件
+	mv -f $@.new $@ # 重命名新文件
+
+# 为旧版本制作tar文件。
+
+ifneq (,$(strip $(dist-version)))
+dist: $(foreach Z,.bz2 .gz .xz,$(dist-version).tar$Z) # 根据版本号创建压缩包
+	md5sum $^ # 计算校验和
+else
+dist: dist-prepare
+	@if v=`git describe`; then \ # 获取当前版本描述
+	  echo Distribution version $$v; \ # 打印版本号
+	  $(MAKE) dist dist-version=$$v; \ # 使用版本号构建分发包
+	else \
+	  false; \ # 如果无法获取版本描述，则报错
+	fi
+endif
+
+# 生成INSTALL文件。
+INSTALL: manual/install-plain.texi manual/macros.texi \ # 依赖于多个TeX文件
+	 $(common-objpfx)manual/pkgvers.texi manual/install.texi
+	makeinfo --no-validate --plaintext --no-number-sections \ # 使用makeinfo转换为纯文本格式
+		 -I$(common-objpfx)manual $&lt; -o $@-tmp
+	$(AWK) &#x27;NF == 0 { ++n; next } \ # 处理空白行
+		NF != 0 { while (n-- &gt; 0) print &quot;&quot;; n = 0; print }&#x27; \ # 插入适当的空白行
+	  &lt; $@-tmp &gt; $@-tmp2
+	rm -f $@-tmp # 清理临时文件
+	-chmod a-w $@-tmp2 # 修改权限
+	mv -f $@-tmp2 $@
+
+$(common-objpfx)manual/%: FORCE
+	$(MAKE) $(PARALLELMFLAGS) -C manual $@ # 在manual目录下构建目标
+
+FORCE: # 强制执行目标
+
+iconvdata/% localedata/% po/%: FORCE
+	$(MAKE) $(PARALLELMFLAGS) -C $(@D) $(@F) # 在相应的目录下构建目标</code></pre></details></li></ul><ul id="1890427e-38bb-8001-bf2b-d6ab01bc704b" class="toggle"><li><details open=""><summary>Makeconfig：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1890427e-38bb-80a0-880e-daa388b01bfe" class="code"><code class="language-Plain Text"># 版权 (C) 1991-2016 自由软件基金会, Inc.
+
+#
+#	这是GNU C库的Makefile配置选项。
+#
+ifneq (,)
+这个makefile需要GNU Make。
+endif
+
+all: # 将此作为默认目标
+
+ifneq &quot;$(origin +included-Makeconfig)&quot; &quot;file&quot;
+
++included-Makeconfig := yes
+
+ifdef subdir
+.. := ../
+endif
+
+# $(common-objdir) 是放置那些不属于单个子目录的对象等的位置。
+ifdef objdir
+# 根据objdir和subdir定义编译对象的前缀路径
+objpfx := $(patsubst %//,%/,$(objdir)/$(subdir)/)
+common-objpfx = $(objdir)/
+common-objdir = $(objdir)
+else
+必须在构建目录的Makefile中定义objdir。
+endif
+
+# sysdeps树的根目录。
+sysdep_dir := $(..)sysdeps
+export sysdep_dir := $(sysdep_dir)
+
+# 获取通过`configure&#x27;命令行选项定义的值。
+include $(common-objpfx)config.make
+
+# 对于调用用户提供的回调函数的源代码应给出的标志。
+uses-callbacks = -fexceptions
+
+# 给予测试堆栈对齐的测试的标志。
+stack-align-test-flags =
+
+# 完整路径到sysdeps目录。
+# `configure&#x27;在`config.make&#x27;中写入`config-sysdirs&#x27;的定义。
+sysdirs := $(foreach D,$(config-sysdirs),$(firstword $(filter /%,$D) $(..)$D))
+
+# 添加贡献sysdeps树的插件到包含列表中，在sysdeps/generic之后。
+# 这使得#include &lt;sysdeps/...&gt;能够正确找到特定插件文件而不必假设插件目录名。
+sysdeps-srcdirs := $(foreach add-on,$(sysdeps-add-ons),\
+			     $(firstword $(filter /%,$(add-on)) \
+					 $(..)$(add-on)))
++sysdep_dirs = $(sysdirs) $(sysdeps-srcdirs)
+ifdef objdir
++sysdep_dirs := $(objdir) $(+sysdep_dirs)
+endif
+
+# 运行config.status以更新config.make和config.h。我们不会向Make显示config.h的依赖关系，
+# 因为它仅在更改时才被触摸，所以每次都会运行config.status；config.make的依赖应该足以强制重新生成和重新执行，
+# 新的映像会注意到如果config.h发生了变化。
+$(common-objpfx)config.make: $(common-objpfx)config.status \
+			     $(..)config.make.in $(..)config.h.in
+	cd $(&lt;D); $(SHELL) $(&lt;F)
+
+# 查找所有插件和sysdeps配置片段，确保在其中任何一个发生更改时重新运行configure。
+$(common-objpfx)config.status: $(..)version.h $(..)configure \
+			       $(foreach dir,$(sysdirs),\
+					 $(wildcard $(dir)/Implies) \
+					 $(patsubst %.ac,%,\
+						    $(firstword $(wildcard \
+ $(addprefix $(dir)/,configure configure.ac))))) \
+			       $(patsubst %.ac,%,\
+ $(wildcard $(..)sysdeps/*/preconfigure $(..)sysdeps/*/preconfigure.ac)) \
+			       $(patsubst %.ac,%,\
+					  $(foreach add-on,$(add-ons),\
+						    $(firstword $(wildcard \
+ $(addprefix $(firstword $(filter /%,$(add-on)) $(..)$(add-on))/,\
+	     configure configure.ac))) \
+ $(wildcard $(addprefix $(firstword $(filter /%,$(add-on)) $(..)$(add-on))/,\
+			sysdeps/*/preconfigure sysdeps/*/preconfigure.ac))))
+	@cd $(@D); if test -f $(@F); then exec $(SHELL) $(@F) --recheck; else \
+	 echo The GNU C library has not been configured. &gt;&amp;2; \
+	 echo Run \`configure\&#x27; to configure it before building. &gt;&amp;2; \
+	 echo Try \`configure --help\&#x27; for more details. &gt;&amp;2; \
+	 exit 1; fi
+
+# 我们不希望将CPPFLAGS导出到运行configure的命令中。
+unexport CPPFLAGS
+
+# 获取用户的配置参数。
+ifneq ($(wildcard $(..)configparms),)
+include $(..)configparms
+endif
+ifneq ($(objpfx),)
+ifneq ($(wildcard $(common-objpfx)configparms),)
+include $(common-objpfx)configparms
+endif
+endif
+
+# 用于与机器无关的安装目录的公共前缀。
+ifeq ($(origin prefix),undefined) # ifndef 会覆盖显式的空值。
+prefix = /usr/local  # 如果未定义prefix，则默认设置为/usr/local作为安装根目录。
+endif
+
+# 决定我们是否应当构建程序。除非用户在configparms中明确告诉我们不要这样做，或者我们正在为目标构建独立版本，否则我们总是这样做。
+ifndef build-programs
+ifneq ($(config-os),none)  # 如果操作系统配置不是&#x27;none&#x27;
+build-programs=yes  # 设置build-programs为yes，表示需要构建程序。
+else
+build-programs=no  # 否则，设置为no，表示不需要构建程序。
+endif
+endif
+
+# 用于与机器相关的安装目录的公共前缀。
+ifeq ($(origin exec_prefix),undefined)
+exec_prefix = $(prefix)  # 如果未定义exec_prefix，则默认使用prefix的值。
+endif
+
+# 安装库和对象文件的位置。
+ifndef libdir
+libdir = $(exec_prefix)/lib  # 如果未定义libdir，默认将其设置为$(exec_prefix)/lib。
+endif
+inst_libdir = $(install_root)$(libdir)  # 安装时使用的完整路径。
+
+# 安装共享库的位置。
+ifndef slibdir
+slibdir = $(exec_prefix)/lib  # 如果未定义slibdir，默认设置为$(exec_prefix)/lib。
+endif
+inst_slibdir = $(install_root)$(slibdir)  # 安装时使用的完整路径。
+
+# 动态链接器的安装位置。
+ifndef rtlddir
+rtlddir = $(slibdir)  # 如果未定义rtlddir，默认使用slibdir的值。
+endif
+inst_rtlddir = $(install_root)$(rtlddir)  # 安装时使用的完整路径。
+
+# 在$(libdir)中安装文件时要添加到文件名前的前缀。对于库`libNAME.a&#x27;，该前缀位于`lib&#x27;和名称之间，以便链接器开关`-l$(libprefix)NAME&#x27;能够找到库；对于其他文件，前缀直接加在文件名之前。
+ifeq ($(origin libprefix),undefined)
+libprefix =  # 如果未定义libprefix，则默认为空。
+endif
+
+# 头文件的安装位置。
+ifndef includedir
+includedir = $(prefix)/include  # 如果未定义includedir，默认设置为$(prefix)/include。
+endif
+inst_includedir = $(install_root)$(includedir)  # 安装时使用的完整路径。
+
+# 与机器无关的数据文件的安装位置。这些包括时区数据库和区域设置数据库。
+ifndef datadir
+datadir = $(prefix)/share  # 如果未定义datadir，默认设置为$(prefix)/share。
+endif
+inst_datadir = $(install_root)$(datadir)  # 安装时使用的完整路径。
+
+# 时区数据文件（与机器无关）的安装位置。
+ifndef zonedir
+zonedir = $(datadir)/zoneinfo  # 如果未定义zonedir，默认设置为$(datadir)/zoneinfo。
+endif
+inst_zonedir = $(install_root)$(zonedir)  # 安装时使用的完整路径。
+
+# 已编译的二进制区域设置档案和已编译的二进制区域设置文件的安装位置。
+ifndef complocaledir
+complocaledir = $(libdir)/locale  # 如果未定义complocaledir，默认设置为$(libdir)/locale。
+endif
+inst_complocaledir = $(install_root)$(complocaledir)  # 安装时使用的完整路径。
+
+# 消息目录数据文件（与机器无关）的安装位置。
+ifndef msgcatdir
+msgcatdir = $(datadir)/locale  # 如果未定义msgcatdir，默认设置为$(datadir)/locale。
+endif
+inst_msgcatdir = $(install_root)$(msgcatdir)  # 安装时使用的完整路径。
+
+# 区域字符映射源文件的安装位置。
+ifndef i18ndir
+i18ndir = $(datadir)/i18n  # 如果未定义i18ndir，默认设置为$(datadir)/i18n。
+endif
+inst_i18ndir = $(install_root)$(i18ndir)  # 安装时使用的完整路径。
+
+# 字符集转换用共享对象的安装位置。
+ifndef gconvdir
+gconvdir = $(libdir)/gconv  # 如果未定义gconvdir，默认设置为$(libdir)/gconv。
+endif
+inst_gconvdir = $(install_root)$(gconvdir)  # 安装时使用的完整路径。
+
+# 程序的安装位置。
+ifndef bindir
+bindir = $(exec_prefix)/bin  # 如果未定义bindir，默认设置为$(exec_prefix)/bin。
+endif
+inst_bindir = $(install_root)$(bindir)  # 安装时使用的完整路径。
+
+# 内部程序的安装位置。
+ifndef libexecdir
+libexecdir = $(exec_prefix)/libexec  # 如果未定义libexecdir，默认设置为$(exec_prefix)/libexec。
+endif
+inst_libexecdir = $(install_root)$(libexecdir)  # 安装时使用的完整路径。
+
+# 管理程序的安装位置。
+ifndef rootsbindir
+rootsbindir = $(exec_prefix)/sbin  # 如果未定义rootsbindir，默认设置为$(exec_prefix)/sbin。
+endif
+inst_rootsbindir = $(install_root)$(rootsbindir)  # 安装时使用的完整路径。
+
+ifndef sbindir
+sbindir = $(exec_prefix)/sbin  # 如果未定义sbindir，默认设置为$(exec_prefix)/sbin。
+endif
+inst_sbindir = $(install_root)$(sbindir)  # 安装时使用的完整路径。
+
+# Info文件的安装位置。
+ifndef infodir
+infodir = $(prefix)/info  # 如果未定义infodir，默认设置为$(prefix)/info。
+endif
+inst_infodir = $(install_root)$(infodir)  # 安装时使用的完整路径。
+
+# 审计库的安装位置。
+ifndef auditdir
+auditdir = $(libdir)/audit  # 如果未定义auditdir，默认设置为$(libdir)/audit。
+endif
+inst_auditdir = $(install_root)$(auditdir)  # 安装时使用的完整路径。
+
+# 默认配置文件的安装位置。这些包括本地时区规范和网络数据库文件。
+ifndef sysconfdir
+sysconfdir = $(prefix)/etc  # 如果未定义sysconfdir，默认设置为$(prefix)/etc。
+endif
+inst_sysconfdir = $(install_root)$(sysconfdir)  # 安装时使用的完整路径。
+
+# nss_db的数据库文件和Makefile的目录。
+ifndef vardbdir
+vardbdir = $(localstatedir)/db  # 如果未定义vardbdir，默认设置为$(localstatedir)/db。
+endif
+inst_vardbdir = $(install_root)$(vardbdir)  # 安装时使用的完整路径。
+
+# &quot;localtime&quot;时区文件的安装位置；这个文件的内容由$(localtime)指定。如果这是一个相对路径名，它是相对于$(zonedir)的。最好将此文件放在其他地方，以便zoneinfo目录仅包含通用数据，并在其他地方定位配置数据。
+ifndef localtime-file
+localtime-file = $(sysconfdir)/localtime  # 如果未定义localtime-file，默认设置为$(sysconfdir)/localtime。
+endif
+
+# 在编译默认时区文件时用于闰秒规定的设置。将其设置为`/dev/null&#x27;表示不处理闰秒（符合1003.1标准），或者设置为`leapseconds&#x27;以正确处理闰秒。两种区域风味总是作为`posix/ZONE&#x27;和`right/ZONE&#x27;可用。该变量决定默认值：如果是`/dev/null&#x27;，则ZONE==posix/ZONE；如果是`leapseconds&#x27;，则ZONE==right/ZONE。
+ifndef leapseconds
+leapseconds = /dev/null  # 如果未定义leapseconds，默认设置为/dev/null。
+endif
+
+# 当一个POSIX风格的TZ环境变量没有指定任何规则时，应该使用哪个时区的DST规则。为了符合1003.1标准，此时区必须使用与美国联邦法律定义的DST相同的规则。运行`make -C time echo-zonenames&#x27;查看可用时区名称列表。可以随时用`zic -p TIMEZONE&#x27;更改此设置。如果你想要POSIX.1兼容性，请使用`America/New_York&#x27;。
+ifndef posixrules
+posixrules = America/New_York  # 如果未定义posixrules，默认设置为America/New_York。
+endif
+
+# &quot;posixrules&quot;时区文件的安装位置；这个文件的内容由$(posixrules)指定。如果这是一个相对路径名，它是相对于$(zonedir)的。
+ifndef posixrules-file
+posixrules-file = posixrules  # 如果未定义posixrules-file，默认设置为posixrules。
+endif
+
+# 您系统本机头文件所在的目录。这在Unix系统上用于生成一些GNU libc头文件。
+ifndef sysincludedir
+sysincludedir = /usr/include  # 如果未定义sysincludedir，默认设置为/usr/include。
+endif
+
+# 安装文件时使用的命令。
+ifndef INSTALL_DATA
+INSTALL_DATA = $(INSTALL) -m 644  # 如果未定义INSTALL_DATA，默认设置为使用$(INSTALL)并赋予644权限安装数据文件。
+endif
+ifndef INSTALL_SCRIPT
+INSTALL_SCRIPT = $(INSTALL)  # 如果未定义INSTALL_SCRIPT，默认使用$(INSTALL)安装脚本文件。
+endif
+ifndef INSTALL_PROGRAM
+INSTALL_PROGRAM = $(INSTALL)  # 如果未定义INSTALL_PROGRAM，默认使用$(INSTALL)安装程序。
+endif
+ifndef INSTALL
+INSTALL = install  # 如果未定义INSTALL，默认设置为install命令。
+endif
+
+# C编译器的名字。如果你有GCC并且它工作正常，就使用它。
+ifeq ($(origin CC),default)
+CC := gcc  # 如果CC是默认值，则设置为gcc。
+endif
+
+# 在构建库的主机上运行的程序编译时要使用的C编译器的名字。如果你将CC设置为交叉编译器，则必须将此设置为普通的编译器。
+ifndef BUILD_CC
+BUILD_CC = $(CC)  # 如果未定义BUILD_CC，默认使用CC的值。
+endif
+
+# 传递给C编译器的默认标志。
+ifndef default_cflags
+ifeq ($(release),stable)
+default_cflags := -g -O2  # 如果release被设置为stable，使用-g和-O2优化级别。
+else
+default_cflags := -g -O  # 否则，使用-g和-O优化级别。
+endif
+endif
+
+# 传递给C编译器以汇编预处理后的汇编代码（`.S&#x27;文件）的标志。
+ifndef asm-CPPFLAGS
+asm-CPPFLAGS =  # 如果未定义asm-CPPFLAGS，默认为空。
+endif
+
+as-needed := -Wl,--as-needed  # 链接器选项，仅当需要时链接库。
+no-as-needed := -Wl,--no-as-needed  # 取消as-needed选项。
+
+no-whole-archive = -Wl,--no-whole-archive  # 链接器选项，取消整个归档文件链接。
+whole-archive = -Wl,--whole-archive  # 强制链接整个归档文件。
+
+# 已安装的启动代码名称。
+# ELF惯例规定启动文件名为crt1.o。
+start-installed-name = crt1.o
+# 对于不需要特殊启动文件进行静态链接的系统，简单地将其设置为常规名称。
+ifndef static-start-installed-name
+static-start-installed-name = $(start-installed-name)  # 如果未定义static-start-installed-name，默认使用start-installed-name的值。
+endif
+
+ifeq (yesyes,$(build-shared)$(have-z-combreloc))
+combreloc-LDFLAGS = -Wl,-z,combreloc  # 如果支持build-shared和have-z-combreloc，则添加组合重定位标志。
+LDFLAGS.so += $(combreloc-LDFLAGS)  # 添加到共享对象的链接标志中。
+LDFLAGS-rtld += $(combreloc-LDFLAGS)  # 添加到运行时链接器的链接标志中。
+endif
+
+relro-LDFLAGS = -Wl,-z,relro  # 设置只读重定位标志。
+LDFLAGS.so += $(relro-LDFLAGS)  # 添加到共享对象的链接标志中。
+LDFLAGS-rtld += $(relro-LDFLAGS)  # 添加到运行时链接器的链接标志中。
+
+ifeq (yes,$(have-hash-style))
+hashstyle-LDFLAGS = -Wl,--hash-style=both  # 使用两种哈希表风格。
+LDFLAGS.so += $(hashstyle-LDFLAGS)  # 添加到共享对象的链接标志中。
+LDFLAGS-rtld += $(hashstyle-LDFLAGS)  # 添加到运行时链接器的链接标志中。
+endif
+
+# 每次最终链接（可执行文件或共享对象）后运行的命令。通过$(call after-link,...)调用，所以应操作文件$1。可以设置为对二进制文件进行某种形式的后处理，或执行某种静态健全性检查。
+ifndef after-link
+after-link =  # 如果未定义after-link，默认为空。
+endif
+
+# 用于链接位置无关可执行程序(PIE)与C库的命令。
+ifndef +link-pie
++link-pie-before-libc = $(CC) -pie -Wl,-O1 -nostdlib -nostartfiles -o $@ \
+	     $(sysdep-LDFLAGS) $(LDFLAGS) $(LDFLAGS-$(@F)) \  # 使用指定的编译器选项和标志来生成输出文件$@
+	     $(combreloc-LDFLAGS) $(relro-LDFLAGS) $(hashstyle-LDFLAGS) \  # 添加特定的链接选项
+	     $(addprefix $(csu-objpfx),S$(start-installed-name)) \  # 指定启动文件
+	     $(+preinit) $(+prectorS) \  # 预初始化和预构造函数
+	     $(filter-out $(addprefix $(csu-objpfx),start.o S$(start-installed-name))\  # 排除特定的对象文件
+			  $(+preinit) $(link-extra-libs) \  # 排除额外的库
+			  $(common-objpfx)libc% $(+postinit),$^) \  # 排除标准库和其他后初始化内容
+	     $(link-extra-libs)
++link-pie-after-libc = $(+postctorS) $(+postinit)  # 后构造函数和后初始化
+define +link-pie
+$(+link-pie-before-libc) $(rtld-LDFLAGS) $(link-libc) $(+link-pie-after-libc)  # 定义链接PIE程序的完整命令
+$(call after-link,$@)  # 调用after-link宏，处理最终链接后的操作
+endef
+define +link-pie-tests
+$(+link-pie-before-libc) $(rtld-tests-LDFLAGS) $(link-libc-tests) \  # 定义链接测试程序的完整命令
+			 $(+link-pie-after-libc)
+$(call after-link,$@)  # 处理测试程序链接后的操作
+endef
+endif
+
+# 用于静态链接程序与C库的命令。
+ifndef +link-static
++link-static-before-libc = $(CC) -nostdlib -nostartfiles -static -o $@ \  # 使用静态链接选项
+	      $(sysdep-LDFLAGS) $(LDFLAGS) $(LDFLAGS-$(@F))  \  # 添加系统依赖的链接标志
+	      $(addprefix $(csu-objpfx),$(static-start-installed-name)) \  # 指定静态启动文件
+	      $(+preinit) $(+prectorT) \  # 预初始化和预构造函数
+	      $(filter-out $(addprefix $(csu-objpfx),start.o $(start-installed-name))\  # 排除特定对象文件
+			   $(+preinit) $(link-extra-libs-static) \  # 排除额外的静态库
+			   $(common-objpfx)libc% $(+postinit),$^) \  # 排除标准库和其他后初始化内容
+	      $(link-extra-libs-static)
++link-static-after-libc = $(+postctorT) $(+postinit)  # 后构造函数和后初始化
+define +link-static
+$(+link-static-before-libc) $(link-libc-static) $(+link-static-after-libc)  # 定义静态链接程序的完整命令
+$(call after-link,$@)  # 处理静态链接后的操作
+endef
+define +link-static-tests
+$(+link-static-before-libc) $(link-libc-static-tests) $(+link-static-after-libc)  # 定义静态链接测试程序的命令
+$(call after-link,$@)  # 处理静态链接测试程序后的操作
+endef
+endif
+
+# 用于链接程序与C库的命令。
+ifndef +link
+ifeq (yes,$(build-shared))
+ifeq (yes,$(build-pie-default))
+no-pie-ldflag = -no-pie
++link = $(+link-pie)  # 如果默认构建PIE，则使用PIE链接命令
++link-tests = $(+link-pie-tests)  # 使用PIE测试链接命令
+else
++link-before-libc = $(CC) -nostdlib -nostartfiles -o $@ \  # 标准共享库链接选项
+	      $(sysdep-LDFLAGS) $(LDFLAGS) $(LDFLAGS-$(@F)) \
+	      $(combreloc-LDFLAGS) $(relro-LDFLAGS) $(hashstyle-LDFLAGS) \
+	      $(addprefix $(csu-objpfx),$(start-installed-name)) \
+	      $(+preinit) $(+prector) \
+	      $(filter-out $(addprefix $(csu-objpfx),start.o $(start-installed-name))\
+			   $(+preinit) $(link-extra-libs) \
+			   $(common-objpfx)libc% $(+postinit),$^) \
+	      $(link-extra-libs)
++link-after-libc = $(+postctor) $(+postinit)
+define +link
+$(+link-before-libc) $(rtld-LDFLAGS) $(link-libc) $(+link-after-libc)  # 定义共享库链接命令
+$(call after-link,$@)  # 处理链接后的操作
+endef
+define +link-tests
+$(+link-before-libc) $(rtld-tests-LDFLAGS) $(link-libc-tests) \  # 定义共享库测试链接命令
+		     $(+link-after-libc)
+$(call after-link,$@)  # 处理测试链接后的操作
+endef
+endif
+else
++link = $(+link-static)  # 如果不构建共享库，则使用静态链接命令
++link-tests = $(+link-static-tests)  # 使用静态测试链接命令
+endif
+endif
+
+ifeq (yes,$(build-shared))
+ifndef rtld-LDFLAGS
+rtld-LDFLAGS = -Wl,-dynamic-linker=$(rtlddir)/$(rtld-installed-name)  # 设置动态链接器路径
+endif
+ifndef rtld-tests-LDFLAGS
+ifeq (yes,$(build-hardcoded-path-in-tests))
+rtld-tests-LDFLAGS = -Wl,-dynamic-linker=$(elf-objpfx)ld.so  # 测试时硬编码动态链接器路径
+else
+rtld-tests-LDFLAGS = $(rtld-LDFLAGS)  # 使用常规动态链接器路径
+endif
+endif
+endif
+
+ifndef link-libc
+ifeq (yes,$(build-shared))
+# 我们需要libc.so的版本化名称作为$(others)等的依赖项，以便在任何尝试运行链接程序之前创建到libc.so的符号链接。
+link-libc-rpath-link = -Wl,-rpath-link=$(rpath-link)  # 设置rpath-link以指向正确的库路径
+ifeq (yes,$(build-hardcoded-path-in-tests))
+link-libc-tests-rpath-link = -Wl,-rpath=$(rpath-link)  # 对于测试，设置rpath直接指向库路径
+else
+link-libc-tests-rpath-link = $(link-libc-rpath-link)  # 使用常规rpath-link设置
+endif
+
+# 定义了在链接时如何处理libc库和其他相关库的规则
+
+# link-libc-before-gnulib 变量定义了在链接过程中，位于gnulib之前的库列表。
+# 这包括了libc.so的版本信息、特定类型的库文件（例如c库），以及ld.so链接器和相关的as-needed标记。
+link-libc-before-gnulib = $(common-objpfx)libc.so$(libc.so-version) \
+			  $(common-objpfx)$(patsubst %,$(libtype.oS),c) \
+			  $(as-needed) $(elf-objpfx)ld.so \
+			  $(no-as-needed)
+
+# link-libc 用于定义标准的libc库链接方式，包括rpath-link选项、之前定义的link-libc-before-gnulib变量内容和gnulib。
+link-libc = $(link-libc-rpath-link) $(link-libc-before-gnulib) $(gnulib)
+
+# link-libc-tests 类似于link-libc，但是专门用于测试程序的链接，包含了与测试相关的gnulib-tests库。
+link-libc-tests = $(link-libc-tests-rpath-link) \
+		  $(link-libc-before-gnulib) $(gnulib-tests)
+
+# rpath-dirs 列出了构建时需要考虑的目录，主要用于动态链接器查找库的位置。
+rpath-dirs = math elf dlfcn nss nis rt resolv crypt mathvec
+
+# rpath-link 定义了运行时库搜索路径，使用了common-objdir和rpath-dirs中的值。
+rpath-link = \
+$(common-objdir):$(subst $(empty) ,:,$(patsubst ../$(subdir),.,$(rpath-dirs:%=$(common-objpfx)%)))
+
+# 根据条件编译不同的link-libc和link-libc-tests定义。
+else
+link-libc = $(common-objpfx)libc.a $(otherlibs) $(gnulib) $(common-objpfx)libc.a $(gnulib)
+link-libc-tests = $(common-objpfx)libc.a $(otherlibs) $(gnulib-tests) $(common-objpfx)libc.a $(gnulib-tests)
+endif
+endif
+
+# 定义了一些LDFLAGS标志，用于指定不同的链接器选项。
+LDFLAGS-rpath-ORIGIN = -Wl,-rpath,&#x27;$$ORIGIN&#x27;
+LDFLAGS-soname-fname = -Wl,-soname,$(@F)
+LDFLAGS-rdynamic = -rdynamic
+LDFLAGS-Bsymbolic = -Bsymbolic
+
+# 根据安装目录的不同设置默认的rpath。
+ifneq ($(libdir),$(slibdir))
+default-rpath = $(slibdir):$(libdir)
+else
+default-rpath = $(libdir)
+endif
+
+# 如果未定义link-extra-libs，则根据目标文件名来设置额外的链接库。
+ifndef link-extra-libs
+link-extra-libs = $(LDLIBS-$(@F))
+link-extra-libs-static = $(link-extra-libs)
+endif
+
+# 定义了静态链接libc库的方式，使用-Wl,--start-group和-Wl,--end-group确保正确处理循环依赖。
+link-libc-static = -Wl,--start-group $(common-objpfx)libc.a $(static-gnulib) -Wl,--end-group
+link-libc-static-tests = -Wl,--start-group $(common-objpfx)libc.a $(static-gnulib-tests) -Wl,--end-group
+
+# 描述了如何链接libgcc，解释了不同情况下选择libgcc或libgcc_eh的原因。
+...
+
+# 定义了编译和链接过程中的预初始化和后初始化对象文件。
++preinit = $(addprefix $(csu-objpfx),crti.o)
++postinit = $(addprefix $(csu-objpfx),crtn.o)
++prector = `$(CC) $(sysdep-LDFLAGS) --print-file-name=crtbegin.o`
++postctor = `$(CC) $(sysdep-LDFLAGS) --print-file-name=crtend.o`
+
+# 特定于位置独立可执行文件(PIE)和静态链接程序的变体。
+# Variants of the two previous definitions for linking PIE programs.
++prectorS = `$(CC) $(sysdep-LDFLAGS) --print-file-name=crtbeginS.o`
++postctorS = `$(CC) $(sysdep-LDFLAGS) --print-file-name=crtendS.o`
+# Variants of the two previous definitions for statically linking programs.
++prectorT = `$(CC) $(sysdep-LDFLAGS) --print-file-name=crtbeginT.o`
++postctorT = `$(CC) $(sysdep-LDFLAGS) --print-file-name=crtend.o`
+csu-objpfx = $(common-objpfx)csu/
+elf-objpfx = $(common-objpfx)elf/”
+
+# 定义了一个命令，当它前置在程序名称及其参数之前，并在构建系统上运行时，
+# 会使得该程序及其参数在为库构建的目标主机上运行。
+ifndef test-wrapper
+test-wrapper =  # 如果未定义，则为空
+endif
+
+# 类似于&#x27;test-wrapper&#x27;，但程序名称前会有环境变量&lt;variable&gt;=&lt;value&gt;的赋值。
+ifndef test-wrapper-env
+test-wrapper-env = $(test-wrapper) env  # 使用&#x27;test-wrapper&#x27;并添加env命令
+endif
+
+# 同样类似于&#x27;test-wrapper&#x27;，但是程序的环境将除了显式指定的&lt;variable&gt;=&lt;value&gt;赋值外为空。
+ifndef test-wrapper-env-only
+test-wrapper-env-only = $(test-wrapper) env -i  # 使用&#x27;test-wrapper&#x27;并添加env -i命令，创建一个几乎空的环境
+endif
+
+# 是否在目标主机上运行为库构建的测试程序。如果交叉编译或&#x27;test-wrapper&#x27;存在，则默认为no。
+ifndef run-built-tests
+ifeq (yes|,$(cross-compiling)|$(test-wrapper))
+run-built-tests = no  # 如果正在交叉编译或者设置了test-wrapper，则不运行构建的测试
+else
+run-built-tests = yes  # 否则，运行构建的测试
+endif
+endif
+
+# 当测试失败时是否立即停止。非空意味着停止，空意味着继续。
+ifndef stop-on-test-failure
+stop-on-test-failure =  # 默认为空，即不停止
+endif
+
+# 如何运行刚刚使用我们的库链接的程序。假设程序二进制文件是$(word 2,$^)。
+built-program-file = $(dir $(word 2,$^))$(notdir $(word 2,$^))  # 获取构建程序文件的路径和名称
+rtld-prefix = $(elf-objpfx)$(rtld-installed-name)			      \
+	      --library-path						      \
+	      $(rpath-link)$(patsubst %,:%,$(sysdep-library-path))  # 设置动态链接器的路径
+
+# 如果构建共享库，则设置逗号变量和系统依赖库路径
+ifeq (yes,$(build-shared))
+comma = ,
+sysdep-library-path = \
+$(subst $(empty) ,:,$(strip $(patsubst -Wl$(comma)-rpath-link=%, %,\
+				       $(filter -Wl$(comma)-rpath-link=%,\
+						$(sysdep-LDFLAGS)))))
+# $(run-via-rtld-prefix)是一个命令，当它前置到用新构建库编写的程序名称前时，
+# 可以在目标主机上执行该程序。对于tests-static或xtests-static中列出的测试，它是空的。
+run-via-rtld-prefix =							      \
+  $(if $(strip $(filter $(notdir $(built-program-file)),		      \
+			$(tests-static) $(xtests-static))),, $(rtld-prefix))
+
+else
+run-via-rtld-prefix =  # 如果不是构建共享库，则为空
+endif
+
+# $(run-program-env)是在运行使用新构建库编写的程序时使用的默认环境变量设置。
+run-program-env = GCONV_PATH=$(common-objpfx)iconvdata \
+		  LOCPATH=$(common-objpfx)localedata LC_ALL=C
+
+# $(run-program-prefix)是一个命令，当它前置到使用新构建库编写的程序名称前时，
+# 可以在构建系统上运行该程序。$(run-program-prefix-before-env)和$(run-program-prefix-after-env)
+# 是类似的部分，分别位于环境变量列表之前和之后。
+run-program-prefix-before-env = $(test-wrapper-env)
+run-program-prefix-after-env = $(run-via-rtld-prefix)
+run-program-prefix = $(run-program-prefix-before-env) $(run-program-env) \
+		     $(run-program-prefix-after-env)
+
+# $(built-program-cmd)是一个命令，当在构建系统上执行时，可以运行作为makefile目标第二个依赖的新构建的程序。
+built-program-cmd-before-env = $(test-wrapper-env)
+built-program-cmd-after-env = $(run-via-rtld-prefix) $(built-program-file)
+built-program-cmd = $(built-program-cmd-before-env) $(run-program-env) \
+		    $(built-program-cmd-after-env)
+
+# $(host-built-program-cmd)是一个命令，当在为目标库构建的主机上执行时，
+# 可以运行作为makefile目标第二个依赖的新构建的程序。
+host-built-program-cmd = $(run-via-rtld-prefix) $(built-program-file)
+
+ifndef LD
+LD := ld -X  # 如果未定义LD，则默认设置为ld -X
+endif
+
+# 接下来的几个部分（从$(test-via-rtld-prefix)开始）与上述类似，但专门针对测试程序。
+# 这些部分提供了如何在目标主机或构建系统上运行测试程序的方法。
+
+# 如果设置为yes，则在测试中硬编码路径，不使用动态链接器前缀。
+ifeq (yes,$(build-hardcoded-path-in-tests))
+test-via-rtld-prefix =  # 测试程序不通过动态链接器前缀运行
+test-program-prefix-before-env = $(test-wrapper-env)  # 使用测试包装环境变量
+test-program-prefix-after-env =  # 不需要额外的后置环境变量
+test-program-prefix = $(test-program-prefix-before-env) $(run-program-env) \
+		      $(test-program-prefix-after-env)  # 定义了测试程序的前缀命令
+test-program-cmd-before-env = $(test-wrapper-env)  # 同样地，定义了前置环境变量
+test-program-cmd-after-env = $(built-program-file)  # 指定了构建的程序文件
+test-program-cmd = $(test-program-cmd-before-env) $(run-program-env) \
+		   $(test-program-cmd-after-env)  # 构建测试程序命令
+host-test-program-cmd = $(built-program-file)  # 目标主机上运行测试程序命令
+else
+# 如果不硬编码路径，则使用动态链接器前缀
+test-via-rtld-prefix = $(run-via-rtld-prefix)
+test-program-prefix-before-env = $(run-program-prefix-before-env)
+test-program-prefix-after-env = $(run-program-prefix-after-env)
+test-program-prefix = $(run-program-prefix)
+test-program-cmd-before-env = $(built-program-cmd-before-env)
+test-program-cmd-after-env = $(built-program-cmd-after-env)
+test-program-cmd = $(built-program-cmd)
+host-test-program-cmd = $(host-built-program-cmd)
+endif
+
+# GCC的额外标志。如果启用了所有警告，则添加更多警告标志。
+ifeq ($(all-warnings),yes)
++gccwarn := -Wall -Wwrite-strings -Wcast-qual -Wbad-function-cast -Wmissing-noreturn -Wmissing-prototypes -Wmissing-declarations -Wcomment -Wcomments -Wtrigraphs -Wsign-compare -Wfloat-equal -Wmultichar
+else
++gccwarn := -Wall -Wwrite-strings
+endif
++gccwarn += -Wundef  # 添加-Wundef标志
+ifeq ($(enable-werror),yes)
++gccwarn += -Werror  # 如果启用werror，则将警告视为错误
+endif
++gccwarn-c = -Wstrict-prototypes -Wold-style-definition  # C语言特定的警告标志
+
+# 允许编译器合并所有常量，因为我们不需要不同文件中的常量地址是不同的。
++merge-constants = -fmerge-all-constants
+
+# 禁用任何假设默认舍入模式的优化，因为glibc函数可能在任何舍入模式下调用。
++math-flags = -frounding-math
+
+# 用于从C源文件生成Makefile依赖关系的程序。-MP标志确保GCC生成头文件的虚拟目标，以防止已移除的头文件破坏构建。
+ifndef +mkdep
++mkdep = $(CC) -M -MP
+endif
+
+# 生成Emacs风格TAGS文件的程序。
+ETAGS	:= etags
+
+# 用于从源代码生成.pot文件的`xgettext&#x27;程序。
+ifndef XGETTEXT
+XGETTEXT = xgettext
+endif
+
+# `m4&#x27;宏处理器；用于预处理汇编代码。
+M4 = m4
+
+# 强制安装文件，即使它们比已安装的文件旧。这个变量被包含在所有安装目标的依赖列表中。
+ifeq ($(force-install),yes)
++force = force-install
+else
++force =
+endif
+
+# 这些是传递给编译器的标志，告诉它进行什么样的优化和/或调试输出。
+ifndef	+cflags
+ifdef		CFLAGS
++cflags	:= $(filter-out -I%,$(CFLAGS))  # 如果定义了CFLAGS，过滤掉-I开头的选项
+endif		# CFLAGS
+endif	# +cflags
+
+# 如果没有其他方式设置了+cflags，默认使用&quot;-g -O&quot;。
+ifeq	&quot;$(strip $(+cflags))&quot; &quot;&quot;
++cflags	:= $(default_cflags)
+endif	# $(+cflags) == &quot;&quot;
+
++cflags += $(cflags-cpu) $(+gccwarn) $(+merge-constants) $(+math-flags)  # 增加额外的编译器标志
++gcc-nowarn := -w  # 禁止所有警告
+
+# 对继承自父级的变量去重。
++cflags	:= $(sort $(+cflags))
+
+# 定义系统依赖目录中的include路径，以便编译时可以找到这些头文件。
++sysdep-includes := $(foreach dir,$(+sysdep_dirs),\
+			      $(addprefix -I,$(wildcard $(dir)/include) $(dir)))
+
+# 给C编译器的标志，指示其查找头文件的位置。
++includes = -I$(..)include $(if $(subdir),$(objpfx:%/=-I%)) \
+	    $(+sysdep-includes) $(includes) \
+	    $(patsubst %/,-I%,$(..)) $(libio-include) -I. $(sysincludes)
+
+# libio内部有多个头文件，因此使用-I代替将许多小的头文件放在include目录下。
+libio-include = -I$(..)libio
+
+# 列出我们构建的非库模块。
+built-modules = iconvprogs iconvdata ldconfig lddlibc4 libmemusage \
+		libSegFault libpcprofile librpcsvc locale-programs \
+		memusagestat nonlib nscd extramodules libnldbl
+
+# 确定当前编译模块名称，将&#x27;-&#x27;替换为&#x27;_&#x27;，并从多个可能来源中选择第一个有效值。
+in-module = $(subst -,_,$(firstword $(libof-$(basename $(@F))) \
+				    $(libof-$(&lt;F)) \
+				    $(libof-$(@F)) \
+				    libc))
+
+# 为特定模块（如libpthread、rtld和libc）使用-ftls-model=initial-exec编译选项。
+tls-model = $(if $(filter libpthread rtld \
+			  libc,$(in-module)),-ftls-model=initial-exec,)
+
+# 定义实际使用的模块C预处理器标志，包括包含libc-modules.h和定义MODULE_NAME宏。
+module-cppflags-real = -include $(common-objpfx)libc-modules.h \
+		       -DMODULE_NAME=$(in-module)
+
+# 对于.v.i文件不使用libc-modules.h和MODULE_NAME定义，因为这些目标不需要IS_IN设施。
+module-cppflags = $(if $(filter %.v.i,$(@F)),,$(module-cppflags-real))
+
+# 隐式编译规则使用的变量。注意，不能在CPPFLAGS中使用-std=*，因为它会覆盖隐式的-lang-asm并破坏.S文件的cpp行为。
+CPPFLAGS = $(config-extra-cppflags) $(CPPUNDEFS) $(CPPFLAGS-config) \
+	   $($(subdir)-CPPFLAGS) \
+	   $(+includes) $(defines) $(module-cppflags) \
+	   -include $(..)include/libc-symbols.h $(sysdep-CPPFLAGS) \
+	   $(CPPFLAGS-$(suffix $@)) \
+	   $(foreach lib,$(libof-$(basename $(@F))) \
+			 $(libof-$(&lt;F)) $(libof-$(@F)),$(CPPFLAGS-$(lib))) \
+	   $(CPPFLAGS-$(&lt;F)) $(CPPFLAGS-$(@F)) $(CPPFLAGS-$(basename $(@F)))
+
+# 覆盖CFLAGS以指定标准和其他编译器标志。
+override CFLAGS	= -std=gnu11 -fgnu89-inline $(config-extra-cflags) \
+		  $(filter-out %frame-pointer,$(+cflags)) $(+gccwarn-c) \
+		  $(sysdep-CFLAGS) $(CFLAGS-$(suffix $@)) $(CFLAGS-$(&lt;F)) \
+		  $(CFLAGS-$(@F)) $(tls-model) \
+		  $(foreach lib,$(libof-$(basename $(@F))) \
+				$(libof-$(&lt;F)) $(libof-$(@F)),$(CFLAGS-$(lib)))
+
+# 覆盖CXXFLAGS以指定C++编译器的系统包含路径和其他标志。
+override CXXFLAGS = $(c++-sysincludes) \
+		    $(filter-out %frame-pointer,$(+cflags)) $(sysdep-CFLAGS) \
+		    $(CFLAGS-$(suffix $@)) $(CFLAGS-$(&lt;F)) $(CFLAGS-$(@F))
+
+# 如果所有内容都隐式地使用-fPIC编译，则通过定义PIC符号来告知这一点。
+ifeq (yes,$(build-pic-default))
+pic-default = -DPIC
+endif
+
+# 启用不同版本库的对象文件。
+libtypes = $(foreach o,$(object-suffixes-for-libc),$(libtype$o))
+all-object-suffixes := .o .os .op .og .oS
+object-suffixes :=
+CPPFLAGS-.o = $(pic-default)
+CFLAGS-.o = $(filter %frame-pointer,$(+cflags))
+libtype.o := lib%.a
+object-suffixes += .o
+
+# 如果启用了共享库构建，则添加对PIC对象的支持。
+ifeq (yes,$(build-shared))
+object-suffixes += .os
+CPPFLAGS-.os = -DPIC -DSHARED
+CFLAGS-.os = $(filter %frame-pointer,$(+cflags)) $(pic-ccflag)
+libtype.os := lib%_pic.a
+pic-ccflag = -fPIC
+PIC-ccflag = -fPIC
+endif
+
+# PIE支持。
+pie-ccflag = -fpie
+PIE-ccflag = -fPIE
+
+# 如果启用了性能分析库构建，则添加对性能分析对象的支持。
+ifeq (yes,$(build-profile))
+object-suffixes += .op
+CPPFLAGS-.op = -DPROF $(pic-default)
+CFLAGS-.op = -pg
+libtype.op = lib%_p.a
+endif
+
+# 方便变量，用于区分共享库情况与其他情况。
+object-suffixes-noshared := $(filter-out .os,$(object-suffixes))
+
+object-suffixes-for-libc := $(object-suffixes)
+
+# 构建特殊库，包含仅静态例程的libc部分。
+ifeq (yes,$(build-shared))
+object-suffixes-for-libc += .oS
+CFLAGS-.oS = $(CFLAGS-.o) $(PIC-ccflag)
+CPPFLAGS-.oS = $(CPPFLAGS-.o) -DPIC -DLIBC_NONSHARED=1
+libtype.oS = lib%_nonshared.a
+endif
+</code></pre></details></li></ul></details></li></ul></div></p></details></li></ul><blockquote id="1900427e-38bb-8065-82cc-cd947ab37f5f" class="">相关问题解决：<figure id="1900427e-38bb-8055-957c-c15981a999fb" class="image"><a href="%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E7%AE%A1%E7%90%86%20e01116f7e2c847f0800bb06ee8ad06c1/image%201.png"><img style="width:576px" src="%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E7%AE%A1%E7%90%86%20e01116f7e2c847f0800bb06ee8ad06c1/image%201.png"/></a></figure><p id="1900427e-38bb-802f-bbea-e33a417de03c" class="">解决：不知道怎么解决啊…</p></blockquote><h3 id="1880427e-38bb-80e6-b2e7-ed8b8655ab6c" class="">2-临时地指定动态链接器在运行程序时，使用的glibc库</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-8000-8cb9-d37963861eb4" class="code"><code class="language-Shell"># 指定该环境变量
+export LD_LIBRARY_PATH=/usr/local/glibc-2.23/lib:$LD_LIBRARY_PATH
+# 查看该环境变量
+echo $LD_LIBRARY_PATH</code></pre><blockquote id="1880427e-38bb-80f2-aebf-df5f0f1ef354" class=""><mark class="highlight-default"><code>LD_LIBRARY_PATH</code></mark><mark class="highlight-default"> 是一个环境变量，主要用于指定动态链接器（linker）在执行程序时搜索共享库（shared libraries）的路径列表。</mark><p id="1880427e-38bb-80d8-8aa3-d51b0a79ab8b" class="">这里在执行该程序之前，动态链接器会首先在/usr/local/glibc-2.23/lib目录下查找所需的共享库，然后再依照原有的路径顺序进行查找。</p></blockquote><blockquote id="1880427e-38bb-8014-a775-fca4f1d28787" class="">注意，这种方式通常用于临时性的改变，若要永久生效，则需要将上述命令添加到你的shell配置文件中。</blockquote><p id="1880427e-38bb-80d8-b452-ef0b8a4bc11f" class="">或者，直接用这个指令，将会使用 glibc 2.23 里面的动态链接器来运行应用程序：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1880427e-38bb-801d-b2e9-ee8e391f45dc" class="code"><code class="language-Shell">LD_PRELOAD=/usr/local/glibc-2.23/lib/ld-2.30.so ./your_application</code></pre><blockquote id="1880427e-38bb-807b-bc08-c01a4660fd9d" class=""><mark class="highlight-red"><mark class="highlight-red_background">这里指令中的ld版本可能要改一下！</mark></mark></blockquote><h1 id="b0f661ff-598d-49c9-9b6a-1e1bba553c9b" class="">二、方案2：直接使用不同版本的ubantu</h1><p id="1950427e-38bb-80e7-b13c-c8302de6c12e" class="">安装以下不同版本的ubantu虚拟机，就会自动对应到对应版本的glibc：</p><table id="1950427e-38bb-80f5-8dac-db183de8f2f9" class="simple-table"><tbody><tr id="1950427e-38bb-80de-822d-c916a363af2a"><td id="`DaI" class="">ubantu16.04</td><td id="|[TN" class="">glibc2.23</td></tr><tr id="1950427e-38bb-800c-8ceb-c182e78ccd17"><td id="`DaI" class=""></td><td id="|[TN" class=""></td></tr><tr id="1950427e-38bb-80f3-b7bb-f0436b00ed96"><td id="`DaI" class=""></td><td id="|[TN" class=""></td></tr></tbody></table><p id="1950427e-38bb-8087-a0ec-f5ae9eebd515" class="">
+</p><h1 id="9732c5c9-904f-4ec3-9a5d-e99bb4ffe5d0" class="">三、其他</h1><p id="1950427e-38bb-8097-99ef-de311fcff594" class="">设置程序运行时，使用某种glibc</p><h3 id="1e4c3604-a32d-418a-9d76-5c7730172a98" class="">（一）指定程序要用到的glibc版本</h3><p id="a593ae2a-64bc-4a9e-878a-f9c3da423126" class="">程序执行时，按如下的顺序搜索可执行程序需要的外部动态库文件:：</p><p id="ee759e2a-a094-45a2-ba49-68748b1a5b7c" class="">1、编译目标代码时指定的动态链接库搜索路径<div class="indented"><p id="e5c48637-9202-435d-99c0-a74574aad4ae" class="">即：在gcc中使用<code>-Wl,-rpath</code>或<code>-R</code>选项指定的目录</p><blockquote id="4749931e-2db0-4e60-8030-d5525273d913" class="">其实现原理是：<p id="49430bcc-2b2c-44a6-9bc5-66bd14fed33f" class="">在ELF文件的动态节中，有一个名为<code><strong>.dynamic</strong></code>的节，它包含了一系列的动态条目（dynamic entries）。其中的一个动态条目是<code><strong>DT_RPATH</strong></code>，它存储了运行时库的搜索路径。另一个相关的动态条目是<code><strong>DT_RUNPATH</strong></code>，它也存储了运行时库的搜索路径，但优先级高于<code><strong>DT_RPATH</strong></code>。如果同时存在<code><strong>DT_RPATH</strong></code>和<code><strong>DT_RUNPATH</strong></code>，则系统会优先使用<code><strong>DT_RUNPATH</strong></code>。</p><p id="62d2ff39-fab0-484f-bb91-8f9d9f94cb63" class="">一般情况下，该参数只会存储相关文件名信息</p><p id="dc4c6abe-f4dd-46b3-bd04-482171b0f063" class="">使用该参数时，<code>DT_RPATH</code>和<code>DT_RUNPATH</code>条目会被设置为相关文件路径信息</p></blockquote><ul id="e5f02b50-27ab-48db-9463-544250b6bf15" class="toggle"><li><details open=""><summary>示例</summary><p id="5d0096c0-1994-4ae1-99e8-bc9a394cda73" class="">
+</p></details></li></ul></div></p><p id="93baa7dd-7b17-4ecf-a959-e0c986174d52" class="">2、环境变量<code>LD_LIBRARY_PATH</code>指定的动态链接库搜索路径</p><p id="4a9b40bb-3c13-4185-97e8-e1652d12c3d7" class="">3、配置文件<code>/etc/ld.so.conf</code>中指定的动态库搜索路径</p><p id="566f7db7-3887-4ad6-8266-535d78cd914a" class="">4、默认的动态库搜索路径<code>/lib</code></p><p id="7404bee9-707d-4bc8-be36-9de30ad6f6b6" class="">5、默认的动态区搜索路径<code>/usr/lib</code></p><blockquote id="c3459782-5f08-4d6f-bd96-dce7a9b44cc6" class="">特别注意，<code>/usr/local/lib</code>并不是默认的动态链接库搜索路径，但编译时会去这个目录中查找库</blockquote><h3 id="036563b6-485a-4fdd-800b-b81a18cebbc3" class="">（二）通过读elf相关节获得程序要使用的glibc文件名&amp;路径</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="dc0478bc-446c-41a3-bde1-a43759054411" class="code"><code class="language-JavaScript">ldd sqlite-test</code></pre><h3 id="e446cf27-5fba-44d1-898f-b2f8b642e17b" class="">（三）通过对elf相关节进行patch的方式修改程序要使用到的glibc路径</h3><p id="956409a2-0c1b-44a0-af0e-f7840fbdeae3" class="">
+</p><p id="80969154-1198-4670-a7c3-42c414185c09" class="">指定其他参数</p><h3 id="542c4110-df80-4da4-938c-c17cda9ef4d0" class="">（一）指定用某个库做动态链接</h3><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="416fd078-b09e-42b8-8aa4-6ec1a6118e43" class="code"><code class="language-JavaScript">gcc -o sqlite-test sqlite-test.c -lsqlite3</code></pre><p id="0ee882cc-52db-4163-9c0f-2500dd6ad381" class="">这里-lsqlite3表示需要链接函数库sqlite3，这样gcc在编译时会将该库链接信息设置到程序的elf相关节中</p><h3 id="d8b90f59-be36-46ba-8a97-16b98f8d01dc" class="">（二）指定头文件库文件</h3><p id="c6f31b16-ec87-4155-96c9-db5934515e3c" class="">编译pow_test.c时，需要调用libpow目录下的头文件pow.h与库文件libpow.so或libpow.a，头文件与库文件不在默认的/usr/或/usr/local目录中，需要在gcc中指定头文件与库文件目录，以及连接的库</p><blockquote id="8e74d8ed-fab9-4fa6-b34b-a162437c1b5e" class="">这里假设所需要的头文件位于./libpow，库文件也位于./libpow 目录，库名为pow，则可以这么书写：</blockquote><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a3488e81-496e-4f8a-86f4-3afddd27b590" class="code"><code class="language-Shell">gcc -o pow_test pow_test.c -I./libpow -L./libpow -lpow #动态链接
+gcc -static -o pow_test.static pow_test.c -I./libpow -L./libpow -lpow #静态链接</code></pre><p id="ed38e057-4007-47a8-aa5a-d158ee22a701" class="">编译生成静态链接库&amp;动态链接库</p><ul id="79897dc9-7e55-47b6-b8d5-4842d021521f" class="toggle"><li><details open=""><summary>生成静态库</summary><p id="4dfff306-67d3-4065-b0da-103316d7275c" class="">静态函数库.a的生成需要先把代码编译成.o的目标文件，然后执行ar命令生成.a的静态库。</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6fa46ffe-7632-4da6-b1ff-c57c062a8a22" class="code"><code class="language-JavaScript">gcc -c pow.c
+ar -rcsv libpow.a pow.o</code></pre></details></li></ul><ul id="84e59c18-b58d-47b2-b5ad-be249e3ff98f" class="toggle"><li><details open=""><summary>生成动态库</summary><p id="d43e415e-658c-4804-b5ff-b56a98ca3037" class="">需要执行带-fPIC参数的gcc命令把代码编译成地址无关化的.o目标文件</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="00838938-1b79-410e-9c30-35e1c0ecacb8" class="code"><code class="language-JavaScript">gcc -fPIC -Wall -c pow.c</code></pre><p id="67c4345f-d3d5-48e1-a21a-c3af9d0e6d71" class="">然后执行带-shared参数gcc命令把.o的目标文件生成.so的动态函数库</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="edefeff1-4056-45c4-b4bb-5c303b9b0b3a" class="code"><code class="language-JavaScript">gcc -shared -o libpow.so pow.o</code></pre></details></li></ul><p id="c884a1b4-94f7-4ac3-892d-ccc42bd819bd" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

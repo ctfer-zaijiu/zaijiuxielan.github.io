@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zaijiu的个人知识分享博客</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>zaijiu的个人知识分享</h1>
+    </nav>
+
+    <div class="container">
+        <div class="card-container">
+            <!-- 卡片1 -->
+            <div class="card">
+                <h2>CTF竞赛-PWN方向</h2>
+                <p>涵盖PWN方向给类经典堆栈题型的解题思路与经典例题，以及部分最新比赛真题实战解题流程。</p>
+                <a href="栈-基础技巧.html" class="btn">阅读更多</a>
+            </div>
+
+            <!-- 卡片2 -->
+            <div class="card">
+                <h2>渗透测试实战指南</h2>
+                <p>涵盖渗透测试从打点、攻入、种马到横向移动的全流程技术分享，重点介绍14种web相关漏洞的底层原理与实战演示。</p>
+                <a href="渗透.html" class="btn">阅读更多</a>
+            </div>
+
+            <!-- 卡片3 -->
+            <div class="card">
+                <h2>Linux系统运维知识</h2>
+                <p>Linux系统文件结构、常用工具与指令的详细手册。包含换源、容器搭建、设置代理链等常见操作的实践记录笔记。</p>
+                <a href="虚拟机-Linux运维.html" class="btn">阅读更多</a>
+            </div>
+
+            <!-- 卡片4 -->
+            <div class="card">
+                <h2>算法与数据结构</h2>
+                <p>常见算法解析、数据结构实现、LeetCode题解及编程竞赛技巧分享。</p>
+                <a href="算法设计.html" class="btn">阅读更多</a>
+            </div>
+
+            <!-- 卡片5 -->
+            <div class="card">
+                <h2>计算机底层原理</h2>
+                <p>关注计算机可执行文件结构与其执行机制，包括对堆栈在linux系统中的实现、延迟绑定和动态链接机制的探讨。</p>
+                <a href="ELF结构.html" class="btn">阅读更多</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 知识分享博客. 保留所有权利</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>linux可能出现的问题及解决方案</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="3952911a-3cf1-46b3-83f9-14930d2c30ed" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1586527155314-1d25428324ff?ixlib=rb-4.0.3&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🎚️</span></div><h1 class="page-title">linux可能出现的问题及解决方案</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="ea4fdaf8-7e84-4d65-a4de-3aedca530bce" class=""><mark class="highlight-gray">你总是谢了又开，给我惊喜，又让我沉入这失望的生活里</mark></blockquote><h1 id="d3b8fd0e-ba80-4446-af15-c4f3ebf8b380" class="">1、存储空间不足</h1><p id="80cc1123-77a0-46e5-b359-18daf833ce2f" class="block-color-teal">【这时候会有以下表现】</p><p id="fd837267-e9a6-4641-a8fa-8c8ca00f99ae" class=""><mark class="highlight-teal">1、下载东西或者创建目录&amp;文件的时候报错：/var/cache/apt/archives/空间不足</mark></p><p id="5807a6c6-df7c-4942-bb37-1860497efbfa" class=""><mark class="highlight-teal">2、普通用户登不上，root登的上</mark></p><p id="bdc74c57-23a2-4deb-a432-7f936fe4d5cb" class="">【解决方式如下】</p><ul id="55dbe6ca-4cf1-4d0f-9f33-cfe69f7a8eaa" class="toggle"><li><details open=""><summary>1、删除大文件（有些文件不好找到，不推荐）</summary><p id="7e68c71c-5ba3-4c43-9b83-3a0a45a1d4a5" class="">（1）用以下命令来查看存储空间占用情况：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a48a8cfb-5db8-47d2-8aed-35d7b6efb3e1" class="code"><code class="language-Shell">$ df -h                       </code></pre><ul id="b4b2cc11-f8f7-4de4-8a6a-d323d27013f7" class="toggle"><li><details open=""><summary>回显分析</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="b8e31e3d-062c-4b37-beeb-765f4d96ba79" class="code"><code class="language-Shell">文件系统                       大小  已用  可用 已用% 挂载点
+udev                           1.9G     0  1.9G    0% /dev
+tmpfs                          390M  1.3M  389M    1% /run
+/dev/mapper/kali4pwn--vg-root   15G   15G     0  100% /    #可以看到，这里是被占满了！
+tmpfs                          2.0G     0  2.0G    0% /dev/shm
+tmpfs                          5.0M     0  5.0M    0% /run/lock
+/dev/mapper/kali4pwn--vg-home   13G  906M   12G    8% /home
+/dev/sda1                      455M   84M  347M   20% /boot
+tmpfs                          390M   96K  390M    1% /run/user/1000</code></pre></details></li></ul></div></p><p id="c1c81829-78fc-4ecb-bb10-0d25fd2cba7a" class="">（2）查看当前目录下所有&gt;50M的文件和目录的位置+大小：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="14026848-cc97-4286-97f1-26072e5b5881" class="code"><code class="language-Shell">du -ah ./ | awk &#x27;$1 ~ /[0-9]M/ &amp;&amp; $1+0 &gt; 50 {print}&#x27; | sort -hr</code></pre><ul id="71cc4ade-0ab3-4a0c-b4c6-9e758bc07da1" class="toggle"><li><details open=""><summary>这个命令的工作原理如下</summary><ul id="bd6321dc-c055-4715-892c-df1b9ae12151" class="bulleted-list"><li style="list-style-type:disc"><code>du -h ./</code>：显示当前目录及其子目录的文件大小。</li></ul><ul id="a0298957-6bbe-499c-b4c7-2d5d9a81b77b" class="bulleted-list"><li style="list-style-type:disc"><code>awk &#x27;$1 ~ /[0-9]M/ &amp;&amp; $1+0 &gt; 50 {print}&#x27;</code>：使用 <code>awk</code> 命令过滤出大于50M的结果。<code>$1 ~ /[0-9]M/</code> 是一个正则表达式，用于匹配以M为单位的文件大小。<code>$1+0 &gt; 50</code> 用于过滤出大于50的结果。</li></ul><ul id="bf70b883-3e8a-4c63-8a5e-b278e57b0ea2" class="bulleted-list"><li style="list-style-type:disc"><code>sort -hr</code>：使用 <code>sort</code> 命令将结果按照文件大小从大到小排序。<code>h</code> 选项表示以人类可读的数字大小（例如，1K、234M、2G）排序，<code>r</code> 选项表示反向排序（即从大到小排序）。</li></ul></details></li></ul></div></p><p id="11ed17d1-59ee-4a5d-b944-7985b54d0f5b" class="">（3）删除一些日志文件&amp;临时文件：<div class="indented"><p id="c327d505-1ca5-4902-abd0-a74e8d507d10" class="">使用命令<code>du -sh /var/log/</code>查看日志文件目录的大小，并用<code>rm</code>命令删除不需要的日志文件</p><p id="943c85cc-5d64-4c83-b1c8-2e81a930d097" class="">使用命令<code>du -sh /tmp/</code>查看临时文件目录的大小，并用<code>rm</code>命令删除不需要的临时文件</p></div></p><p id="f9a881c8-c46c-4cd9-9177-104dfa77d560" class="">（4）删容器+镜像：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="dfd6c368-80cd-4955-8862-a2c3fedf05f6" class="code"><code class="language-Shell">docker rmi -f $(docker images -qa)
+docker rm -f $(docker ps -a -q)</code></pre></div></p></details></li></ul><p id="5fa37ae7-8b74-4579-b152-91eb86f9a429" class="">2、回退到某个镜像（墙裂推荐！救了我好多次！）</p><ul id="332edbe4-7093-4c3f-bc55-2e0606968c63" class="toggle"><li><details open=""><summary>3、磁盘扩容（也不失为一种好方法）</summary><p id="c6f63cc9-c486-4760-a802-2a4d4d299124" class="">还有磁盘扩容的方法详见（先删快照然后按照里面增加容量那部分章节去加容量，加好后，再按照里面开目录的章节去开目录）：</p><p id="5a8c075e-3a86-487e-a2b8-fe4217b4cb52" class=""><a href="https://blog.csdn.net/m0_54747676/article/details/127801586">(54条消息) 解决linux根目录磁盘空间不足问题_文件系统根目录磁盘空间不足_lawG的博客-CSDN博客</a></p><p id="5786a8a1-1d55-4c34-a5eb-f698c1bdd857" class="">如果害怕删快照恢复不了，可以先克隆：</p><p id="8bbb9dba-cfb2-4c82-9a19-56aa5b89203c" class=""><a href="https://blog.csdn.net/qq_41125219/article/details/118641132">(54条消息) VMware 克隆主机（详细教程）_李子捌的博客-CSDN博客</a></p></details></li></ul><h1 id="ea2e4d1b-975f-453a-b23a-e472f0e0dc1a" class="">2、防火墙导致网络传输失败</h1><blockquote id="106d597e-fffc-4e24-9e45-f10cbb4b3bf1" class="">在虚拟机与宿主机的telnet连接建立过程中遇到的问题</blockquote><ul id="064a097e-60e0-4708-b9cb-3173f3e10f55" class="toggle"><li><details open=""><summary>一些网络连接失败可能是因为防火墙问题引起的：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="10fc6da1-2d68-404e-b991-282c17cf5dc1" class="code"><code class="language-Shell">sudo systemctl status firewalld.service
+sudo systemctl stop firewalld.service
+sudo systemctl disable firewalld.service</code></pre><p id="ee8b7f92-7cc3-4b29-a8c8-e846a909e9d0" class="">
+</p></details></li></ul><ul id="ed2e8c4c-4efa-4fe7-bf32-82ecfa1c21e0" class="toggle"><li><details open=""><summary>也有可能是SELinux设置了连接的权限引起的：</summary><p id="7e01cf24-31fc-4d1b-8bae-59645c285a59" class="">修改/etc/selinux/config文件中的SELINUX=”” 为 disabled，然后重启</p></details></li></ul><h1 id="092bdbfc-4edd-41dd-af70-3a38792968af" class="">3、yum无法安装某些系统需要的软件</h1><p id="f290b1d3-b636-46ad-9a15-09d62d4019ae" class="">centos7的yum比较垃圾，有时候镜像站里明明有某个软件，但他就是下载不下来，这时候就需要手动下载安装：</p><p id="d3cbce9d-28fc-435a-ac00-ebbd30e4e5e9" class="">例如：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="7fc7597a-d2d2-4670-b113-99be050bdcff" class="code"><code class="language-Shell">wget http://mirror.centos.org/centos/7/extras/x86_64/Packages/fuse-overlayfs-0.7.2-6.el7_8.x86_64.rpm
+rpm -ivh fuse-overlayfs-0.7.2-6.el7_8.x86_64.rpm</code></pre><p id="01caf1dd-97ff-4e5e-ae8f-8082f0a193aa" class="">其中，<a href="http://mirror.centos.org/centos/7/extras/x86_64/Packages/fuse-overlayfs-0.7.2-6.el7_8.x86_64.rpm">http://mirror.centos.org/centos/7/extras/x86_64/Packages/</a>这个网站可以存一下，要下载什么包的时候就可以在这里面找</p><h1 id="ef093802-16dc-4524-9074-7107031e66b0" class="">4、因为墙导致github下载不了东西</h1><p id="e7a1fbd5-ae01-423b-a5ab-6dc2bf6007bf" class="">有3种解决思路，一种是在虚拟机中开梯子，另一种是在宿主机中开梯子下载zip文件，解压后用xftp传给虚拟机，还有一种是使用github的镜像站</p><h1 id="7f908a7b-cbdb-4cdf-b0c9-8648b131333f" class="">5、权限不足</h1><p id="6d6c6f8a-470a-45e6-88b0-c5e4e7d50366" class=""><code>chmod a+rwx 文件名</code> #为某个文件添加rwx权限</p><p id="b5f4aba3-f1ce-4e67-9444-ae6757b5aec4" class=""><code>chmod a+rwx -R 目录路径</code> #为某个目录下的所有文件添加rwx权限</p><p id="23f87f5d-b9e4-42d6-bba6-25ce297837f4" class="">su #以su来运行shell，如果有些软件当时下载时是root，那可能普通用户运行不了他，建议是所有软件都用root下载</p><h1 id="1b099d94-777d-4b13-856d-4883392df48d" class="">6、xftp无法连接</h1><p id="3874aede-b1f2-4cc7-8c78-237fe3f4e79b" class="">可能是虚拟机没有连接上虚拟网卡&amp;虚拟网桥，可以尝试用浏览器访问百度，如果连不上，尝试重启虚拟机有时候可以重连上虚拟设备。</p><p id="e12c2995-7774-4c01-9bd8-71e7d7ff2c16" class=""><strong>1、查看当前ip地址：</strong></p><blockquote id="9c7ac5a0-1288-46c9-962c-e7715389fa82" class="">有可能是ip地址对应错了</blockquote><p id="048ddc11-37e0-416c-b2ca-b757938682dc" class="">用这个命令查看ip地址：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="22463626-9cdb-441d-884c-ae663d397a28" class="code"><code class="language-Shell">$ ifconfig
+......
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 192.168.11.133  netmask 255.255.255.0  broadcast 192.168.11.255
+......</code></pre><p id="cddd5b10-3839-4e5a-9e5e-f5f7dfe06f3d" class="">可以看到局域网ip的192.168.11.133，再看看xftp连接的ip是不是这个：</p><figure id="4a14ecae-1fca-4427-a211-370447ff7a6e" class="image"><a href="linux%E5%8F%AF%E8%83%BD%E5%87%BA%E7%8E%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%203952911a3cf146b383f914930d2c30ed/Untitled.png"><img style="width:709.8333129882812px" src="linux%E5%8F%AF%E8%83%BD%E5%87%BA%E7%8E%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%203952911a3cf146b383f914930d2c30ed/Untitled.png"/></a></figure><p id="dda732bd-0e33-4b59-81f8-9cf53aeafe04" class=""><strong>2、查看22端口有没有被别的进程占用</strong></p><blockquote id="605beba6-1e9c-4f1f-9366-cfae39e7c214" class="">xftp使用ssh，ssh默认是22端口</blockquote><p id="d95b2942-73df-4e0b-9484-f06e07f547ac" class="">用这个命令查看ssh进程占用了哪个端口</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a4661179-fa19-46aa-8644-4faf2d3e6e86" class="code"><code class="language-C">netstat -tuln | grep sshd</code></pre><p id="3215b911-157e-4633-896f-b497dd69bc72" class="">如果没有回显，可能是两种情况：<div class="indented"><p id="2e91568f-0291-4402-9e5f-89dc22339057" class="">（1）22端口被占用</p><p id="844b6a26-c6c1-4ef4-8fef-743f6b7862f2" class="">（2）ssh进程没有启动</p></div></p><p id="65209b90-db9e-40e6-87dd-ca038f69bc6d" class=""><strong>3、重启ssh服务</strong></p><blockquote id="d8c131a1-cced-4203-9826-55dac9180fba" class="">也可能是ssh服务没有开启</blockquote><p id="fb752451-13c0-4e21-a202-bc2c587683fa" class="">用这个方式开启：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="bea92984-4fd8-49d5-b9f9-ff110c1e2c5f" class="code"><code class="language-Shell">$ sudo apt install openssh-server
+$ sudo systemctl restart ssh #重启ssh</code></pre><h1 id="927a61f8-572a-4873-a401-9471f291bc37" class="">7、改完网络配置后不能联网了</h1><p id="135280cf-dee5-4b4f-bd71-a0a5ca7a6c8b" class="">【问题描述】</p><p id="e139b2ae-a05c-405b-aa4f-f57a9d77e9f7" class="">网络模式从NAT改到桥接后就不能联网了</p><p id="c333b7c8-3add-4674-8f96-85a872b98e5e" class="">【分析】</p><p id="82ddb9ec-7944-4854-aa29-aaa2aca3d210" class="">算了，摆烂，改回NAT得了</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

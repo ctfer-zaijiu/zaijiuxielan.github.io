@@ -1,0 +1,687 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>【知识介绍】零碎知识点、注意点</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="3fbf2e64-27f3-4206-a1e0-3e601dcf4fc1" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1484589065579-248aad0d8b13?ixlib=rb-4.0.3&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🍪</span></div><h1 class="page-title">【知识介绍】零碎知识点、注意点</h1><p class="page-description"></p></header><div class="page-body"><h1 id="dbbc63d6-4c97-44d7-baa5-084195f1fe11" class="">一、零碎知识点</h1><h3 id="900d6447-448f-4025-844e-43611e5b47e3" class=""><strong>1-__readfsqword函数</strong></h3><p id="4d7ba3f3-fbb0-40c5-820b-f92ad4fb33f3" class="">一般在逆向中会看到一段类似这样的代码：<code>v8 = __readfsqword(0x28u)</code>，其作用是从线程本地存储（TLS）中读取偏移地址为 <code><strong>0x28</strong></code>的 8 字节数据，这个数据一般是指向线程控制块（Thread Control Block, TCB）的指针。线程控制块是操作系统内核中的一个数据结构，它存储了关于线程的各种信息，包括线程 ID、栈指针、寄存器状态等等</p><p id="8506a710-d2ba-4317-bafd-ae4a06dba982" class="">好像是说只要开canary就会有这个__readfsqword函数</p><h3 id="61100634-2d3d-4528-a64c-d857b7fea338" class="">2-x32程序不开pie下的基址</h3><p id="20b29f48-f046-447b-971c-4413c186c8b1" class=""><strong>x32下，分为三个不同权限的页，每页4KB：</strong></p><p id="65429032-1273-4530-b341-39d83400b6c4" class="">0x8048000-0x8049000：代码段（可读可执行）</p><p id="3589bd64-eac9-41ad-8463-bbf5f30f23a2" class="">0x8049000-0x804a000：只读数据段（只读）</p><p id="ee30c0ce-f781-4acf-808c-9f4514dd113d" class="">0x804a000-0x804b000：数据段（可读可写）包括bss在内</p><p id="bcc48ce1-0173-4906-a717-3a6f81f8ba91" class="">还有其他，则是一些来自glibc的</p><p id="0a69a4df-7ae9-41ba-a58d-ab5c2a8bb095" class=""><strong>x64下：</strong></p><p id="0f82716e-3dba-4333-a26f-06d5b70655fc" class="">数据段基址是0x400000，包括str，data，bss和plt表</p><p id="6cab21d9-27e5-4bd7-bb89-b5ce0ff145cb" class="">代码段基址是0x600000，包括got和test节</p><p id="9a2519f0-597f-4939-ab3a-233bf6c862f5" class=""><strong>重映射机制：</strong></p><p id="13b68ff3-b593-4000-8b06-cd523346e755" class="">当可执行文件较小时，可能会出现同一个块被多次映射到不同地址的现象：</p><p id="4e1be727-2a43-456d-a891-e8c6ffe14909" class="">比如这里的flag字段，首先是在整个文件中偏移D20，然后程序要把代码段加载到0x400000，因为整个程序比较小就干脆整个程序加载上去了，然后程序要把数据段加载到0x600000，因为flag位于数据段所以又被加载一次</p><h3 id="ed217606-7b5f-46db-be89-cd8aa2f01e9b" class="">3-read函数</h3><p id="d1e27bc8-8ef0-4a03-b424-e7f59abf2dab" class="">【传参】</p><p id="0843ed68-8c3c-4cd8-9369-897173935c81" class="">在 glibc 中的 <code><strong>read</strong></code> 函数实际执行过程中，一般不涉及对 <code><strong>ebp</strong></code> 寄存器的保存。填的栈只由esp调控，并且函数执行完ret后esp正好指向第一个传参处（这是因为他的最后一句必定是ret）</p><p id="7e23f2be-40f3-4c27-bb21-8e9f5c3f037a" class="">【返回值】</p><p id="43cf8b18-0484-4eb2-a7db-c787e2b55b09" class="">它读了多少，就会把eax设置为多少，这个点可以用来设置系统调用号</p><p id="a3c6c812-3ab2-4ab7-8d22-a1519756ec8f" class="">【不接受’\n’，也不会因为’\0’停止读取】</p><p id="aea47a98-5cb1-4d2b-a3c5-fefb4cd06621" class="">read判断读取结束的方式好像是和其他读取方式不通过的</p><p id="8103aac7-c75f-4b93-8743-39d8f924652f" class=""><mark class="highlight-yellow_background">我们可以直接用send方法给他喂数据，不需要用sendline方法，如果用了sendline反而会导致我们给他喂的数据末尾多一个’\n’</mark></p><ul id="3b57db7a-902c-4e95-9764-d1877ddcf834" class="toggle"><li><details open=""><summary>示例</summary><p id="bf363713-26c7-4ee0-a7f2-9bde280c7453" class="">这篇笔记里的例题中的exp，经过实际调试证明必须用send方法，入股用sendline就会多给他一个’\n’</p><figure id="90957a6a-9ce0-40b2-82de-7df71e51b471" class="link-to-page"><a href="https://www.notion.so/pie-3-16-90957a6a9ce040b282de7df71e51b471?pvs=21"><span class="icon">👏</span>基于pie低3个16进制位不变的绕过</a></figure></details></li></ul><h3 id="4509739c-c2ad-480f-b257-3544964374f8" class="">4-linux命令执行的一个小bug</h3><p id="e35319f7-3d33-44c0-ab0d-db31460e8659" class="">【定义】</p><p id="1e1e6485-bc25-4267-aa32-2c0d67fd53d6" class="">linux命令行可以一行中执行多行命令，例如：</p><figure id="6d73f993-20e7-496d-aaaa-ee0e5d72c8df" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled.png"><img style="width:2064px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled.png"/></a></figure><p id="63216a2c-04e3-4fd8-9e13-c8cf4a279392" class="">【利用】</p><p id="e320fa7d-7b00-47d3-beb2-ee2e32912f42" class="">也就是说，不一定要system(”/bin/sh”)来实现getshell，有时候只需要能够构建出<code>system(”/bin/sh;垃圾数据”)</code>也可以getshell</p><p id="8126a158-c3aa-4938-965a-c68e66cd5671" class="">【例题】</p><ul id="a3695eb7-441b-4974-87b5-c7439e6c33e8" class="toggle"><li><details open=""><summary><strong>以这道bjdctf_2020_router为例</strong></summary><figure id="5d7c9722-4353-4f69-9c19-b4aab640fca3"><div class="source"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/bjdctf_2020_router.zip">bjdctf_2020_router.zip</a></div></figure><p id="0d72309b-2435-4c26-b104-7a407de24371" class=""><strong>1、逆向</strong></p><p id="715e637a-514a-4ab2-a8ec-d34848dd3b04" class="">checksec：</p><figure id="d79e86e5-3375-495d-9610-72de96e33455" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%201.png"><img style="width:432px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%201.png"/></a><figcaption>只开了一个NX啊，真是不小心呢</figcaption></figure><p id="2538c164-9027-4d21-a0c3-0fb725cad05d" class="">IDA，看它的main函数如下：</p><figure id="a8c54a47-3149-4983-843a-80671dbc330d" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%202.png"><img style="width:432px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%202.png"/></a></figure><figure id="08d22716-3d9e-458d-bcbb-37a7cd208cd1" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%203.png"><img style="width:384px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%203.png"/></a></figure><p id="6f854109-eaf5-4257-9bcc-68660283520a" class="">menu函数：</p><figure id="026eab98-116c-46cc-baf0-994aa9d3d795" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%204.png"><img style="width:240px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%204.png"/></a></figure><p id="8c0009bb-51f2-4f9b-8dad-68f85458ca04" class="">一眼dj，应该是出在这个ping，而这里strcat应该是字符串粘贴，v6应该是”ping”然后我们输入的v5被拼接在这个v6后面</p><p id="5df1ae63-ca3a-4cea-bbd7-85b1360e6ae4" class="">那我们就后面来个<code>;/bin/sh</code>，让他一个system执行两句话咯</p><p id="1254ef77-f0c2-4871-8139-4aa198983619" class=""><strong>2、秒了</strong></p><figure id="1ae47379-6d8a-4d80-b73e-98e7adeafcce" class="image"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%205.png"><img style="width:442px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%205.png"/></a></figure></details></li></ul><h3 id="e67f661b-cacc-4df3-88c8-66cc6e780aec" class="">5-elf程序执行流程</h3><p id="249d6d7c-5f01-4c5a-a5e2-07a32f84a6e4" class="">如下：</p><figure id="2da4538f-e471-491a-a380-fdfd3cafc1ed" class="image" style="text-align:left"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%206.png"><img style="width:528px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%206.png"/></a></figure><h1 id="7a6f6a29-5116-4b0c-bbf3-17f74dc8191c" class="">二、写题时候的注意点</h1><h3 id="e88cdd58-ca64-4e11-9730-8279337bbc2a" class="">1-一个真jb贱的点！</h3><p id="9ca5791d-034e-4b98-abb1-1d3961cb9579" class="">一道栈迁移里面遇到的</p><p id="a565ad82-26cf-43c4-8853-b50376b80b36" class=""><mark class="highlight-yellow_background">一个程序给你限制read个0x40字节，然后你payload正好0x40字节给他拿去栈迁移，这个时候一定要用send方法不能用sendline，不然那个回车键就会留在那个撒币内存里面！</mark></p><blockquote id="f03b18aa-3aa7-4d94-8d55-58e31e7675cf" class="">made这个逼玩意卡了我两天啊！！！</blockquote><h3 id="49c453f6-5859-46ff-b9c6-df99be7d01e2" class="">2-高版本glibc中execve的一个冗余检测</h3><p id="c684ce6b-ab3c-4e5d-a57b-f9629fdb44b1" class="">【定义】</p><p id="d47c3020-2113-42aa-8aa3-d60b8c51b2d4" class="">因为这个冗余检测，经常会导致别处可以用的exp在自己主机环境失效</p><p id="2e8a9c02-868b-457c-99c3-145ed252c562" class="">【代码】</p><p id="3970b05b-1d65-4c94-bb83-e3c93802fc92" class="">主要是这段：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="db006d4d-b5a6-4dc8-978e-b20a8987178b" class="code"><code class="language-Python">.text:000000000004F391    movhps xmm0, qword ptr [rsp + 8]
+.text:000000000004F391    movaps xmmword ptr [rsp + 0x40], xmm0
+.text:000000000004F39B    call sigaction</code></pre><p id="867d97c5-7d3c-4696-8ee3-f8f5e0d24aa5" class="">这里因为用到了SSE指令集的movhps和movaps，所以就有一个要求：<div class="indented"><p id="5945031f-202d-485e-bf82-33741f8b3f9c" class="">SSE指令集的这两个指令必须要求在执行过程中rsp+198h+var_158的值是向0x10B对齐的，否则就会触发对齐异常从而使程序crash</p></div></p><p id="11f9fbfa-349b-48b8-8e54-274a0d93daf0" class="">【解决】</p><ul id="c48d74fc-c6ff-444d-a585-4110d88ca725" class="toggle"><li><details open=""><summary><strong>垫高esp</strong></summary><p id="5613ee6f-668c-498c-94fa-bb1d2613c66a" class="">在payload里面填充一些ret_gadgets来让system(”/bin/sh”)时的esp被垫高一点</p><p id="569f49f4-f5d6-4204-889f-a84d2cbb808a" class="">如图所示，右边的payload在system(”/bin/sh”)时的esp会被垫高1B</p><figure id="5eb78806-36ff-4f1b-999e-6e7891198de7" class="image" style="text-align:left"><a href="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%207.png"><img style="width:528px" src="%E3%80%90%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D%E3%80%91%E9%9B%B6%E7%A2%8E%E7%9F%A5%E8%AF%86%E7%82%B9%E3%80%81%E6%B3%A8%E6%84%8F%E7%82%B9%203fbf2e6427f34206a1e03e601dcf4fc1/Untitled%207.png"/></a></figure><p id="ff956d70-6bd8-477c-b949-f934116ae791" class="">如果还不行流再垫高，1B1B试试看咯</p><p id="94942125-6407-4c82-85ce-f2e413abee56" class="">如果payload限制了长度那就栈迁移咯</p></details></li></ul><h3 id="f01547c1-7104-448a-8f19-ec4871981ac0" class="">3-shell时获得flag的一些小心眼</h3><ul id="26da922d-9039-4fb1-b281-e76eaa95c60a" class="bulleted-list"><li style="list-style-type:disc">有时候flag是隐藏文件，需要<code>cat ./flag*</code></li></ul><ul id="42a16bc4-adf1-4cc1-8fa6-04a74340b75e" class="bulleted-list"><li style="list-style-type:disc">有时候flag是环境变量，需要…</li></ul><h3 id="6f0fbee7-08c6-4c15-91a0-5613606db81c" class="">4-题目名中的提示</h3><p id="46c543be-7861-4538-b783-86a0e5fdc6e9" class="">题目名字有时候会带一些提示，例如：</p><p id="4486c4a8-7f28-4870-8f79-a96dcac00095" class="">shell we go就暗示你这道题目是用go语言写的</p><h3 id="33f1a160-60b8-4be7-ab58-2f6e5241751d" class="">5-IDA无法正确反编译后门函数</h3><p id="d8ce8169-4d24-4d28-965d-5e13d9f187b9" class="">有时候IDA没法正确反编译后门函数，后门函数会被反编译成这样：</p><p id="ead5047d-bbe5-4c67-a4f9-52aaed90c429" class="">（？图呢）</p><p id="60f7ba28-c084-4a89-91e1-7f81e31bd398" class="">我们直接反汇编界面看他，就可以一眼丁真</p><p id="e2f264dd-f1c1-46e2-9f0e-c2d88b2194b3" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
