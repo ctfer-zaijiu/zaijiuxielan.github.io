@@ -1,0 +1,684 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>查找算法</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="ca9528fc-5cfc-42b0-ad20-a3919654fa07" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/binoculars_gray.svg"/></div><h1 class="page-title">查找算法</h1><p class="page-description"></p></header><div class="page-body"><h3 id="81deef6b-e863-472d-bed9-a9879db4507d" class="">顺序查找</h3><p id="9723e975-0fda-4f9d-b5b5-bcf61f2abce1" class="">【定义】</p><p id="fea916c1-f628-4a2a-8493-48cca7ace50d" class="">从尾到头一个个元素查比较过去。（它的防止查找越界的方式，书里是用“哨兵”，也就是在idx=0处存放那个要查找的元素，这样最多找到idx=0处跳出）</p><p id="4ce73029-0594-4fe2-8540-1e92723e5ade" class="">【性质】</p><p id="0ee324c4-5df9-4619-8576-db086536528b" class="">可以有动态结构但查找慢</p><p id="b5d2570b-1d22-4015-b68e-3c9c5da1f287" class="">如果要找的元素是表中的第i个元素，则从尾到头查要进行n-i+1次比较</p><p id="f67c6234-620d-430c-87aa-6bbf4bb2d9e0" class="">则其：<div class="indented"><ul id="ee543a3e-d1e1-47d6-b480-dfe13518219a" class="bulleted-list"><li style="list-style-type:disc">查找成功时的平均查找长度为：<code>对于每个位置，求“在概位置的概率*在该位置的比较次数”的结果，然后所有结果求和</code>，如下：<figure id="2f440d0c-580d-4580-9584-9af96a968dc2" class="image" style="text-align:left"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled.png"><img style="width:240px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled.png"/></a></figure></li></ul><ul id="b2357e63-c976-4347-94ec-f1421643bfcd" class="bulleted-list"><li style="list-style-type:disc">查找不成功时的平均查找长度为：<figure id="4768aaa1-35b8-4f6b-9abe-c42d884024ca" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%201.png"><img style="width:108px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%201.png"/></a></figure></li></ul></div></p><blockquote id="8cfadc24-10e0-4ae9-9daa-1650673c90a2" class="">记忆：“平均查找长度”是1+2+3+…</blockquote><p id="7cea743f-83f3-4455-a374-39dd8c3b2a75" class="">时间复杂度：<div class="indented"><p id="2e347400-7f99-4c0b-92ca-9cd70af00149" class="">O(n)</p></div></p><h3 id="a2f5d3d2-9aa5-404c-8c02-51458afa98d2" class="">二分查找</h3><p id="a3997186-412c-431f-9e58-50a1aeb303df" class="">【定义】</p><p id="d7d4a14d-8ba6-4d8a-b5fb-d03e33d74131" class="">对比一下，小于中点就取前半，大于就取后半，直到找到对应元素</p><p id="40334bc0-04ad-4567-b4a1-58657503f6b2" class="">【性质】</p><p id="a90b03f6-c6c9-4c3e-8ee0-05041331c21a" class="">查找快但不允许有动态结构，因为<mark class="highlight-teal">必须是1、节点有序2、顺序存储</mark>！</p><p id="af596055-f517-417f-9907-0de75a6c344d" class="">平均查找长度：<div class="indented"><figure id="f6eaca67-b59a-4d06-9aa9-f74d29c68e4f" class="image" style="text-align:left"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%202.png"><img style="width:528px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%202.png"/></a></figure></div></p><p id="06812dc6-0fca-4900-abfb-bd2c6db44d1c" class="">时间复杂度：<div class="indented"><p id="18254088-f952-4f9f-bcb7-2aed62320466" class=""><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(log_2n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span></span><span>﻿</span></span></p><blockquote id="2be56443-4386-4365-a57e-cf74d596a8f4" class="">这是因为：<figure id="11383ac4-a158-4b55-8a3b-3851c79be204" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%203.png"><img style="width:240px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%203.png"/></a></figure><p id="3adcfdf9-29a7-489a-b659-5bfdd3061594" class="">也可以这么理解：因为比较n次，就可以对应<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span>的数据</p></blockquote></div></p><blockquote id="3bca7828-6a20-43d0-9efe-8890a401d579" class="">记忆：“时间复杂度”“平均查找长度”都是<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><msub><mi>g</mi><mn>2</mn></msub><mi>n</mi></mrow><annotation encoding="application/x-tex">log_2n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">o</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal">n</span></span></span></span></span><span>﻿</span></span></blockquote><h3 id="63cb82ee-5cf5-43ed-a571-f449d716eef8" class="">分块查找</h3><p id="749e8310-ed3d-41de-bbb2-cf3d21aeb901" class="">【定义】</p><p id="4fababbd-a958-46f6-bc23-bf0571177127" class="">分为两步：第一步是在索引表中确定待查记录所在的块，可以顺序查找或折半查找索引表；第二步是在块内顺序查找</p><p id="969de8cb-d175-44d5-80ab-01886e05b141" class="">【结构要求】</p><p id="bbb94e39-fe59-46de-867c-e08040bf6c9b" class="">要求块内可无序，但块间有序，块间可以对各块的关键字建立一个索引表，其吸取了顺序查找和折半查找各自的优点，既有动态结构又适用于快速查找。</p><h3 id="33466b9a-e300-4c20-bb33-9a4259fe3804" class="">哈希查找</h3><p id="42fb681f-446a-4303-a2d5-3b9bfbcabe2b" class="">【定义】</p><p id="0cb88b0e-6fc0-4aaf-aebb-03076c946473" class="">由要查找的值key，通过函数变换得到一个散列地址H(key)</p><p id="21f91414-0aaa-4b5b-9fac-679a82b988d2" class="">常见的散列函数如下：</p><ul id="6e43deda-b9cc-4e92-9752-942f79d4b069" class="bulleted-list"><li style="list-style-type:disc"><strong>直接定址法</strong>：直接取关键字的某个线性函数值为散列地址，散列函数为H(key)=key 或 H(key)=a*key+b (a,b 是常数)</li></ul><ul id="ab575691-4ac1-48eb-8601-4edc622ba3f4" class="bulleted-list"><li style="list-style-type:disc"><strong>除留余数法</strong>：假定散列表表长为 m，取一个不大于 但最接近或等于 m 的质数p，利用以下公式把关键字转换成散列地址：H(key)=key%p</li></ul><ul id="2317c452-82cb-4af8-9311-9619ea004319" class="bulleted-list"><li style="list-style-type:disc">数字分析法</li></ul><ul id="8bdb3c1e-af64-4c86-a4fb-d9167330b0a3" class="bulleted-list"><li style="list-style-type:disc">平方取中法</li></ul><blockquote id="8eaaed65-bdcd-450f-96f8-dd6051890835" class="">主要考前两种</blockquote><p id="70d80d33-d517-48bf-b0e5-87efe0976315" class="">【解决冲突】</p><blockquote id="32056733-377b-453e-91a0-4b357b5fa027" class="">根据前面两种散列函数发，有可能出现H(key1)=H(key2)的情况</blockquote><p id="d0e6a84b-bc01-4a68-97df-d1deaaa62ef5" class=""><strong>开放定址法：</strong><div class="indented"><p id="c1abe740-f538-4ddf-b6f4-760024aec23d" class="">【定义】</p><p id="276422fd-60c4-4ee5-997f-97c782c53b69" class="">发生了哈希冲突时，开放定址法会从发生冲突的位置开始，按照某种固定的顺序寻找哈希表中的下一个空闲位置，并将冲突的元素存储在那里</p><p id="6829e590-5487-4c56-8f9d-b9a769d0166a" class="">【详细过程】，</p><p id="e4b6f34c-cdcc-4cc4-92ab-ca9a54cccd55" class="">有以下几种实现方式：</p><ul id="d61c8546-d233-4937-8b78-0e214c4d9df7" class="bulleted-list"><li style="list-style-type:disc">线性探测法：从发生冲突的单元开始，依次检查下一个单元，直到找到一个空闲单元。这种方法容易产生堆积现象，即连续的已占用单元。</li></ul><ul id="87eda8ff-42ad-4ae8-9e58-18d165a09cda" class="bulleted-list"><li style="list-style-type:disc">平方探测法：从发生冲突的单元开始，探测的位置是冲突单元的前后第<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>i</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">i^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">i</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span>个元素，其中 i 的值为1,2,3,...。这种方法可以解决线性探测法中的一次聚集问题，但可能引入二次聚集问题</li></ul><p id="533f078d-76f8-44bc-ac1a-44ec9dbe113e" class="">【性质】</p><p id="497f869d-fc7c-4f9d-a5e7-1691e962d2dd" class="">开放定址法的一个缺点是在删除元素时不能直接删除，否则会引起查找错误。因此，通常采用标记删除的方式，即做一个特殊标记，直到有新元素插入时才真正删除该元素</p><p id="8ccb5c5c-24f3-480b-95a3-b88325de26d7" class="">求平均查找长度：<div class="indented"><p id="ebf8bd2e-d7d1-4cad-a097-e84992584538" class=""><mark class="highlight-blue">查找成功的平均查找长度=总查找次数/查找元素个数</mark></p></div></p><p id="5350749d-9128-465d-bce2-a6c9d8f9d960" class="">散列表的查找长度取决于三个因素：<div class="indented"><p id="d0922a6a-bbf2-4d91-9dc3-9ba4bf9220a6" class="">散列函数、处理冲突的方法和装填因子（<code>装填因子a=表中记录数/散列表长度</code>）</p><blockquote id="45275b41-fbdd-465a-a617-678e7b876339" class="">a越大表示装填的记录越“满”，发生冲突的可能性就越大</blockquote></div></p><p id="9901f1a3-3ae0-4bf2-b4a8-6203a483551e" class="">【例题】</p><ul id="a869e0cc-5231-491e-bae3-363a77f860ea" class="toggle"><li><details open=""><summary>例题如下</summary><figure id="a33acb26-58f1-43cf-be60-b3817890d7a0" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%204.png"><img style="width:576px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%204.png"/></a></figure><p id="c55bb98e-0daf-49a8-9e67-4c9c763f080d" class="">解如下：</p><figure id="f4c0f014-99da-417d-aed7-6ed8814b7598" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%205.png"><img style="width:384px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%205.png"/></a></figure><figure id="04de81f6-3dfb-4949-a815-37746309ba97" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%206.png"><img style="width:384px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%206.png"/></a></figure><figure id="429b597d-91a8-4769-b6fc-c8a1f4f6813d" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%207.png"><img style="width:384px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%207.png"/></a></figure><figure id="406d1737-b074-49cc-8ef9-1b25e743873a" class="image"><a href="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%208.png"><img style="width:384px" src="%E6%9F%A5%E6%89%BE%E7%AE%97%E6%B3%95%20ca9528fc5cfc42b0ad20a3919654fa07/Untitled%208.png"/></a></figure><p id="b0d52583-e4d5-47d8-a56b-c4f091d4ad80" class="">其中要单独说一下，查找不成功的平均查找长度：</p></details></li></ul></div></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

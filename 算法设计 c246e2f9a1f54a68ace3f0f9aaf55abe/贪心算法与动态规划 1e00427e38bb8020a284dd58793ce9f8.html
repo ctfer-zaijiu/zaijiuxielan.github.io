@@ -1,0 +1,1699 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>贪心算法与动态规划</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="1e00427e-38bb-8020-a284-dd58793ce9f8" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/heart-outline_gray.svg"/></div><h1 class="page-title">贪心算法与动态规划</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1e00427e-38bb-804b-8e58-d0d9c4d09179" class="">这两个思路的提出都是为了解决“避免重复计算子问题导致资源浪费”的问题。</blockquote><h1 id="1e00427e-38bb-8091-af23-c653346f2cad" class="">一、贪心算法</h1><h2 id="1e00427e-38bb-80f3-b61c-c0c5dc15fcbf" class="">（一）基础思想</h2><p id="1e20427e-38bb-80c9-88c8-d3d58f1bbe71" class="">在解决某一类具体问题时，人们发现对于这一类问题，可以分解成一系列小问题，然后每次选小问题的最优解就能得到整体的正确结果。</p><p id="1e20427e-38bb-8004-814b-d7cca7491e24" class="">所以人们做了总结，把这类问题叫做“贪心问题”，这种解法叫做“贪心解法”。</p><h2 id="1e10427e-38bb-8012-8240-e878e5899fe2" class="">（二）解题思路</h2><h3 id="1e10427e-38bb-8013-8239-f99463f3c324" class="">1-条件</h3><p id="1e20427e-38bb-80d8-834f-cffb5383388d" class="">如果该问题存在一种解法思路，满足“如果在该思路中每一步选择中都采取当前状态下的最优的选择，将会导致全局最优解”</p><p id="1e20427e-38bb-8079-aa92-c8b921b93077" class="">就可以用贪心算法。</p><h3 id="1e10427e-38bb-80c6-8a7a-f76abd6d95ca" class="">2-公式化解法</h3><p id="1e20427e-38bb-80c5-97d3-d063ec61e66c" class="">先想这个大问题里面可以由哪些“小贪”积累出来，然后想这个小贪要如何实现，一般有三种实现套路：<div class="indented"><p id="1e10427e-38bb-807c-8166-dab414ae6a24" class="">1、写一个for循环，贪心体现在for循环里面是小问题求最优解的求解方式，然后再写一个得到最优解之后的处理方式（一般有以下这三种处理方式）：<div class="indented"><p id="1e20427e-38bb-80b3-923a-d2ea005d00a9" class="">（1）挑战大问题，挑战成功则大问题直接被解决，跳出循环；（2）擂台法；（3）继承当前状态给下一个循环；</p></div></p><p id="1e20427e-38bb-80f6-8051-c164678729cf" class="">2、贪心可能是体现在直接做一个排序得到每个小问题的最优解，然后写一个for循环在里面对每一个最优解做匹配决定其去留。</p><p id="1e20427e-38bb-80fc-83f9-ff16f442e377" class="">3、贪心也有可能会体现在for循环中“从当前小问题如何过渡到下一个小问题”上，选择最优的过渡方式，参考“盛水最多的容器”。</p></div></p><p id="1e20427e-38bb-801b-ab81-dbe90629ac57" class="">然后可以考虑用双指针思想和逆向思维，因为它们在解决贪心问题时也比较常出现。</p><h2 id="1e00427e-38bb-80b4-91e5-e0d55416e813" class="">（三）例题</h2><h3 id="1e40427e-38bb-8056-a6ef-c68611aa5cfb" class=""><strong>1-基础贪心问题</strong></h3><ol type="1" id="1e40427e-38bb-805b-ba31-c1794ebb17eb" class="numbered-list" start="1"><li><strong>分配问题</strong><ul id="1e40427e-38bb-802c-b484-e40c3d4dfa4e" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e20427e-38bb-80c5-ab3e-d3c6ad566c30" class="toggle"><li><details open=""><summary>力扣-分发饼干（满足尽可能多的孩子）：<a href="https://leetcode-cn.com/problems/assign-cookies/">455. 分发饼干</a></summary><p id="1e20427e-38bb-80a9-96d7-eadaa82cf3d1" class="">【题目】</p><p id="1e20427e-38bb-80d0-bfef-e8e2b094cc95" class="">假设你是一位很棒的家长，想要给你的孩子们一些小饼干。但是，每个孩子最多只能给一块饼干。</p><p id="1e20427e-38bb-807d-b98d-cd0f1aea5b66" class="">对每个孩子 i，都有一个胃口值 g[i]，这是能让孩子们满足胃口的饼干的最小尺寸；并且每块饼干 j，都有一个尺寸 s[j] 。如果 s[j] &gt;= g[i]，我们可以将这个饼干 j 分配给孩子 i ，这个孩子会得到满足。你的目标是满足尽可能多的孩子，并输出这个最大数值。</p><ul id="1e20427e-38bb-80ac-b88c-ce81ff60b204" class="toggle"><li><details open=""><summary>示例</summary><p id="1e20427e-38bb-80e0-ad09-f88701b6b47e" class="">示例 1:</p><p id="1e20427e-38bb-8007-9095-c053b54f8b6e" class="">输入: g = [1,2,3], s = [1,1]<br/>输出: 1<br/>解释:<br/>你有三个孩子和两块小饼干，3 个孩子的胃口值分别是：1,2,3。<br/>虽然你有两块小饼干，由于他们的尺寸都是 1，你只能让胃口值是 1 的孩子满足。<br/>所以你应该输出 1。<br/></p><p id="1e20427e-38bb-8045-9405-ebce076a4aa0" class="">示例 2:</p><p id="1e20427e-38bb-8033-9244-dc979119c2dc" class="">输入: g = [1,2], s = [1,2,3]<br/>输出: 2<br/>解释:<br/>你有两个孩子和三块小饼干，2 个孩子的胃口值分别是 1,2。<br/>你拥有的饼干数量和尺寸都足以让所有孩子满足。<br/>所以你应该输出 2。<br/></p><p id="1e20427e-38bb-80d4-900a-d4e0b74dd97a" class="">提示：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e20427e-38bb-801c-95b9-d9d4af1da011" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">1 &lt;= g.length &lt;= 3 * 10^4
+0 &lt;= s.length &lt;= 3 * 10^4
+1 &lt;= g[i], s[j] &lt;= 2^31 - 1</code></pre></details></li></ul><p id="1e20427e-38bb-80eb-abc3-c35d2f59c0c0" class="">【解法】</p><p id="1e20427e-38bb-8045-9b35-e9bd044903b7" class="">思考：<div class="indented"><p id="1e20427e-38bb-80ef-bd06-f0480675b7dc" class="">因为要求的是最多的孩子，所以先做一个孩子的排序，越小的孩子绝对越好凑数，所以我们每一次分饼干一定要优先看最小的孩子。</p><p id="1e20427e-38bb-80c0-ac5f-e482ca69ffef" class="">又因为越大的饼干绝对越有潜力，所以我们每一次分饼干都要留出最多最大的饼干给剩下的孩子，也就相当于每次要分最小的满足当前孩子胃口的饼干。</p></div></p><p id="1e20427e-38bb-807a-bc40-e2c6b14a19b3" class="">算法：<div class="indented"><p id="1e20427e-38bb-80e2-815c-c61c0bb51361" class="">先做一个孩子和饼干的排序，然后写一个for从小到大遍历孩子，对于每个孩子——找到最小的适合他的饼干。</p><blockquote id="1e20427e-38bb-80ff-8187-dc63021f24f9" class="">用到了先排序再匹配</blockquote></div></p><ul id="1e20427e-38bb-801e-a60d-e97868b2cd28" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e20427e-38bb-80d6-acc9-c2bb6dcd78ed" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    int findContentChildren(vector&lt;int&gt;&amp; g, vector&lt;int&gt;&amp; s) {
+        sort(g.begin(), g.end()); // 孩子按胃口升序
+        sort(s.begin(), s.end()); // 饼干按大小升序
+        
+        int i = 0, j = 0;
+        int count = 0;
+        while (i &lt; g.size() &amp;&amp; j &lt; s.size()) {
+            if (s[j] &gt;= g[i]) {
+                count++; // 满足一个孩子
+                i++;     // 移动到下一个孩子
+            }
+            j++; // 无论是否匹配，饼干都被消耗或跳过
+        }
+        return count;
+    }
+};</code></pre></details></li></ul></details></li></ul><ul id="1e40427e-38bb-80ee-b9b3-e2bb829bdb9d" class="toggle"><li><details open=""><summary>力扣-分发糖果（相邻孩子评分高的需更多糖果）：<a href="https://leetcode-cn.com/problems/candy/">135. 分发糖果</a></summary><p id="1e40427e-38bb-800d-91c6-d7103c587cd0" class="">【题目】</p><p id="1e40427e-38bb-80b4-a056-ff6c880f09c0" class="">n 个孩子站成一排。给你一个整数数组 ratings 表示每个孩子的评分。</p><p id="1e40427e-38bb-800c-bbb0-f752caa4abec" class="">你需要按照以下要求，给这些孩子分发糖果：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e40427e-38bb-80af-9b96-c89149f1e507" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">每个孩子至少分配到 1 个糖果。
+相邻两个孩子评分更高的孩子会获得更多的糖果。</code></pre><p id="1e40427e-38bb-80d0-b9f2-f701033bac9e" class="">请你给每个孩子分发糖果，计算并返回需要准备的 最少糖果数目 。</p><ul id="1e40427e-38bb-80e6-a302-d1b3f760cd1f" class="toggle"><li><details open=""><summary>示例</summary><p id="1e40427e-38bb-8027-bec5-cec09bc398e6" class="">示例 1：</p><p id="1e40427e-38bb-807c-805e-f0d59dfcc563" class="">输入：ratings = [1,0,2]<br/>输出：5<br/>解释：你可以分别给第一个、第二个、第三个孩子分发 2、1、2 颗糖果。<br/></p><p id="1e40427e-38bb-8072-9172-c93bfdc1bf15" class="">示例 2：</p><p id="1e40427e-38bb-80ab-bc93-ca9065e43503" class="">输入：ratings = [1,2,2]<br/>输出：4<br/>解释：你可以分别给第一个、第二个、第三个孩子分发 1、2、1 颗糖果。<br/>第三个孩子只得到 1 颗糖果，这满足题面中的两个条件。<br/></p></details></li></ul><p id="1e40427e-38bb-804d-aeba-c5d86623a898" class="">【解法】</p><p id="1e40427e-38bb-80b2-b3fe-f50d14a195d0" class="">思想：<div class="indented"><p id="1e40427e-38bb-8087-b5b8-c51aaf987738" class=""><strong>分解问题</strong>，先处理单向关系，再反向处理另一方向，避免同时处理双向的复杂性。</p><p id="1e40427e-38bb-80ef-9bd2-efd06e84c6a0" class="">这里的贪心是把问题分解为两个小问题，在两个小问题上通过贪心解决。</p></div></p><p id="1e40427e-38bb-8002-91ad-ff965fa0ae17" class="">要解决这个问题，我们需要确保每个孩子得到的糖果数既满足左右邻居的比较条件，又尽可能少。具体步骤如下：<div class="indented"><p id="1e40427e-38bb-80f7-b133-c3a2a5257ca1" class="">1、初始化：每个孩子至少1颗糖果，所以先给所有孩子发1颗。</p><p id="1e40427e-38bb-80e2-a5c4-c3a84f1d4e4d" class="">2、从左到右遍历：处理右边孩子评分比左边高的情况，确保右边的糖果数比左边多1。</p><p id="1e40427e-38bb-80d6-bef0-c5935ff1134b" class="">3、从右到左遍历：处理左边孩子评分比右边高的情况，则糖果数应取当前值和右边加1中的较大者，确保同时满足左右条件。</p></div></p><p id="1e40427e-38bb-804e-95a4-cb9830aa92b6" class="">两次遍历下来就能解决问题了。然后统计一下此时发了多少糖果返回即可。</p><ul id="1e40427e-38bb-8073-8d94-f063b420d3fb" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e40427e-38bb-80be-8680-ed8f88e1e39b" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt; // 用于max函数
+
+using namespace std;
+
+class Solution {
+public:
+    int candy(vector&lt;int&gt;&amp; ratings) {
+        int n = ratings.size();
+        if (n == 0) return 0;
+        
+        vector&lt;int&gt; candies(n, 1); // 初始化每个孩子1颗糖果
+        
+        // 从左到右遍历，处理右边评分更高的孩子
+        for (int i = 1; i &lt; n; ++i) {
+            if (ratings[i] &gt; ratings[i - 1]) {
+                candies[i] = candies[i - 1] + 1;
+            }
+        }
+        
+        // 从右到左遍历，处理左边评分更高的孩子，并取最大值
+        for (int i = n - 2; i &gt;= 0; --i) {
+            if (ratings[i] &gt; ratings[i + 1]) {
+                candies[i] = max(candies[i], candies[i + 1] + 1);
+            }
+        }
+        
+        // 计算总糖果数
+        int sum = 0;
+        for (int c : candies) {
+            sum += c;
+        }
+        return sum;
+    }
+};</code></pre></details></li></ul></details></li></ul><blockquote id="1e40427e-38bb-803a-904a-f63d3c736d8d" class="">分发糖果有点意思，<mark class="highlight-red">把双向问题分解成两个单向问题</mark></blockquote></li></ul></li></ol><ol type="1" id="1e40427e-38bb-805d-9cd0-c30714de09cc" class="numbered-list" start="2"><li><strong>区间问题</strong><ul id="1e40427e-38bb-8099-9bac-d550e1423cf2" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e10427e-38bb-8045-b1a7-d60bb21beda1" class="toggle"><li><details open=""><summary>力扣-无重叠区间（移除最少数量的区间使剩余不重叠）：<a href="https://leetcode-cn.com/problems/non-overlapping-intervals/">435. 无重叠区间</a></summary><p id="1e10427e-38bb-80a6-a5be-fb0379f58cd2" class="">【题目】</p><p id="1e10427e-38bb-8008-9191-e8b68d7367b2" class="">给定一个区间的集合 <code>intervals</code> ，其中 <code>intervals[i] = [start_i, end_i]</code> 。返回 <em>需要移除区间的最小数量，使剩余区间互不重叠 </em>。</p><p id="1e10427e-38bb-80d4-b63a-fc08b215af0e" class=""><strong>注意</strong> 只在一点上接触的区间是 <strong>不重叠的</strong>。例如 <code>[1, 2]</code> 和 <code>[2, 3]</code> 是不重叠的。</p><ul id="1e10427e-38bb-80c0-bfd5-d7e32f983879" class="toggle"><li><details open=""><summary>示例</summary><p id="1e10427e-38bb-800f-8e9d-e0ecdcb9d99b" class=""><strong>示例 1:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e10427e-38bb-806d-9d55-d6862fe6d64b" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: intervals = [[1,2],[2,3],[3,4],[1,3]]
+输出: 1
+解释: 移除 [1,3] 后，剩下的区间没有重叠。
+</code></pre><p id="1e10427e-38bb-8096-ab12-e7fdaf5d92f3" class=""><strong>示例 2:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e10427e-38bb-804e-b511-d59927cbad51" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: intervals = [ [1,2], [1,2], [1,2] ]
+输出: 2
+解释: 你需要移除两个 [1,2] 来使剩下的区间没有重叠。
+</code></pre><p id="1e10427e-38bb-8092-a955-f37650215356" class=""><strong>示例 3:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e10427e-38bb-80a0-b8d0-d0cc25f6340e" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: intervals = [ [1,2], [2,3] ]
+输出: 0
+解释: 你不需要移除任何区间，因为它们已经是无重叠的了。
+</code></pre><p id="1e10427e-38bb-80b4-855c-f773b2a4fa97" class=""><strong>提示:</strong></p><ul id="1e10427e-38bb-8008-b9e8-cd7c5dafba36" class="bulleted-list"><li style="list-style-type:disc"><code>1 &lt;= intervals.length &lt;= 10^5</code></li></ul><ul id="1e10427e-38bb-80cc-99dd-d7bf63ba31af" class="bulleted-list"><li style="list-style-type:disc"><code>intervals[i].length == 2</code></li></ul><ul id="1e10427e-38bb-80e0-83ae-fd520f4a4fcb" class="bulleted-list"><li style="list-style-type:disc"><code>5 * 10^4 &lt;= start_i &lt; end_i &lt;= 5 * 10^4</code></li></ul></details></li></ul><p id="1e10427e-38bb-8095-a86d-cbac19ec82b6" class="">【解法】</p><p id="1e10427e-38bb-80c3-a352-cf6bc60774b5" class="">分析：<div class="indented"><p id="1e20427e-38bb-8015-972b-c5a083250ddf" class="">首先逆向思维，题目所求等价于求最多能保留多少不重叠区间，然后用总数减去这个数。</p><p id="1e20427e-38bb-8000-9797-df0f543447f1" class="">然后思考从哪里可以一点一点贪，套三个套路都想一遍然后发现这里贪心可以体现在先对去解结束时间做一个从小到大排序，然后去遍历各个排序后的区间，总是先遍历结束时间更早的区间可以使得每次选择的区间<strong>尽可能少地占用时间资源。</strong></p></div></p><p id="1e10427e-38bb-8068-8644-f047f2be8b4c" class="">算法逻辑：<div class="indented"><ol type="1" id="1e10427e-38bb-80db-a55b-f2f5ba00f99e" class="numbered-list" start="1"><li>按结束时间排序：将区间按结束时间从小到大排序，这样每次选择结束最早的区间，可以给后续留下更多空间。</li></ol><ol type="1" id="1e10427e-38bb-8071-a73d-e3d9fd66023a" class="numbered-list" start="2"><li>遍历选择不重叠区间：维护当前选中区间的结束时间，若后续区间的开始时间≥当前结束时间，则选中该区间，并更新结束时间。</li></ol><blockquote id="1e10427e-38bb-8039-8c0b-e15dca393ad8" class="">结束时间越早的区间，占用后续时间的“长度”越短。每次选择最早结束的区间，并跳过与之重叠的区间。<p id="1e10427e-38bb-80c6-bf3a-dc2745035967" class="">这样是不会出现“有一个[1,2]、[3,4]、[5,6]、[2、5]”而去选“[1,2]、[2,5]”的情况，因为“开始时间是用来匹配的，结束时间是用来贪心的”如果把开始时间用又来贪心又用来匹配就有可能会变成这样。</p></blockquote></div></p><ul id="1e20427e-38bb-80a9-8749-c64622687734" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e20427e-38bb-8035-9537-c78a1ebbd1a9" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    int eraseOverlapIntervals(vector&lt;vector&lt;int&gt;&gt;&amp; intervals) {
+        if (intervals.empty()) return 0;
+        
+        // 按区间结束时间升序排序
+        sort(intervals.begin(), intervals.end(), [](const vector&lt;int&gt;&amp; a, const vector&lt;int&gt;&amp; b) {
+            return a[1] &lt; b[1];
+        });
+        
+        int count = 1; // 至少可以保留一个区间
+        int end = intervals[0][1];
+        
+        for (int i = 1; i &lt; intervals.size(); ++i) {
+            if (intervals[i][0] &gt;= end) { // 不重叠，保留该区间
+                count++;
+                end = intervals[i][1];
+            }
+        }
+        
+        return intervals.size() - count; // 总区间数 - 保留数 = 移除数
+    }
+};</code></pre></details></li></ul></details></li></ul><ul id="1e40427e-38bb-8027-b0ea-f4c849118d42" class="toggle"><li><details open=""><summary>力扣-用最少数量的箭引爆气球（合并重叠区间）：<a href="https://leetcode-cn.com/problems/minimum-number-of-arrows-to-burst-balloons/">452. 用最少数量的箭引爆气球</a></summary><p id="1e40427e-38bb-8022-b53b-d4c0d2a794f4" class="">【题目】</p><p id="1e40427e-38bb-803b-bb9b-cf04ff7a9494" class="">有一些球形气球贴在一堵用 XY 平面表示的墙面上。墙面上的气球记录在整数数组 points ，其中points[i] = [xstart, xend] 表示水平直径在 xstart 和 xend之间的气球。你不知道气球的确切 y 坐标。</p><p id="1e40427e-38bb-806a-acbe-f2d5cc3b831c" class="">一支弓箭可以沿着 x 轴从不同点 完全垂直 地射出。在坐标 x 处射出一支箭，若有一个气球的直径的开始和结束坐标为 xstart，xend， 且满足  xstart ≤ x ≤ xend，则该气球会被 引爆 。可以射出的弓箭的数量 没有限制 。 弓箭一旦被射出之后，可以无限地前进。</p><p id="1e40427e-38bb-809b-b41a-d754232a2a32" class="">给你一个数组 points ，返回引爆所有气球所必须射出的 最小 弓箭数 。</p><ul id="1e40427e-38bb-8043-a501-e3eb025b1f8a" class="toggle"><li><details open=""><summary>示例</summary><p id="1e40427e-38bb-80b1-9add-fa93815b61a6" class="">示例 1：</p><p id="1e40427e-38bb-8001-bbe5-d5a88f0a3359" class="">输入：points = [[10,16],[2,8],[1,6],[7,12]]<br/>输出：2<br/>解释：气球可以用2支箭来爆破:<br/>-在x = 6处射出箭，击破气球[2,8]和[1,6]。<br/>-在x = 11处发射箭，击破气球[10,16]和[7,12]。<br/></p><p id="1e40427e-38bb-8077-acad-cddeb0c7d5a6" class="">示例 2：</p><p id="1e40427e-38bb-805a-8aa6-d39c96e075a4" class="">输入：points = [[1,2],[3,4],[5,6],[7,8]]<br/>输出：4<br/>解释：每个气球需要射出一支箭，总共需要4支箭。<br/></p><p id="1e40427e-38bb-8073-a811-f00e14eb8e31" class="">示例 3：</p><p id="1e40427e-38bb-8058-9ef2-e2b28d1dafd8" class="">输入：points = [[1,2],[2,3],[3,4],[4,5]]<br/>输出：2<br/>解释：气球可以用2支箭来爆破:<br/></p><ul id="1e40427e-38bb-80ee-b469-cced61c06b4d" class="bulleted-list"><li style="list-style-type:disc">在x = 2处发射箭，击破气球[1,2]和[2,3]。</li></ul><ul id="1e40427e-38bb-80e6-bbc4-c495d794524e" class="bulleted-list"><li style="list-style-type:disc">在x = 4处射出箭，击破气球[3,4]和[4,5]。</li></ul></details></li></ul><p id="1e40427e-38bb-80e0-b76e-f1866126c9e8" class="">【解法】</p><p id="1e40427e-38bb-80cf-b234-faa23fd49137" class="">思考：<div class="indented"><p id="1e40427e-38bb-805f-9cf6-d464cfbcf48e" class="">问题转化为找到最多的重叠区间.</p><p id="1e40427e-38bb-8016-93e0-ecab7e08f9ab" class="">假设我们按每个区间的结束位置从小到大排序。然后，我们初始化一个变量，记录当前箭的位置为第一个区间的结束位置。这支箭可以覆盖所有起始点小于等于这个位置的区间。然后遍历后续的区间，如果某个区间的起始点大于当前箭的位置，说明需要再射一支箭，并更新箭的位置为这个新区间的结束位置。</p><blockquote id="1e40427e-38bb-80ee-b30f-cba79432452b" class="">因为你想想，题目要求覆盖全部气球，那绝对有一根最左的箭是要射到全部气球里结束位置最小的气球的，射的位置区间绝对包含它的结束位置。然后这一箭射爆了一些气球，那剩下没被射爆的气球里面的结束位置最小的气球，他就又变成了剩下的全部气球里结束位置最小的气球了，那就又变成了绝对要有一支箭射向他…..</blockquote></div></p><ul id="1e40427e-38bb-8006-8c57-caa3e9fa87d4" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e40427e-38bb-8096-a7e4-cba47e8016ea" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    int findMinArrowShots(vector&lt;vector&lt;int&gt;&gt;&amp; points) {
+        if (points.empty()) return 0;
+        
+        // 按每个气球的右端点从小到大排序
+        sort(points.begin(), points.end(), [](const vector&lt;int&gt;&amp; a, const vector&lt;int&gt;&amp; b) {
+            return a[1] &lt; b[1];
+        });
+        
+        int arrows = 1; // 至少需要一支箭
+        int arrowPos = points[0][1]; // 第一支箭射在第一个气球的右端点
+        
+        // 遍历所有气球
+        for (int i = 1; i &lt; points.size(); ++i) {
+            // 如果当前气球的左端点 &gt; 当前箭的位置，说明需要新箭
+            if (points[i][0] &gt; arrowPos) {
+                arrows++;
+                arrowPos = points[i][1]; // 更新箭的位置到当前气球的右端点
+            }
+            // 否则，当前箭可以覆盖这个气球，无需操作
+        }
+        
+        return arrows;
+    }
+};</code></pre></details></li></ul><p id="1e40427e-38bb-800f-bd3a-c16ea5b77583" class="">
+</p></details></li></ul></li></ul></li></ol><hr id="1e40427e-38bb-8021-9feb-dbbd398d3b69"/><h3 id="1e40427e-38bb-80b0-b293-c3d28e898aa6" class=""><strong>2-调度与任务安排</strong></h3><ol type="1" id="1e40427e-38bb-80c1-af76-ebbc80ec78a4" class="numbered-list" start="1"><li><strong>会议安排</strong><ul id="1e40427e-38bb-80eb-8b79-ffc1c42fe2d3" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：在限定时间内安排最多会议。<blockquote id="1e80427e-38bb-8084-b4a6-cafc9fbd86fb" class="">往往会用到最小堆和最大堆（后者在实现上可以用存储负值的最小堆实现）</blockquote></li></ul><ul id="1e40427e-38bb-802d-a6ae-f97171050fd8" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-80af-9cfe-f74f75722837" class="toggle"><li><details open=""><summary>力扣-会议室（每个会议给起止时间，求会议室最少数量）：<a href="https://leetcode-cn.com/problems/meeting-rooms-ii/">253. 会议室 II</a></summary><p id="1e40427e-38bb-8029-bb96-dab48c4352cf" class="">【例题】</p><p id="1e70427e-38bb-8078-af6b-d2ab507357c1" class="">给定一个会议时间安排的数组，每个会议时间都会包括开始和结束的时间 [[s1,e1],[s2,e2],…] (si &lt; ei)，<br/> 为避免会议冲突，同时要考虑充分利用会议室资源，请你计算<br/><strong>至少需要</strong>多少间会议室，才能满足这些会议安排。</p><ul id="1e70427e-38bb-80cb-a275-f5bde38ce877" class="toggle"><li><details open=""><summary>示例</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e70427e-38bb-80ac-90a4-c92069cb4f74" class="code"><code class="language-JavaScript" style="white-space:pre-wrap;word-break:break-all">示例 1:
+输入: [[0, 30],[5, 10],[15, 20]]
+输出: 2
+
+示例 2:
+输入: [[7,10],[2,4]]
+输出: 1</code></pre></details></li></ul><p id="1e40427e-38bb-8016-a89c-c608633578df" class="">【解法】</p><p id="1e40427e-38bb-806a-b74b-ca590a39803e" class="">思路1：<div class="indented"><p id="1e70427e-38bb-8091-9bd5-e19408f2518c" class="">直接转换成 力扣435. 求最多的不重叠区间问题（解法参考前文），然后如果遇到会重叠的情况就把导致重叠的会议拎出来。</p><p id="1e70427e-38bb-80ba-9f9a-ce6ab801953c" class="">然后再对所有被拎出来的会议求最多的不重叠区间（但是不需要排序因为前面已经排序好了），然后再拎出其中的重叠者……</p><p id="1e70427e-38bb-800a-8877-d254b697eb24" class="">以此类推，直到拎不出导致重叠的会议。</p></div></p><p id="1e80427e-38bb-80db-9dea-ef0f90c1c831" class="">思路2：<div class="indented"><p id="1e80427e-38bb-80f8-be7d-fb999efab00a" class="">等价于找出同一时间段内最多有多少个会议同时进行，这个数量即为所需的最小会议室数量。</p><p id="1e80427e-38bb-8056-a384-cee3582a1017" class="">首先将所有的会议按照开始时间进行排序，然后维护一个最小堆，其中：<div class="indented"><p id="1e80427e-38bb-80e4-9622-d9c1648ebe6f" class="">1、它的每个元素表示一间会议室，元素的值表示该会议室最后一场会议的结束时间</p><p id="1e80427e-38bb-8074-81c8-cdc777a464af" class="">2、堆顶元素表示当前所有会议室中最早结束的会议室。</p></div></p><blockquote id="1e80427e-38bb-80da-b63d-cf9fab125d39" class="">最小堆是一种特殊结构，他的性质是：会总是动态维护最小值在堆顶，这样每次pop的时候总会是弹出当前最小的元素。<p id="1e80427e-38bb-80c9-b7dd-e4ea61b5d459" class="">该结构在底层实现上是基于堆排序算法，每次加入一个元素视为给二叉树插入新结点所以会自动找到它适合的位置。</p></blockquote><p id="1e80427e-38bb-806f-9cee-c267e6b31682" class="">然后遍历处理每个会议：<div class="indented"><p id="1e80427e-38bb-809c-a68a-e62e7e2b5d06" class="">如果当前会议的开始时间≤堆顶的结束时间（每个循环中都是在优先用剩余所有会议中的最先开始者去匹配剩余所有会议室中的最先结束者），则弹出堆顶元素并将当前会议的结束时间加入堆中（表示更新了那个最先结束的会议室的结束时间也就是复用了那个会议室，并且更新了堆顶让他指向新的最早结束的会议室，堆中元素个数不变）。</p><p id="1e80427e-38bb-809b-a551-c8cc690b31a8" class="">如果当前会议的开始时间&gt;堆顶的结束时间，则直接将当前会议的结束时间加入堆中（表示新开了一个会议室，堆中元素个数+1）</p></div></p><ul id="1e80427e-38bb-807b-a182-e3500db43f29" class="toggle"><li><details open=""><summary>代码实现</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e80427e-38bb-8012-b623-c57735772188" class="code"><code class="language-Plain Text">import heapq
+
+def minMeetingRooms(intervals):
+    if not intervals:
+        return 0
+    
+    # 按开始时间排序
+    intervals.sort(key=lambda x: x[0])
+    
+    # 使用最小堆来记录会议的结束时间
+    heap = []
+    heapq.heappush(heap, intervals[0][1])
+    
+    for interval in intervals[1:]:
+        start, end = interval
+        # 如果当前会议的开始时间大于等于堆顶的结束时间，可以复用会议室
+        if start &gt;= heap[0]:
+            heapq.heappop(heap)
+        # 将当前会议的结束时间加入堆中
+        heapq.heappush(heap, end)
+    
+    # 堆的大小即为所需的最小会议室数量
+    return len(heap)</code></pre></details></li></ul></div></p><p id="1e80427e-38bb-807f-9dea-f207be062ff2" class="">思路对比：<div class="indented"><p id="1e80427e-38bb-8010-9709-fcd521015474" class="">思路1是可行的，但是在最坏情况下（所有会议完全重叠），需要 <code>n+(n-1)+(n-2)+…+1</code>次计算，相当于是 <code>O(n²)</code></p><p id="1e80427e-38bb-8036-ab84-fedaf56dff5d" class="">思路2的时间复杂度为 <code>O(n log n)</code>，更高效。</p><blockquote id="1e80427e-38bb-80ce-9966-ed7c712c3c5a" class="">证明思路2的时间复杂度：<p id="1e80427e-38bb-8057-91c6-dc2e3a728ff8" class="">1、首先排序的时间复杂度最快的是 <strong>O(n log n)</strong></p><p id="1e80427e-38bb-80c8-9b62-d3330b790bb9" class="">2、然后遍历除了第一个会议以外的其他所有n-1会议都要做pop或者pop+push操作，每一次pop或者push操作的时间复杂度是O(log k)，其中k是堆的大小。假设是所有的会议都用同一间会议室的最坏情况，那就是2*(n-1)*log k也就是O(n log n)</p></blockquote></div></p></details></li></ul><ul id="1e40427e-38bb-8020-998b-ddd7a3e8e779" class="toggle"><li><details open=""><summary>力扣-课程表（每个课程给持续时间和终止期限，求最多课程数量）：<a href="https://leetcode-cn.com/problems/course-schedule-iii/">630. 课程表 III</a></summary><p id="1e40427e-38bb-8036-a6af-d6e119b5285d" class="">【例题】</p><p id="1e80427e-38bb-8004-b043-f541fcb31592" class="">这里有 <code>n</code> 门不同的在线课程，按从 <code>1</code> 到 <code>n</code> 编号。给你一个数组 <code>courses</code> ，其中 <code>courses[i] = [durationi, lastDayi]</code> 表示第 <code>i</code> 门课将会 <strong>持续</strong> 上 <code>durationi</code> 天课，并且必须在不晚于 <code>lastDayi</code> 的时候完成。</p><p id="1e80427e-38bb-8073-8a86-cb98326d99d0" class="">你的学期从第 <code>1</code> 天开始。且不能同时修读两门及两门以上的课程。</p><p id="1e80427e-38bb-8013-adc7-d115d209f9b6" class="">返回你最多可以修读的课程数目。</p><ul id="1e80427e-38bb-80f4-b1c6-e7f6faa60167" class="toggle"><li><details open=""><summary>示例：</summary><p id="1e80427e-38bb-808a-a29e-ca9aa6f13b26" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e80427e-38bb-8095-98ac-dcca536ed727" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：courses = [[100, 200], [200, 1300], [1000, 1250], [2000, 3200]]
+输出：3
+解释：
+这里一共有 4 门课程，但是你最多可以修 3 门：
+首先，修第 1 门课，耗费 100 天，在第 100 天完成，在第 101 天开始下门课。
+第二，修第 3 门课，耗费 1000 天，在第 1100 天完成，在第 1101 天开始下门课程。
+第三，修第 2 门课，耗时 200 天，在第 1300 天完成。
+第 4 门课现在不能修，因为将会在第 3300 天完成它，这已经超出了关闭日期。</code></pre><p id="1e80427e-38bb-80b4-a54e-c6a94d0443c9" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e80427e-38bb-8077-9d3c-d0b2c23f3aae" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：courses = [[1,2]]
+输出：1</code></pre><p id="1e80427e-38bb-8053-91bd-c0d58be507eb" class=""><strong>示例 3：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e80427e-38bb-80bf-94c4-f28e7b691631" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：courses = [[3,2],[4,3]]
+输出：0</code></pre></details></li></ul><p id="1e40427e-38bb-8071-97a7-e9e885d690b0" class="">【解法】</p><p id="1e40427e-38bb-8095-b12d-c48eb80d3dc9" class="">思路：<div class="indented"><p id="1e80427e-38bb-809c-86f2-e381cc9f1747" class="">将有效课程按截止日期升序排列，使用最大堆动态维护已选课程的持续时间（实现上可以用存储负值的最小堆实现），其中：<div class="indented"><p id="1e80427e-38bb-8015-ad5e-d0f89e57c94b" class="">1、它的每个元素代表一个已加入的课程，每个元素的值代表一个已加入课程的持续时间</p><p id="1e80427e-38bb-80de-a959-d2fcb45e6d5c" class="">2、它的堆顶表示已加入的那个持续时间最长的课程（不断对堆顶进行优化就是压缩总课程时间）</p></div></p><p id="1e80427e-38bb-804b-81de-f164ab59853a" class="">然后遍历每一个待选课程，做如下操作：<div class="indented"><ul id="1e80427e-38bb-802f-9404-f7940129ea88" class="bulleted-list"><li style="list-style-type:disc">如果当前课程可以加入已选课程（总时间不超过当前课程的截止日期），直接加入。</li></ul><ul id="1e80427e-38bb-8035-8054-f11617c05405" class="bulleted-list"><li style="list-style-type:disc">如果当前课程不可加入已选课程（总时间超过当前课程的截止日期），则做判断：<ul id="1e80427e-38bb-802b-ade1-e29e70e320fa" class="bulleted-list"><li style="list-style-type:circle">如果当前课程持续时间&lt;堆顶元素，则替代之（即POP再PUSH，优化总课程时间并且推举出新的堆顶）（这里必定可以替代，因为当前课程耗时&lt;堆顶课程，截止时间还≥堆顶课程）</li></ul><ul id="1e80427e-38bb-8002-a2ef-ca01aaeacefe" class="bulleted-list"><li style="list-style-type:circle">如果当前课程持续时间≥堆顶元素，则无需行动（丢弃该课程）</li></ul></li></ul></div></p></div></p><p id="1e80427e-38bb-80bb-a8a6-da433c6cf0d9" class="">贪心思想：<div class="indented"><p id="1e80427e-38bb-80a9-9169-c87e13950bc1" class="">体现在不断优化堆顶使得在每个课程进行审视后的已选课程堆是在当前已审视的所有课程中的耗时最短的没任何一节课逾期的课程列表。又因为对于当前审视的课，前面的已选课程堆已经是耗时最短了，所以可以支持“总时间是否超过当前课程的截止日期”的比较条件成立从而筛选出哪些课加了就会超时。</p></div></p><ul id="1e90427e-38bb-8085-a302-d90dbb29abc1" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e90427e-38bb-804f-86cf-f5538674b5f7" class="code"><code class="language-Plain Text">#include &lt;algorithm&gt;
+#include &lt;queue&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    int scheduleCourse(vector&lt;vector&lt;int&gt;&gt;&amp; courses) {
+        // 过滤掉无法完成的课程（持续时间超过截止日期）
+        vector&lt;vector&lt;int&gt;&gt; validCourses;
+        for (const auto&amp; course : courses) {
+            if (course[0] &lt;= course[1]) {
+                validCourses.push_back(course);
+            }
+        }
+        
+        // 按截止日期升序排序
+        sort(validCourses.begin(), validCourses.end(), 
+            [](const vector&lt;int&gt;&amp; a, const vector&lt;int&gt;&amp; b) {
+                return a[1] &lt; b[1];
+            });
+        
+        priority_queue&lt;int&gt; maxHeap; // 最大堆，存储已选课程的持续时间
+        int sumTime = 0;
+        
+        for (const auto&amp; course : validCourses) {
+            int duration = course[0];
+            int lastDay = course[1];
+            
+            if (sumTime + duration &lt;= lastDay) {
+                // 当前课程可以加入，直接入堆
+                maxHeap.push(duration);
+                sumTime += duration;
+            } else {
+                // 尝试替换已选课程中持续时间最长的课程
+                if (!maxHeap.empty() &amp;&amp; duration &lt; maxHeap.top()) {
+                    sumTime -= maxHeap.top(); // 减去被替换的课程时间
+                    maxHeap.pop();
+                    sumTime += duration;
+                    maxHeap.push(duration);
+                }
+            }
+        }
+        
+        return maxHeap.size();
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ul></li></ol><ol type="1" id="1e40427e-38bb-806e-899e-eb55ee78fd9e" class="numbered-list" start="2"><li><strong>任务调度</strong><ul id="1e40427e-38bb-80b8-b290-c61876b222f7" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：优化任务执行顺序或资源分配。</li></ul><ul id="1e40427e-38bb-80a5-b8c1-da435d4a7f96" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-8003-bd35-f90bce924a8a" class="toggle"><li><details open=""><summary>力扣-任务调度器：<a href="https://leetcode-cn.com/problems/task-scheduler/">621. 任务调度器</a>（CPU 任务冷却时间限制，看起来是贪心实际上是考阅读）</summary><p id="1e80427e-38bb-8099-bb81-d640998c7367" class="">【题目】</p><p id="1e80427e-38bb-803d-abe9-ee053efe4ad7" class="">给你一个用字符数组 <code>tasks</code> 表示的 CPU 需要执行的任务列表，用字母 A 到 Z 表示，以及一个冷却时间 <code>n</code>。每个周期或时间间隔允许完成一项任务。任务可以按任何顺序完成，但有一个限制：两个<strong> 相同种类</strong> 的任务之间必须有长度为<strong> </strong><code>n</code><strong> </strong>的冷却时间。</p><p id="1e80427e-38bb-809f-b0e6-d001ce0fd403" class="">返回完成所有任务所需要的<strong> 最短时间间隔</strong> 。</p><ul id="1e80427e-38bb-8015-9190-de96392c22ef" class="toggle"><li><details open=""><summary>示例</summary><p id="1e80427e-38bb-8002-a6af-d8145aaf0875" class=""><strong>示例 1：</strong></p><p id="1e80427e-38bb-8028-922b-eb6e89fff351" class=""><strong>输入：</strong>tasks = [&quot;A&quot;,&quot;A&quot;,&quot;A&quot;,&quot;B&quot;,&quot;B&quot;,&quot;B&quot;], n = 2</p><p id="1e80427e-38bb-8065-9e19-f45f936216d4" class=""><strong>输出：</strong>8</p><p id="1e80427e-38bb-80c3-b0a9-e457bb95b32e" class=""><strong>解释：</strong></p><p id="1e90427e-38bb-8022-9b3c-e782388cebce" class="">A-B-1-A-B-1-A-B-1，完成一个任务耗时1，两个相同任务间需要相隔2</p><p id="1e80427e-38bb-807c-b6f2-ec72f409173b" class="">在完成任务 A 之后，你必须等待两个间隔。对任务 B 来说也是一样。在第 3 个间隔，A 和 B 都不能完成，所以你需要待命。在第 4 个间隔，由于已经经过了 2 个间隔，你可以再次执行 A 任务。</p><p id="1e80427e-38bb-801f-96cd-d13ed8c5ef1c" class=""><strong>示例 2：</strong></p><p id="1e80427e-38bb-80e7-a176-c095205875c6" class=""><strong>输入：</strong>tasks = [&quot;A&quot;,&quot;C&quot;,&quot;A&quot;,&quot;B&quot;,&quot;D&quot;,&quot;B&quot;], n = 1</p><p id="1e80427e-38bb-80e7-80d8-d14577b79a7c" class=""><strong>输出：</strong>6</p><p id="1e80427e-38bb-80ad-bd5b-dab8e31ab5e7" class=""><strong>解释：</strong>一种可能的序列是：A -&gt; B -&gt; C -&gt; D -&gt; A -&gt; B。</p><p id="1e80427e-38bb-80c2-9d38-f6806fa4e984" class="">由于冷却间隔为 1，你可以在完成另一个任务后重复执行这个任务。</p><p id="1e80427e-38bb-8091-a26f-fc04591df812" class=""><strong>示例 3：</strong></p><p id="1e80427e-38bb-8052-9f32-dc68ce1ece5b" class=""><strong>输入：</strong>tasks = [&quot;A&quot;,&quot;A&quot;,&quot;A&quot;,&quot;B&quot;,&quot;B&quot;,&quot;B&quot;], n = 3</p><p id="1e80427e-38bb-803b-a4d7-c7eda97ee277" class=""><strong>输出：</strong>10</p><p id="1e80427e-38bb-8082-9106-d701643ec47b" class=""><strong>解释：</strong>一种可能的序列为：A -&gt; B -&gt; idle -&gt; idle -&gt; A -&gt; B -&gt; idle -&gt; idle -&gt; A -&gt; B。</p><p id="1e80427e-38bb-809a-825e-d965edd25ae9" class="">只有两种任务类型，A 和 B，需要被 3 个间隔分割。这导致重复执行这些任务的间隔当中有两次待命状态。</p></details></li></ul><p id="1e80427e-38bb-8066-8b0a-e6283ee8ad65" class="">【解法】</p><p id="1e90427e-38bb-804d-b2d2-e8e141d18bd3" class="">思路1：<div class="indented"><p id="1e90427e-38bb-80cd-aaed-dfc225e80ca8" class="">通过算法动态地找到一个最优的任务序列，然后返回该序列的长度</p></div></p><p id="1e80427e-38bb-804c-9589-e54c6ea17b9a" class="">思路2：<div class="indented"><p id="1e90427e-38bb-805d-bc17-db7030865b58" class="">画个图：</p><figure id="1e90427e-38bb-80b2-a493-daeb2553b0a8" class="image"><a href="%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%201e00427e38bb8020a284dd58793ce9f8/image.png"><img style="width:288px" src="%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%201e00427e38bb8020a284dd58793ce9f8/image.png"/></a></figure><p id="1e80427e-38bb-809a-80ce-f880f3b100da" class="">可以看到，假设任务X是唯一出现次数最多的任务，出现了k次，时间间隔是n。那么在其他任务的总出现次数≤n(k-1)（即图中的“纳垢数”）的时候，最短的总耗时必为Time=(k-1)(n+1)+1。假设有m个任务A,B,C…同时是出现次数最多的任务，出现了k次，时间间隔为n，则最短的总耗时必为Time=(k-1)(n+1)+m。</p><p id="1e90427e-38bb-80fb-821d-d4cd5ecaed3e" class="">如果其他任务的总出现次数&gt;n(k-m)，就表示“任务种类非常多，且每种任务出现次数相近”，此时<mark class="highlight-blue">总耗时时长=总任务数，这是因为任务之间必不需要轮一个空的等待时间了。</mark></p><blockquote id="1e90427e-38bb-80a6-9bcf-f0e318d097d7" class="">证明：当其他任务的总出现次数越&gt;n(k-m)，就表示任务种类越多，且每种任务出现次数越接近，反制越趋近n(k-m)就表示任务种类越少且每种任务出现次数越不同。我们可以分别举两个极端情况的例子验证此时是否Time=总任务数，如果都验证成功，那就表示是ok的。</blockquote><p id="1e90427e-38bb-80e9-8d3e-cf9ab6a80673" class="">实现上，可以先算出m和对应的k，然后直接通过返回<code>max( (k-1)(n+1)+m , 总任务数 )</code>即可。</p></div></p><ul id="1e90427e-38bb-8042-ab82-c259caf1a035" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e90427e-38bb-802c-b024-fb030ae7dd5a" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    int leastInterval(vector&lt;char&gt;&amp; tasks, int n) {
+        vector&lt;int&gt; counts(26, 0);
+        for (char c : tasks) {
+            counts[c - &#x27;A&#x27;]++;
+        }
+        
+        int max_count = *max_element(counts.begin(), counts.end());
+        int same_max = 0;
+        for (int cnt : counts) {
+            if (cnt == max_count) {
+                same_max++;
+            }
+        }
+        
+        int time1 = (max_count - 1) * (n + 1) + same_max;
+        return max(time1, static_cast&lt;int&gt;(tasks.size()));
+    }
+};</code></pre></details></li></ul><p id="1e80427e-38bb-8005-ab5d-f074fbce6d50" class="">
+</p></details></li></ul></li></ul></li></ol><hr id="1e40427e-38bb-80a7-9bc2-c9839d834759"/><h3 id="1e40427e-38bb-8008-8f26-e360cb83898b" class=""><strong>3-字符串与重构问题</strong></h3><ol type="1" id="1e40427e-38bb-8000-ba65-c340cb0afddd" class="numbered-list" start="1"><li><strong>重构字符串</strong><ul id="1e40427e-38bb-80b2-891b-c6a2416787f1" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：通过贪心策略重新排列字符。</li></ul><ul id="1e40427e-38bb-80cd-acea-ff9712ffc23b" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e90427e-38bb-80ea-839b-e670d5c95fa3" class="toggle"><li><details open=""><summary>力扣-重构字符串（相邻字符不重复）：<a href="https://leetcode-cn.com/problems/reorganize-string/">767. 重构字符串</a></summary><p id="1e90427e-38bb-80b4-8767-d63b958db4d2" class="">【题目】</p><p id="1e90427e-38bb-806c-9a70-edddb2e06069" class="">给定一个字符串 <code>s</code> ，检查是否能重新排布其中的字母，使得两相邻的字符不同。</p><p id="1e90427e-38bb-806b-85ac-f212e1bb9cca" class="">返回<em> </em><em><code>s</code></em><em> 的任意可能的重新排列。若不可行，返回空字符串 </em><em><code>&quot;&quot;</code></em> 。</p><ul id="1e90427e-38bb-801a-8215-f45557359a0a" class="toggle"><li><details open=""><summary>示例</summary><p id="1e90427e-38bb-8079-9954-fcb2efaeb20c" class=""><strong>示例 1:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e90427e-38bb-80ac-a2bc-f398672cce62" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: s = &quot;aab&quot;
+输出: &quot;aba&quot;
+</code></pre><p id="1e90427e-38bb-80d3-bf08-ffc12dfc8a34" class=""><strong>示例 2:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e90427e-38bb-803c-bc13-e1ea997a0b2c" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: s = &quot;aaab&quot;
+输出: &quot;&quot;
+</code></pre><p id="1e90427e-38bb-80c0-a6a2-f87c09b6bba8" class=""><strong>提示:</strong></p><ul id="1e90427e-38bb-8071-97c7-ed93d4913d52" class="bulleted-list"><li style="list-style-type:disc"><code>1 &lt;= s.length &lt;= 500</code></li></ul><ul id="1e90427e-38bb-80ac-8527-dcfffadad1d4" class="bulleted-list"><li style="list-style-type:disc"><code>s</code> 只包含小写字母</li></ul></details></li></ul><p id="1e90427e-38bb-8091-af82-f1c8c1010fd1" class="">【解法】</p><p id="1e90427e-38bb-8020-adcb-e5c0bec07e8a" class="">感觉思路好像可以有点像“任务调度器”这道题，那我们就可以直接用类似的思路先直接判断是否返回空字符串：<div class="indented"><p id="1e90427e-38bb-80a7-b307-f8ba80f8f29d" class="">统计每个字符的出现次数，并检查是否存在某个字符的频率超过 <code>(n+1)/2</code>（其中 <code>n</code> 是字符串长度）。如果存在，则无法重构，直接返回空字符串。</p></div></p><p id="1e90427e-38bb-806a-a05a-c0bd19fa896d" class="">接下来想要求排列后的字符串序列，这个我们可以用贪心：<div class="indented"><p id="1e90427e-38bb-80e2-8f79-dfa336c54dde" class="">将字符按频率存入最大堆，每次取出频率最高的两个字符交替排列，确保相邻字符不同。重复此过程直到堆中元素只剩一个，这最后一个直接加入列表末尾即可。</p></div></p><ul id="1e90427e-38bb-80ba-9d89-f59b318b8cb0" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e90427e-38bb-80f8-acca-d46ea5e99d83" class="code"><code class="language-Plain Text">#include &lt;queue&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Solution {
+public:
+    string reorganizeString(string s) {
+        int n = s.size();
+        vector&lt;int&gt; count(26, 0);
+        for (char c : s) {
+            count[c - &#x27;a&#x27;]++;
+        }
+        
+        // 检查最大频率是否超过阈值
+        int max_count = 0;
+        for (int cnt : count) {
+            max_count = max(max_count, cnt);
+        }
+        if (max_count &gt; (n + 1) / 2) {
+            return &quot;&quot;;
+        }
+        
+        // 构建最大堆，按频率从高到低排列
+        priority_queue&lt;pair&lt;int, char&gt;&gt; pq;
+        for (int i = 0; i &lt; 26; ++i) {
+            if (count[i] &gt; 0) {
+                pq.push({count[i], &#x27;a&#x27; + i});
+            }
+        }
+        
+        string res;
+        while (pq.size() &gt;= 2) {
+            // 取出频率最高的两个不同字符
+            auto [cnt1, char1] = pq.top(); pq.pop();
+            auto [cnt2, char2] = pq.top(); pq.pop();
+            
+            res += char1;
+            res += char2;
+            
+            // 减少次数并重新入堆（若次数仍大于0）
+            if (--cnt1 &gt; 0) {
+                pq.push({cnt1, char1});
+            }
+            if (--cnt2 &gt; 0) {
+                pq.push({cnt2, char2});
+            }
+        }
+        
+        // 处理最后一个可能的字符
+        if (!pq.empty()) {
+            res += pq.top().second;
+        }
+        
+        return res;
+    }
+};</code></pre></details></li></ul></details></li></ul><ul id="1e40427e-38bb-80bc-8fb8-dc8197dd0aa5" class="toggle"><li><details open=""><summary>力扣-K距离间隔重排字符串（进阶版）：<a href="https://leetcode-cn.com/problems/rearrange-string-k-distance-apart/">358. K 距离间隔重排字符串</a></summary><p id="1e90427e-38bb-803e-86bb-dd736bb3ed37" class="">【题目】</p><p id="1e90427e-38bb-800e-9fdd-ef2f7d4ee3fe" class="">给你一个非空的字符串 s 和一个整数 k，你要将这个字符串中的字母进行重新排列，使得重排后的字符串中相同字母的位置间隔距离至少为 k。</p><p id="1e90427e-38bb-8030-85a9-eba4f0e28935" class="">所有输入的字符串都由小写字母组成，如果找不到距离至少为 k 的重排结果，请返回一个空字符串 “”。</p><ul id="1e90427e-38bb-80c7-ba5d-ec1717466ba1" class="toggle"><li><details open=""><summary>示例</summary><p id="1e90427e-38bb-804f-9551-c2754887aff7" class="">示例 1：<br/>输入: s = &quot;aabbcc&quot;, k = 3<br/>输出: &quot;abcabc&quot;<br/>解释: 相同的字母在新的字符串中间隔至少 3 个单位距离。<br/></p><p id="1e90427e-38bb-80c2-9116-c40998beca87" class="">示例 2:<br/>输入: s = &quot;aaabc&quot;, k = 3<br/>输出: &quot;&quot;<br/>解释: 没有办法找到可能的重排结果。<br/></p><p id="1e90427e-38bb-8039-ad10-e3dbc86dcd78" class="">示例 3<br/>输入: s = &quot;aaadbbcc&quot;, k = 2<br/>输出: &quot;abacabcd&quot;<br/>解释: 相同的字母在新的字符串中间隔至少 2 个单位距离。<br/></p></details></li></ul><p id="1e90427e-38bb-80e2-84fb-e72ab4bb3ae2" class="">【解法】</p><p id="1e90427e-38bb-800c-9aa1-e1108f7a4a0d" class="">思路：<div class="indented"><p id="1e90427e-38bb-8085-b738-ef01f3ce70ef" class="">前面判断是不是空字符串的方式有变</p><p id="1e90427e-38bb-8068-ab63-e4df8c1afe83" class="">首先统计每个字符的出现次数，使用最大堆（优先队列）来维护字符及其剩余次数，以便每次都能快速获取剩余次数最多的字符。</p><p id="1e90427e-38bb-8061-96b2-ee99a865c01b" class="">然后每次从堆中取出次数最多的k个不同的字符，组成一个块。这样可以确保相同字符之间的间隔至少为k。如果某次取出的字符数不足k个，并且还有剩余字符未被处理，则说明无法满足条件，返回空字符串。</p><p id="1e90427e-38bb-8007-bbb3-fc08c762d757" class="">处理过的字符如果仍有剩余次数，重新放回堆中继续处理。</p></div></p><ul id="1e90427e-38bb-80b8-8e63-c721a3a61f2f" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e90427e-38bb-8045-b301-daae8f3540de" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;queue&gt;
+#include &lt;string&gt;
+#include &lt;unordered_map&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    string rearrangeString(string s, int k) {
+        if (k &lt;= 1) return s;  // k为0或1时直接返回原字符串
+        unordered_map&lt;char, int&gt; cnt;
+        for (char c : s) cnt[c]++;
+        
+        // 最大堆，按次数排序
+        priority_queue&lt;pair&lt;int, char&gt;&gt; max_heap;
+        for (auto &amp;entry : cnt) {
+            max_heap.push({entry.second, entry.first});
+        }
+        
+        string result;
+        while (!max_heap.empty()) {
+            vector&lt;pair&lt;int, char&gt;&gt; temp;
+            int current_group_size = 0;
+            
+            // 尝试取出k个不同的字符
+            for (int i = 0; i &lt; k; ++i) {
+                if (max_heap.empty()) break;
+                auto current = max_heap.top();
+                max_heap.pop();
+                result += current.second;
+                current_group_size++;
+                if (--current.first &gt; 0) {
+                    temp.push_back(current);
+                }
+            }
+            
+            // 如果当前组的大小不足k，且还有剩余字符未处理，返回空字符串
+            if (current_group_size &lt; k &amp;&amp; !temp.empty()) {
+                return &quot;&quot;;
+            }
+            
+            // 将临时存储的字符重新放回堆中
+            for (auto &amp;p : temp) {
+                max_heap.push(p);
+            }
+        }
+        
+        return result;
+    }
+};</code></pre></details></li></ul><p id="1e90427e-38bb-800b-af21-d44325812993" class="">
+</p></details></li></ul></li></ul></li></ol><ol type="1" id="1e40427e-38bb-808d-bb37-c555d490bf6c" class="numbered-list" start="2"><li><strong>拼接最大数</strong><ul id="1e40427e-38bb-800b-a896-eaa246c1d469" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：将数组中的数字拼接成最大的数。</li></ul><ul id="1e40427e-38bb-80ac-98f3-c7ad5c13bd07" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-809b-b8db-deca345f372e" class="toggle"><li><details open=""><summary>力扣-最大数（自定义排序：<code>a+b &gt; b+a</code>）：<a href="https://leetcode-cn.com/problems/largest-number/">179. 最大数</a></summary><p id="1ea0427e-38bb-8014-a588-fde8ad95456f" class="">【题目】</p><p id="1ea0427e-38bb-80f5-9484-d83fe9baede9" class="">给定一组非负整数 <code>nums</code>，重新排列每个数的顺序（每个数不可拆分）使之组成一个最大的整数。</p><p id="1ea0427e-38bb-8047-9e3b-db5b96b4672b" class=""><strong>注意：</strong>输出结果可能非常大，所以你需要返回一个字符串而不是整数。</p><ul id="1ea0427e-38bb-806d-914d-d1e1de0146c4" class="toggle"><li><details open=""><summary>示例</summary><p id="1ea0427e-38bb-8095-a8b3-c7fbafcaaffe" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-8062-99e3-ee9b0d91ef56" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：nums = [10,2]输出：&quot;210&quot;</code></pre><p id="1ea0427e-38bb-80ee-bc38-c27daaff7444" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-8022-87cb-e7fa83edaf0d" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：nums = [3,30,34,5,9]输出：&quot;9534330&quot;</code></pre></details></li></ul><p id="1ea0427e-38bb-80e9-aa86-cea5c2bd5413" class="">【解法】</p><p id="1ea0427e-38bb-80ec-bb67-ddd522105fd1" class="">思路1：<div class="indented"><p id="1ea0427e-38bb-80e7-83ce-d450d4af4cdf" class="">先做一个排序，第一个数字大的排前面，如果第一个数字一样大的两个数字就比第二个数字，以此类推….</p><blockquote id="1ea0427e-38bb-80e5-a99e-d868172033e2" class="">但是我们发现这个是要重构比较规则，不能直接套用字典序的C++自带的字符串比较规则，因为：<p id="1ea0427e-38bb-807a-9b07-dd89e3064ca5" class="">举个例子，比如a是&quot;3&quot;，b是&quot;30&quot;。直接比较字典序的话，&quot;3&quot;和&quot;30&quot;哪个更大？字符串比较是按字符逐个进行的。第一个字符都是&#x27;3&#x27;，然后比较第二个字符时，&quot;3&quot;没有第二个字符，而&quot;30&quot;有&#x27;0&#x27;。字符串比较中，较短的字符串如果前面的字符都相同，则较短的排在前面。因此，&quot;3&quot;的字典序实际上比&quot;30&quot;小</p></blockquote></div></p><p id="1ea0427e-38bb-8034-89bc-cd01fe068763" class="">思路2：<div class="indented"><p id="1ea0427e-38bb-8042-b960-f2f6515c7de3" class="">这里我们想了个办法让我们能直接套用字典序的比较规则来简化代码：</p><p id="1ea0427e-38bb-8002-9f96-c1b74b0208b7" class="">先把所有数字转成字符串，然后以“a+b&gt;b+a”（这里是比较a+b和b+a两个字符串的字典序）代替“a&gt;b”的比较规则进行排序。将所有排序后的字符串拼接成一个结果字符串即可。</p><blockquote id="1ea0427e-38bb-807a-9b46-f587392e8312" class="">字符串比较是按字符的ASCII值逐个比较的：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-8065-b6f2-d96c1d589777" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">&quot;330&quot; vs &quot;303&quot;
+↑ 第1个字符：&#x27;3&#x27; vs &#x27;3&#x27; → 相等
+   ↓ 第2个字符：&#x27;3&#x27; vs &#x27;0&#x27; → &#x27;3&#x27; &gt; &#x27;0&#x27; → &quot;330&quot; &gt; &quot;303&quot;</code></pre></blockquote></div></p><p id="1ea0427e-38bb-80ab-aa8b-f78677acd3cc" class="">代码：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-801e-9146-db331e50c162" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;algorithm&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    string largestNumber(vector&lt;int&gt;&amp; nums) {
+        vector&lt;string&gt; strs;
+        for (int num : nums) {
+            strs.push_back(to_string(num));
+        }
+        
+        sort(strs.begin(), strs.end(), [](const string&amp; a, const string&amp; b) {
+            return a + b &gt; b + a;
+        });
+        
+        string res;
+        for (const string&amp; s : strs) {
+            res += s;
+        }
+        
+        if (res.empty() || res[0] == &#x27;0&#x27;) {
+            return &quot;0&quot;;
+        }
+        return res;
+    }
+};</code></pre></div></p></details></li></ul></li></ul></li></ol><hr id="1e40427e-38bb-8047-8efe-fb1a926875f2"/><h3 id="1e40427e-38bb-8084-8b64-d12b55e9aabb" class=""><strong>4-股票买卖问题</strong></h3><ol type="1" id="1e40427e-38bb-80c0-8123-d7a8d2551234" class="numbered-list" start="1"><li><strong>多次交易</strong><ul id="1e40427e-38bb-80e2-afd0-ea19ebbb01e5" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：通过贪心捕捉所有上升波段。</li></ul><ul id="1e40427e-38bb-80bc-a40a-e32ba56c3b31" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-808b-b985-f65a5c06b438" class="toggle"><li><details open=""><summary><a href="https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/">122. 买卖股票的最佳时机 II</a>（每天可买卖，利润累加）</summary><p id="1ea0427e-38bb-8095-a093-da695721cb45" class="">【题目】</p><p id="1ea0427e-38bb-80d7-94aa-d38f737877cd" class="">给你一个整数数组 <code>prices</code> ，其中 <code>prices[i]</code> 表示某支股票第 <code>i</code> 天的价格。</p><p id="1ea0427e-38bb-8069-bf64-eb818b1d897a" class="">在每一天，你可以决定是否购买和/或出售股票。你在任何时候 <strong>最多</strong> 只能持有 <strong>一股</strong> 股票。你也可以先购买，然后在 <strong>同一天</strong> 出售。</p><p id="1ea0427e-38bb-8058-bb6e-dac96cb9acde" class="">返回 <em>你能获得的 </em><em><strong>最大</strong></em><em> 利润</em> 。</p><ul id="1ea0427e-38bb-80e4-a662-ea113e73fb45" class="toggle"><li><details open=""><summary>示例</summary><p id="1ea0427e-38bb-8057-8a35-d37446485e12" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-8073-872c-cd08f55362be" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：prices = [7,1,5,3,6,4]
+输出：7
+解释：在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5 - 1 = 4。
+随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6 - 3 = 3。
+最大总利润为 4 + 3 = 7 。</code></pre><p id="1ea0427e-38bb-8062-b9e4-d7f8b70f3b4b" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-806c-8e74-eef664a26a6b" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：prices = [1,2,3,4,5]
+输出：4
+解释：在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5 - 1 = 4。
+最大总利润为 4 。</code></pre><p id="1ea0427e-38bb-80df-916e-f4d867174a47" class=""><strong>示例 3：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-8058-8d6e-ccc64534358c" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：prices = [7,6,4,3,1]
+输出：0
+解释：在这种情况下, 交易无法获得正利润，所以不参与交易可以获得最大利润，最大利润为 0。</code></pre></details></li></ul><p id="1ea0427e-38bb-806e-914d-dc990a3fa310" class="">【解法】</p><p id="1ea0427e-38bb-80c3-a6fd-cd10744471eb" class="">思路：<div class="indented"><p id="1ea0427e-38bb-809e-a0f4-d03b8140066f" class="">关键在于抓住所有可能的上升趋势，即——只要当天的价格比前一天高，就在前一天买入，当天卖出，这样可以确保所有正收益都被累加。</p></div></p><p id="1ea0427e-38bb-801d-a05f-e0514ad7a339" class="">代码：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-807b-88d9-f138337cbb22" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+using namespace std;
+
+class Solution {
+public:
+    int maxProfit(vector&lt;int&gt;&amp; prices) {
+        int max_profit = 0;
+        for (int i = 1; i &lt; prices.size(); ++i) {
+            if (prices[i] &gt; prices[i-1]) {
+                max_profit += prices[i] - prices[i-1];
+            }
+        }
+        return max_profit;
+    }
+};</code></pre></div></p></details></li></ul></li></ul></li></ol><ol type="1" id="1e40427e-38bb-80f0-a351-eaec7858547f" class="numbered-list" start="2"><li><strong>加油站问题</strong><ul id="1e40427e-38bb-803e-89f5-e9828e4048c9" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：环形路线中寻找可绕行的起点。</li></ul><ul id="1e40427e-38bb-807a-80d8-e6d88539ab2c" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-8020-946f-c6c45de84d54" class="toggle"><li><details open=""><summary><a href="https://leetcode-cn.com/problems/gas-station/">134. 加油站</a>（油量累积验证）</summary><p id="1ea0427e-38bb-8094-98ef-fe2a7337e6f6" class="">【题目】</p><p id="1ea0427e-38bb-80f4-aabd-f7b31185009d" class="">在一条环路上有 <code>n</code> 个加油站，其中第 <code>i</code> 个加油站有汽油 <code>gas[i]</code><em> </em>升。</p><p id="1ea0427e-38bb-8096-b060-dd16174186b2" class="">你有一辆油箱容量无限的的汽车，从第<em> </em><code>i</code><em> </em>个加油站开往第<em> </em><code>i+1</code><em> </em>个加油站需要消耗汽油 <code>cost[i]</code><em> </em>升。你从其中的一个加油站出发，开始时油箱为空。</p><p id="1ea0427e-38bb-80f0-b37a-d28053e1a524" class="">给定两个整数数组 <code>gas</code> 和 <code>cost</code> ，如果你可以按顺序绕环路行驶一周，则返回出发时加油站的编号，否则返回 <code>-1</code> 。如果存在解，则 <strong>保证</strong> 它是 <strong>唯一</strong> 的。</p><ul id="1eb0427e-38bb-8057-81cc-d40cae057a98" class="toggle"><li><details open=""><summary>示例</summary><p id="1ea0427e-38bb-80be-b58a-c8e72ced2e7c" class=""><strong>示例 1:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-806d-a450-c96d70b562ea" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: gas = [1,2,3,4,5], cost = [3,4,5,1,2]
+输出: 3
+解释:
+从 3 号加油站(索引为 3 处)出发，可获得 4 升汽油。此时油箱有 = 0 + 4 = 4 升汽油
+开往 4 号加油站，此时油箱有 4 - 1 + 5 = 8 升汽油
+开往 0 号加油站，此时油箱有 8 - 2 + 1 = 7 升汽油
+开往 1 号加油站，此时油箱有 7 - 3 + 2 = 6 升汽油
+开往 2 号加油站，此时油箱有 6 - 4 + 3 = 5 升汽油
+开往 3 号加油站，你需要消耗 5 升汽油，正好足够你返回到 3 号加油站。
+因此，3 可为起始索引。</code></pre><p id="1ea0427e-38bb-8063-8632-ccd95e774a37" class=""><strong>示例 2:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1ea0427e-38bb-80e6-90b7-f20ecc3a5d31" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: gas = [2,3,4], cost = [3,4,3]
+输出: -1
+解释:
+你不能从 0 号或 1 号加油站出发，因为没有足够的汽油可以让你行驶到下一个加油站。
+我们从 2 号加油站出发，可以获得 4 升汽油。 此时油箱有 = 0 + 4 = 4 升汽油
+开往 0 号加油站，此时油箱有 4 - 3 + 2 = 3 升汽油
+开往 1 号加油站，此时油箱有 3 - 3 + 3 = 3 升汽油
+你无法返回 2 号加油站，因为返程需要消耗 4 升汽油，但是你的油箱只有 3 升汽油。
+因此，无论怎样，你都不可能绕环路行驶一周。</code></pre></details></li></ul><p id="1ea0427e-38bb-8092-b4f0-c407ff8a7478" class="">【解法】</p><p id="1eb0427e-38bb-80d5-866c-c5e95a320081" class="">思路：<div class="indented"><p id="1ea0427e-38bb-80c7-8d11-fae4ae9b13e5" class="">首先这里我们可以把汽油和消耗汽油转变为一个 更有用的数据——计算每个加油站的净油量差（加油量减去消耗量）。</p><p id="1eb0427e-38bb-8074-8abc-fb2db49d6dc3" class="">然后用一次遍历去看每一个加油站，维护一个遍历全部加油站后剩余油量值的变量<code>total_gas</code>，若全部遍历一遍之后<code>total_gas</code>为负则必定无法走一圈。<div class="indented"><p id="1eb0427e-38bb-80fa-b01a-c4a969f2f0a3" class="">同时，在遍历过程中先把第一个站假设为起点，维护一个<code>current_gas</code>变量，每次到下一个站就为他加净油量差，如果在某个站时<code>current_gas</code>变成了负数，就表示在前面的起点到当前这个站之间的所有站都不可能是真正的起点。所以我们就继续把下一个站假设为起点….</p><blockquote id="1eb0427e-38bb-807f-9b39-e216d3a09657" class="">这样假设是正确的，因为我们不可能吧和下一个站之间的净油量差为负数的站假设为起点。当我们去假设一个起点时这个站肯定和下个站之间净油量差是正数。<p id="1eb0427e-38bb-805a-bb90-e05957a8c6bb" class="">而且假设有连续的三个点“A-B-C”，我们假设了正的A为起点，其中B是负的，C是正的，那我们会不会因为假设了A就把C给忽略掉？不会！证明如下：<div class="indented"><p id="1eb0427e-38bb-8087-b948-e4c3a503e40e" class="">假设B负的比A正的多，则在B处就截止了对A的假设，重新假设了C。</p><p id="1eb0427e-38bb-802d-bbc3-c3fb870b3004" class="">假设B负的比A正的少，则证明A比C更适合当起点。</p></div></p></blockquote></div></p></div></p><ul id="1eb0427e-38bb-8071-8561-c715a46b04bf" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8068-bed0-cdd56499a19f" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+using namespace std;
+
+class Solution {
+public:
+    int canCompleteCircuit(vector&lt;int&gt;&amp; gas, vector&lt;int&gt;&amp; cost) {
+        int total_gas = 0;    // 总剩余油量
+        int current_gas = 0;  // 当前剩余油量
+        int start = 0;        // 起始加油站
+        
+        for (int i = 0; i &lt; gas.size(); ++i) {
+            total_gas += gas[i] - cost[i];
+            current_gas += gas[i] - cost[i];
+            
+            // 如果当前油量不足，重置起点和当前油量
+            if (current_gas &lt; 0) {
+                start = i + 1;
+                current_gas = 0;
+            }
+        }
+        
+        // 总剩余油量非负则存在唯一解，否则无解
+        return total_gas &gt;= 0 ? start : -1;
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ul></li></ol><hr id="1e40427e-38bb-80bd-ba52-caadd9454cda"/><h3 id="1e40427e-38bb-803e-bf88-ca8f49ddcf2a" class=""><strong>5-跳跃游戏系列</strong></h3><ol type="1" id="1e40427e-38bb-80a1-8c3f-c4bdd9e29517" class="numbered-list" start="1"><li><strong>能否到达终点</strong><ul id="1e40427e-38bb-8074-8c34-eb70a14b6d94" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：根据数组值跳跃，判断是否能到末尾。</li></ul><ul id="1e40427e-38bb-80b0-9b47-fba8809ed2aa" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e00427e-38bb-8048-a5e6-fa830c57ec66" class="toggle"><li><details open=""><summary>力扣-跳跃游戏（贪心选择每一步的最大覆盖范围）：<a href="https://leetcode-cn.com/problems/jump-game/">55. 跳跃游戏</a></summary><p id="1e00427e-38bb-8094-9c11-d565da59688b" class="">【题目】</p><p id="1e00427e-38bb-804f-8521-e914103eefb2" class="">给你一个非负整数数组 <code>nums</code> ，你最初位于数组的 <strong>第一个下标</strong> 。数组中的每个元素代表你在该位置可以跳跃的最大长度。</p><p id="1e00427e-38bb-80cd-a4dd-dfcfd9a62fe2" class="">判断你是否能够到达最后一个下标，如果可以，返回 <code>true</code> ；否则，返回 <code>false</code> 。</p><ul id="1e00427e-38bb-80aa-979a-e000566204ef" class="toggle"><li><details open=""><summary><strong>示例</strong></summary><p id="1e00427e-38bb-80c3-bfd5-f637f70033a2" class="">示例 1：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-80f7-94f4-e5863be4de34" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：nums = [2,3,1,1,4]
+输出：true
+解释：可以先跳 1 步，从下标 0 到达下标 1, 然后再从下标 1 跳 3 步到达最后一个下标。</code></pre><p id="1e00427e-38bb-801f-a209-d78ad9dad970" class="">示例 2：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-806f-85a6-ce2fe3fa9402" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：nums = [3,2,1,0,4]
+输出：false
+解释：无论怎样，总会到达下标为 3 的位置。但该下标的最大跳跃长度是 0 ， 所以永远不可能到达最后一个下标。</code></pre></details></li></ul><ul id="1e00427e-38bb-8093-8479-f95f29108f07" class="toggle"><li><details open=""><summary><strong>提示</strong></summary><p id="1e00427e-38bb-804b-a020-ea68bb4e6241" class="">1 &lt;= nums.length &lt;= 10<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow></mrow><mn>4</mn></msup></mrow><annotation encoding="application/x-tex">^4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span></p><p id="1e00427e-38bb-806b-80c3-dfdf63cb4e18" class="">0 &lt;= nums[i] &lt;= 10<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow></mrow><mn>5</mn></msup></mrow><annotation encoding="application/x-tex">^5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span></p></details></li></ul><p id="1e00427e-38bb-80a6-9b49-e42b66df5a6d" class="">【解法-1】</p><p id="1e00427e-38bb-80ce-8fd4-d0244a12537e" class="">从示例里可以看到，当出现值为0的节点时是最关键的判断点，如果所有元素都不为0， 那么一定可以跳到最后。</p><p id="1e00427e-38bb-8015-8c49-c0daa1eb6230" class="">所以我们可以从后往前遍历，如果遇到nums[i] = 0，就找i前面的元素j，使得nums[j] &gt; i - j。如果找不到，则不可能跳到num[i+1]，返回false。</p><blockquote id="1e00427e-38bb-8080-988c-ca0567628bf2" class="">不能是nums[j] &gt;= i - j，等于时nums[j]这个位置正好只能跳到nums[i]的位置</blockquote><ul id="1e00427e-38bb-8008-ad6a-f7ec7371586d" class="toggle"><li><details open=""><summary><strong>代码</strong></summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-801d-afd3-cb331a39e030" class="code"><code class="language-Plain Text">class Solution {
+public:
+    bool canJump(vector&lt;int&gt;&amp; nums) {
+        for (int i = nums.size()-1; i &gt;=0; i--)
+        {
+            if(nums[i]==0)
+            {
+                int j=i-1;
+                while(j&gt;=0&amp;&amp;nums[j]&lt;=i-j)
+                {
+                    j--;
+                    if(j&lt;0) return false;
+                }
+            }
+        }
+        return true;
+    }
+};</code></pre></details></li></ul><p id="1e00427e-38bb-800c-9b0b-fae3471d08df" class="">【解法-2】</p><p id="1e10427e-38bb-801f-b8e8-da9a92e95a5c" class="">贪心策略：小问题是能不能到达位置 x，以及能到达的话从 x 出发最远能跳到多远</p><p id="1e00427e-38bb-80b6-a785-def4cbb195ad" class="">对于当前位置 x，它后面的x+1...x+nums[x]这些位置必定可达，所以我们可以依次遍历数组中每个位置，实时维护当前可以到达的最远位置（贪心）。然后写一个遍历第一个位置到最后一个位置的for循环：<div class="indented"><ul id="1e00427e-38bb-8045-9e63-fb0432cfcc4f" class="bulleted-list"><li style="list-style-type:disc">如果当前点可以到达的最远位置已经覆盖到了最后一个位置，就返回True。</li></ul><ul id="1e00427e-38bb-80a7-8662-d0b040c80bdc" class="bulleted-list"><li style="list-style-type:disc">如果当前点可以到达的最远位置还没覆盖到最后一个位置，继续循环并且更新当前可达到的最远位置数据max_reach。</li></ul><ul id="1e10427e-38bb-802d-86cc-c97c95fad7a4" class="bulleted-list"><li style="list-style-type:disc">如果当前点不在“当前可达到的最远位置数据max_reach”内，则返回False。</li></ul></div></p><ul id="1e00427e-38bb-80a3-b2b2-d6f054192087" class="toggle"><li><details open=""><summary><strong>代码</strong></summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-801d-807e-e92a8670c5ce" class="code"><code class="language-Plain Text">class Solution {
+public:
+    bool canJump(std::vector&lt;int&gt;&amp; nums) {
+        int n = nums.size();
+        int max_reach = 0; // 当前能覆盖的最远下标
+        
+        for (int i = 0; i &lt; n; ++i) {
+            // 如果当前位置已经无法到达，直接失败
+            if (i &gt; max_reach) return false;
+            
+            // 更新能到达的最远位置
+            max_reach = std::max(max_reach, i + nums[i]);
+            
+            // 提前判断是否覆盖终点
+            if (max_reach &gt;= n - 1) return true;
+        }
+        
+        return true; // 循环结束说明能到达
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ul></li></ol><ol type="1" id="1e40427e-38bb-8089-b878-df0bfe2d127e" class="numbered-list" start="2"><li><strong>最少跳跃次数</strong><ul id="1e40427e-38bb-8077-b102-ceb86a7ddbe5" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：求到达终点的最少步数。</li></ul><ul id="1e40427e-38bb-802a-958d-e8fb15f20cd6" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e00427e-38bb-80d2-8545-d42c320ce078" class="toggle"><li><details open=""><summary>力扣-跳跃游戏Ⅱ（贪心选择下一步最远点）：<a href="https://leetcode-cn.com/problems/jump-game-ii/">45. 跳跃游戏 II</a></summary><p id="1e00427e-38bb-8070-a300-d65d6f61e718" class="">【题目】</p><p id="1e00427e-38bb-80a5-a042-cacc2df6c6f3" class="">给定一个长度为 <code>n</code> 的 <strong>0 索引</strong>整数数组 <code>nums</code>。初始位置为 <code>nums[0]</code>。</p><p id="1e00427e-38bb-8096-8589-d892391eed3e" class="">每个元素 <code>nums[i]</code> 表示从索引 <code>i</code> 向后跳转的最大长度。换句话说，如果你在 <code>nums[i]</code> 处，你可以跳转到任意 <code>nums[i + j]</code> 处:</p><ul id="1e00427e-38bb-8036-a539-f89d49af99c7" class="bulleted-list"><li style="list-style-type:disc"><code>0 &lt;= j &lt;= nums[i]</code></li></ul><ul id="1e00427e-38bb-80ec-9f2d-c8edff7a7dea" class="bulleted-list"><li style="list-style-type:disc"><code>i + j &lt; n</code></li></ul><p id="1e00427e-38bb-8007-a3a3-db9c33b15c75" class="">返回到达 <code>nums[n - 1]</code> 的最小跳跃次数。生成的测试用例可以到达 <code>nums[n - 1]</code>。</p><ul id="1e00427e-38bb-80b4-a0f8-fdab28abbb8a" class="toggle"><li><details open=""><summary>示例</summary><p id="1e00427e-38bb-80a0-8d9a-fdb07bf0d3f0" class=""><strong>示例 1:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-805c-a774-d90c71786273" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: nums = [2,3,1,1,4]
+输出: 2
+解释: 跳到最后一个位置的最小跳跃数是2。
+     从下标为 0 跳到下标为 1 的位置，跳1 步，然后跳3 步到达数组的最后一个位置。</code></pre><p id="1e00427e-38bb-8010-8719-f8441802ba4c" class=""><strong>示例 2:</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-8006-aac1-cee1a7410631" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入: nums = [2,3,0,1,4]
+输出: 2</code></pre><p id="1e00427e-38bb-8057-83ad-d4b6d427d355" class=""><strong>提示:</strong></p><ul id="1e00427e-38bb-8057-8929-ecd487e96262" class="bulleted-list"><li style="list-style-type:disc"><code>1 &lt;= nums.length &lt;= 10^4</code></li></ul><ul id="1e00427e-38bb-802b-a878-ee8b05ca927f" class="bulleted-list"><li style="list-style-type:disc"><code>0 &lt;= nums[i] &lt;= 1000</code></li></ul><ul id="1e00427e-38bb-808f-86ca-f8ff27646599" class="bulleted-list"><li style="list-style-type:disc">题目保证可以到达 <code>nums[n-1]</code></li></ul></details></li></ul><p id="1e00427e-38bb-802f-b867-c210f2a30c30" class="">【解法】</p><p id="1e00427e-38bb-8065-a5fe-c0ef734a76a3" class="">贪心策略：计算每一步时都尽量让她尽可能的跳到最远，这样直到能跳到终点时此时所用的步数就是最小步数了。</p><p id="1e00427e-38bb-8074-8957-e34f8799e960" class="">逻辑：<div class="indented"><p id="1e00427e-38bb-80ba-9eac-c9c8ad614690" class="">当你每跳完一跳，你要看如果以“从当前这一跳前所能跳到的最远荷叶的下一个荷叶，到当前这一跳后能跳到的最远荷叶，之间的每一片荷叶”做起点，能跳多远。如果跳不到终点，就跳下一跳（跳跃次数++）。</p><p id="1e00427e-38bb-8046-84b5-cf404d6c0d4d" class="">一直到能跳到终点，就直接结束。</p></div></p><p id="1e00427e-38bb-80de-a9b4-f4150aed859e" class="">意义：<div class="indented"><p id="1e00427e-38bb-8049-ac32-f2c265483d57" class="">这样每一片荷叶只需要做一次判断，时间复杂度O(n)。但是如果你简单粗暴用广度优先搜索的话复杂度就得是O(n^2)</p></div></p><ul id="1e00427e-38bb-80a9-823a-c8ce2b3894fe" class="toggle"><li><details open=""><summary>算法</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-8090-bf0d-e58f7dac5042" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt; // 用于 std::max
+
+class Solution {
+public:
+    int jump(std::vector&lt;int&gt;&amp; nums) {
+        int n = nums.size();
+        if (n == 1) return 0; // 已经在终点
+        
+        int jumps = 0;
+        int current_end = 0; // 当前跳跃能覆盖的最远位置
+        int max_reach = 0;   // 下一步能覆盖的最远位置
+        
+        for (int i = 0; i &lt; n; ++i) {
+            max_reach = std::max(max_reach, i + nums[i]);
+            
+            // 如果已经覆盖终点，提前结束
+            if (max_reach &gt;= n - 1) {
+                jumps++;
+                break;
+            }
+            
+            // 到达当前覆盖边界，必须跳跃
+            if (i == current_end) {
+                jumps++;
+                current_end = max_reach;
+            }
+        }
+        
+        return jumps;
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ul></li></ol><hr id="1e40427e-38bb-8013-92b8-e181f3966e25"/><h3 id="1e40427e-38bb-802b-ae3f-edd0f2bb0840" class=""><strong>6-分治与贪心结合</strong></h3><ol type="1" id="1e40427e-38bb-80e3-a562-deef3bcf97c6" class="numbered-list" start="1"><li><strong>分割数组</strong><ul id="1e40427e-38bb-80cc-a388-c41fceca62f3" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：将数组分成满足条件的子数组。</li></ul><ul id="1e40427e-38bb-80e3-8614-fd028beed7ec" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-8032-9c98-e0c57d5ba1b9" class="toggle"><li><details open=""><summary><a href="https://leetcode-cn.com/problems/partition-labels/">763. 划分字母区间</a>（同一字母只能出现在一个片段）</summary><p id="1eb0427e-38bb-80a2-bbd7-f6e4669bd56f" class="">【题目】</p><p id="1eb0427e-38bb-802d-96bf-d7cb50a3a47a" class="">给你一个字符串 <code>s</code> 。我们要把这个字符串划分为尽可能多的片段，同一字母最多出现在一个片段中。例如，字符串 <code>&quot;ababcc&quot;</code> 能够被分为 <code>[&quot;abab&quot;, &quot;cc&quot;]</code>，但类似 <code>[&quot;aba&quot;, &quot;bcc&quot;]</code> 或 <code>[&quot;ab&quot;, &quot;ab&quot;, &quot;cc&quot;]</code> 的划分是非法的。</p><p id="1eb0427e-38bb-8010-b47a-d89e3c024618" class="">注意，划分结果需要满足：将所有划分结果按顺序连接，得到的字符串仍然是 <code>s</code> 。</p><p id="1eb0427e-38bb-80b2-83b3-c9db9f993657" class="">返回一个表示每个字符串片段的长度的列表。</p><ul id="1eb0427e-38bb-80da-a6dc-fcd932f32b09" class="toggle"><li><details open=""><summary>示例</summary><p id="1eb0427e-38bb-801d-9e9d-e588a3ce1817" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80e5-8c6b-d74c8b8827c8" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：s = &quot;ababcbacadefegdehijhklij&quot;
+输出：[9,7,8]
+解释：
+划分结果为 &quot;ababcbaca&quot;、&quot;defegde&quot;、&quot;hijhklij&quot; 。
+每个字母最多出现在一个片段中。
+像 &quot;ababcbacadefegde&quot;, &quot;hijhklij&quot; 这样的划分是错误的，因为划分的片段数较少。</code></pre><p id="1eb0427e-38bb-80f1-8c9a-c2f507ee65f9" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-806b-a561-e602a9c463d3" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：s = &quot;eccbbbbdec&quot;
+输出：[10]
+</code></pre><p id="1eb0427e-38bb-800f-8fad-e0da2a3c6b01" class=""><strong>提示：</strong></p><ul id="1eb0427e-38bb-80df-9546-d503cb5e4149" class="bulleted-list"><li style="list-style-type:disc"><code>1 &lt;= s.length &lt;= 500</code></li></ul><ul id="1eb0427e-38bb-80c5-89f0-f76f9d5b6f88" class="bulleted-list"><li style="list-style-type:disc"><code>s</code> 仅由小写英文字母组成</li></ul></details></li></ul><p id="1eb0427e-38bb-8008-9d8f-c9fa9e7a6c29" class="">【解法】</p><p id="1eb0427e-38bb-8024-808e-e25e2ad2538a" class="">思路1：<div class="indented"><p id="1eb0427e-38bb-807e-a60d-c5cd701e8701" class="">为了确保题目要求，我们可以把这里面的每个字符第一次出现在字符串中的位置和最后一次出现在字符串中的位置记录下来，这样就得到了一个区间列表。</p><p id="1eb0427e-38bb-80f6-b9fb-d7c588f07da3" class="">接下来，把这个区间列表中有重合的区间做合并，合并完成后的区间列表就是符合题目要求的字符串片段列表。</p></div></p><p id="1eb0427e-38bb-8056-bcd5-ded2c7d2ae75" class="">思路2：<div class="indented"><p id="1eb0427e-38bb-8000-b9c9-f114190a5ba3" class="">使用数组 <code>last</code> 保存每个字符的最后出现位置。</p><p id="1eb0427e-38bb-80bb-8d7a-cf72c073ec7a" class="">初始化 <code>start</code> 和 <code>end</code> 为0表示当前片段的开始和结束位置。</p><p id="1eb0427e-38bb-8054-8ac9-ed1f65ee3867" class="">然后遍历字符串。对于字符串中的每个字符，做如下操作：<div class="indented"><p id="1eb0427e-38bb-803c-8d89-c048c26d0611" class="">查看当前字符的最后出现位置，擂台法更新<code>end</code></p></div></p><p id="1eb0427e-38bb-80d7-a2e6-c63c9f4ebe52" class="">这样，当遍历到 <code>end</code> 所指向的字符时，就说明当前片段已覆盖了片段中所有出现过的字符的最后出现位置（相当于是做了一个重合区间合并后得到的区间结果了）！此时记录长度并重置<code>start</code>为下一个字符，表示去研究下一个片段了，并且继续进行遍历。</p></div></p><p id="1eb0427e-38bb-80f4-84c4-da8c83c205ab" class="">分析：<div class="indented"><p id="1eb0427e-38bb-800e-b2a1-c10bff2a145c" class="">两种思路时间复杂度都为O(n)，前者可以给出字符串片段列表的内容，后者只需要更少的空间复杂度</p></div></p><ul id="1eb0427e-38bb-80e3-856b-d65dcb498b9d" class="toggle"><li><details open=""><summary>思路1-代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-801d-9bf8-db2075a3d79a" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Solution {
+public:
+    vector&lt;int&gt; partitionLabels(string s) {
+        vector&lt;int&gt; last(26, 0); // 记录每个字符的最后出现位置
+        for (int i = 0; i &lt; s.size(); ++i) {
+            last[s[i] - &#x27;a&#x27;] = i;
+        }
+        
+        vector&lt;int&gt; result;
+        int start = 0, end = 0;
+        for (int i = 0; i &lt; s.size(); ++i) {
+            end = max(end, last[s[i] - &#x27;a&#x27;]); // 扩展当前片段的边界
+            if (i == end) { // 触发分割条件
+                result.push_back(end - start + 1);
+                start = end + 1; // 重置起点
+            }
+        }
+        return result;
+    }
+};</code></pre></details></li></ul><ul id="1eb0427e-38bb-80c9-8d44-c78b8e79befe" class="toggle"><li><details open=""><summary>思路2-代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-808b-92bc-ff7268c702de" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;algorithm&gt;
+using namespace std;
+
+class Solution {
+public:
+    vector&lt;int&gt; partitionLabels(string s) {
+        // Step1: 记录每个字符的起始和结束位置
+        vector&lt;pair&lt;int, int&gt;&gt; intervals(26, {-1, -1});
+        for (int i = 0; i &lt; s.size(); ++i) {
+            int idx = s[i] - &#x27;a&#x27;;
+            if (intervals[idx].first == -1) {
+                intervals[idx].first = i; // 记录起始位置
+            }
+            intervals[idx].second = i;    // 更新结束位置
+        }
+        
+        // Step2: 提取有效区间并排序
+        vector&lt;pair&lt;int, int&gt;&gt; valid_intervals;
+        for (auto&amp; p : intervals) {
+            if (p.first != -1) { // 仅处理出现过的字符
+                valid_intervals.push_back(p);
+            }
+        }
+        sort(valid_intervals.begin(), valid_intervals.end());
+        
+        // Step3: 合并重叠区间
+        vector&lt;pair&lt;int, int&gt;&gt; merged;
+        for (auto&amp; interval : valid_intervals) {
+            if (merged.empty() || interval.first &gt; merged.back().second) {
+                merged.push_back(interval);
+            } else {
+                merged.back().second = max(merged.back().second, interval.second);
+            }
+        }
+        
+        // Step4: 转换为长度列表
+        vector&lt;int&gt; res;
+        for (auto&amp; p : merged) {
+            res.push_back(p.second - p.first + 1);
+        }
+        return res;
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ul></li></ol><ol type="1" id="1e40427e-38bb-80de-8975-ffa501d4c863" class="numbered-list" start="2"><li><strong>Huffman 编码</strong><ul id="1e40427e-38bb-80b7-905f-ccf9899ab12d" class="bulleted-list"><li style="list-style-type:disc"><strong>题目</strong>：用贪心构造最优前缀码。</li></ul><ul id="1e40427e-38bb-8048-b9c6-e983d10252da" class="bulleted-list"><li style="list-style-type:disc">例题：<ul id="1e40427e-38bb-80da-b82d-c0ba6fc7014a" class="toggle"><li><details open=""><summary>变种：合并果子（如 <a href="https://www.acwing.com/problem/content/150/">AcWing 148. 合并果子</a>）</summary><p id="1eb0427e-38bb-80db-ad98-d5dacbeac7f3" class="">【题目】</p><p id="1eb0427e-38bb-80ee-a424-d4028dc7be4a" class="">在一个果园里，达达已经将所有的果子打了下来，而且按果子的不同种类分成了不同的堆。达达决定把所有的果子合成一堆。每一次合并，达达可以把两堆果子合并到一起，消耗的体力等于两堆果子的重量之和。可以看出，所有的果子经过 <em>n</em>−1次合并之后，就只剩下一堆了。达达在合并果子时总共消耗的体力等于每次合并所耗体力之和。因为还要花大力气把这些果子搬回家，所以达达在合并果子时要尽可能地节省体力。</p><p id="1eb0427e-38bb-8097-bd04-d2c84c8e8b64" class="">假定每个果子重量都为 1，并且已知果子的种类数和每种果子的数目，你的任务是设计出合并的次序方案，使达达耗费的体力最少，并输出这个最小的体力耗费值。</p><p id="1eb0427e-38bb-80c6-b3a5-e2ef0ba9a632" class="">例如有 3 种果子，数目依次为 1，2，9。可以先将 1、2堆合并，新堆数目为3，耗费体力为3。接着，将新堆与原先的第三堆合并，又得到新的堆，数目为 12，耗费体力为12。所以达达总共耗费体力=3+12=15。可以证明 15 为最小的体力耗费值。</p><p id="1eb0427e-38bb-8022-bed1-f71359db5ddd" class=""><strong>输入格式</strong></p><p id="1eb0427e-38bb-80d3-8fcb-f15a2fc90273" class="">输入包括两行，第一行是一个整数 <em>n</em>，表示果子的种类数。第二行包含 <em>n</em>个整数，用空格分隔，第<em>i</em>个整数<em>ai</em>是第<em>i</em>种果子的数目。</p><p id="1eb0427e-38bb-804e-bc22-dce2f8b8e3a2" class=""><strong>输出格式</strong></p><p id="1eb0427e-38bb-808b-ab82-d724227ee939" class="">输出包括一行，这一行只包含一个整数，也就是最小的体力耗费值。输入数据保证这个值小于 231。</p><p id="1eb0427e-38bb-801d-97c2-e67b767416db" class=""><strong>数据范围</strong></p><p id="1eb0427e-38bb-8087-b2ea-ff75bf5ebf20" class="">1≤<em>n</em>≤10000 , 1≤<em>ai</em>≤20000</p><p id="1eb0427e-38bb-80bb-adb4-d01f19132e4d" class=""><strong>输入样例：</strong></p><p id="1eb0427e-38bb-8072-b4e5-e23e4b217de3" class="">3<br/>1 2 9<br/></p><p id="1eb0427e-38bb-809c-8e47-f17354d6e860" class=""><strong>输出样例：</strong></p><p id="1eb0427e-38bb-808f-ad28-c0414ad066af" class="">15</p><p id="1eb0427e-38bb-8082-a71f-fa407ca145a3" class="">【解法】</p><p id="1eb0427e-38bb-80f7-b672-c8c269b88810" class="">思路：<div class="indented"><p id="1eb0427e-38bb-8028-87fd-d98d885e82d8" class="">只需要每次总取出最小的两堆果子进行合并，就可以保证消耗最少的体力值。</p><p id="1eb0427e-38bb-80b6-8413-f31ad2487fb4" class="">实现上，直接用最小堆秒了。</p></div></p><ul id="1eb0427e-38bb-80b4-99f3-cd636757ff35" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8071-83a2-ff3cf6baba19" class="code"><code class="language-Plain Text">#include &lt;iostream&gt;
+#include &lt;queue&gt;
+#include &lt;vector&gt;
+
+using namespace std;
+
+int main() {
+    int n;
+    cin &gt;&gt; n;
+    
+    priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt; min_heap; // 最小堆
+    
+    for (int i = 0; i &lt; n; ++i) {
+        int a;
+        cin &gt;&gt; a;
+        min_heap.push(a);
+    }
+    
+    long long total_energy = 0; // 使用long long防止溢出
+    
+    while (min_heap.size() &gt; 1) {
+        int first = min_heap.top();
+        min_heap.pop();
+        int second = min_heap.top();
+        min_heap.pop();
+        
+        int combined = first + second;
+        total_energy += combined;
+        
+        min_heap.push(combined);
+    }
+    
+    cout &lt;&lt; total_energy &lt;&lt; endl;
+    
+    return 0;
+}</code></pre></details></li></ul><p id="1eb0427e-38bb-80db-a7d5-c24830cf892d" class="">
+</p></details></li></ul></li></ul></li></ol><hr id="1e40427e-38bb-80fe-a977-c96643c7ca3d"/><h3 id="1e40427e-38bb-80d4-ae2f-f664496af83d" class=""><strong>7-更多</strong></h3><ul id="1e00427e-38bb-801f-92f9-ce086f2ba64f" class="toggle"><li><details open=""><summary>力扣-盛最多水的容器</summary><p id="1e00427e-38bb-80a0-ad56-e5e3ddc97c6e" class="">【题目】</p><p id="1e00427e-38bb-806f-bdeb-f3da366b02bc" class="">给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) </p><p id="1e00427e-38bb-8002-80af-f88eaf6f885f" class="">找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。</p><p id="1e00427e-38bb-80e1-9e1c-d39b13299b5e" class="">返回容器可以储存的最大水量。</p><p id="1e00427e-38bb-8030-b4ea-ede081cc9892" class="">说明：你不能倾斜容器。</p><ul id="1e00427e-38bb-8083-98d4-c1b1ed917e66" class="toggle"><li><details open=""><summary><strong>示例</strong></summary><p id="1e00427e-38bb-807f-8c5f-f46a905d39b2" class="">示例 1：<div class="indented"><p id="1e00427e-38bb-80f0-bfcd-dee6a3347481" class="">输入：[1,8,6,2,5,4,8,3,7]</p><p id="1e00427e-38bb-80d8-ba67-fd210ddfd8a4" class="">输出：49</p><figure id="1e00427e-38bb-8090-b636-c5cffbe779e5" class="image"><a href="https://i-blog.csdnimg.cn/blog_migrate/b5afee031df3c33627753dd1b0d8a126.png"><img style="width:480px" src="https://i-blog.csdnimg.cn/blog_migrate/b5afee031df3c33627753dd1b0d8a126.png"/></a></figure><p id="1e00427e-38bb-801c-a25c-cb5915b1a805" class="">解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。</p></div></p><p id="1e00427e-38bb-805f-9bed-d16bb7076d16" class="">示例 2：<div class="indented"><p id="1e00427e-38bb-803f-8b12-c01cd724a192" class="">输入：height = [1,1]</p><p id="1e00427e-38bb-803c-8d3f-f9483311397b" class="">输出：1</p></div></p></details></li></ul><p id="1e00427e-38bb-80e8-949b-f1d7393eeb7f" class="">【解法】</p><p id="1e20427e-38bb-80c6-a5af-d7cbb8c4d2d7" class="">思路：<div class="indented"><p id="1e00427e-38bb-8099-adb5-eea13126e7d1" class="">因为有两条边所以考虑用双指针的思路，<code>left</code>和<code>right</code>分别初始化地指向数组的起始和末尾，每次计算一下面积（矮指针长度*两指针之间的距离）然后擂台法挑战更新最大容量。</p><p id="1e20427e-38bb-801d-9885-ea277d6bfe0f" class="">难点是想到每次进入下一个循环的方式：<mark class="highlight-red">移动较矮一侧的指针</mark>（因为移动较高的一侧不会增加容量——如果移动高的一侧，水池的高度不会增加，而宽度却在减少，则容量一定变小）。</p><blockquote id="1e00427e-38bb-8061-8b9b-c1b505cb0eec" class="">这样相当于排除了所有以当前矮指针为边界的更差情况，减少了计算量！<p id="1e20427e-38bb-80a2-8925-dff8e9b793c9" class="">如果你矮的要移动一次，长的也要移动一次，计算量就是指数级了。如果你只移动矮的，计算量就是O(n)。</p></blockquote></div></p><p id="1e00427e-38bb-8040-93c7-dd75df4ff850" class="">贪心策略：小问题是这次移动后的容积，挑战最大容积的总问题，挑战成功后用擂台法。这里贪心还体现在只移动最小的一侧。</p><blockquote id="1e20427e-38bb-8073-8707-dc692aed2f34" class="">擂台法：<p id="1e20427e-38bb-80b5-a6f6-c3765331f4a4" class="">每次比较两个元素，胜者留在擂台上，直到所有元素都比较完。</p></blockquote><ul id="1e00427e-38bb-80a6-bbbf-f9b909aa8d45" class="toggle"><li><details open=""><summary><strong>代码（C++）</strong></summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-802c-96e1-c75bdbd604aa" class="code"><code class="language-Plain Text">class Solution {
+public:
+    int maxArea(std::vector&lt;int&gt;&amp; height) {
+        int left = 0;
+        int right = height.size() - 1;
+        int max_area = 0;
+        
+        while (left &lt; right) {
+            // 计算当前容器的容量
+            int current_height = std::min(height[left], height[right]);
+            int current_width = right - left;
+            int current_area = current_height * current_width;
+            
+            // 更新最大容量
+            max_area = std::max(max_area, current_area);
+            
+            // 移动较矮的一侧指针
+            if (height[left] &lt; height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        return max_area;
+    }
+};</code></pre></details></li></ul></details></li></ul><h1 id="1e00427e-38bb-80c8-b401-f40fc7010845" class="">二、动态规划（DP）</h1><h2 id="1e00427e-38bb-80ee-ba90-fb7159b4b9e9" class="">（一）基础思想</h2><p id="1e00427e-38bb-8098-b632-da0124f2ab06" class="">听起来很高大上，其实它的核心思想就是“通过记录历史状态避免重复计算”。</p><p id="1e20427e-38bb-8032-bc71-f3ea96690db0" class="">我觉得这个“动态规划思想”，其实就是“缓存思想”的另一种叫法。</p><h2 id="1e00427e-38bb-80bd-8a7d-cf05874d1705" class="">（二）解题思路</h2><h3 id="1e10427e-38bb-80a3-92a9-ca13e291933d" class="">1-条件</h3><p id="1e10427e-38bb-80ea-aef6-e57756046713" class="">看到满足以下点的问题可以用动态规划来解：<div class="indented"><p id="1e10427e-38bb-8078-8d15-e09f2665abc0" class="">1、问题分解：可以将问题分解为多个同样的更小的子问题</p><p id="1e10427e-38bb-807a-96fc-dfeacb38fc2a" class="">2、状态转移：每一个当前子问题的状态依赖于前面某个子问题的状态（一般要把前面的所有子问题的答案记到一个dp里，然后当前子问题的状态转移方程通过查表和计算得到当前状态再记进表里）</p></div></p><h3 id="1e10427e-38bb-8001-8c23-d4e9177cd927" class="">2-公式化解法</h3><p id="1e00427e-38bb-8070-8fee-ce7ee03a7092" class="">分为以下两种：</p><ul id="1e00427e-38bb-803c-b57a-cbe1ff8b8fe8" class="bulleted-list"><li style="list-style-type:disc">自顶向下：<p id="1e20427e-38bb-800f-b3b5-f7143421bfdd" class="">看起来很高级其实就是给普通问题的递归解法（自顶向下）加一个缓存机制。</p></li></ul><ul id="1e00427e-38bb-80ba-b06f-f2bab4aae27c" class="bulleted-list"><li style="list-style-type:disc">自底向上：<p id="1e20427e-38bb-803f-a4bd-f99f93ec9309" class="">把问题分成n个（或者i*j个）同样的小问题，画一个dp表，横纵一个遍历项目，纵轴一个遍历项目，每个格子表示当前积累的奖池，会越积累越多。</p><p id="1e20427e-38bb-8049-943f-fc842f31397f" class="">然后按照“外层循环从上往下填，内层循环从左往右填”的顺序去填表，每个格子的填写依赖于它的上一行或者上一列的数据而且只会做“根据某种判断条件判断累加或者不累加”的处理，所以一般来说越往右下的格子奖池累计的越多。</p><p id="1e20427e-38bb-8059-a986-e45d9800a254" class="">然后最后取出最右下的格子的值就是整个问题的答案。</p></li></ul><h2 id="1e00427e-38bb-802f-b0b9-dfffd785815d" class="">（三）例题</h2><h3 id="1e40427e-38bb-80c8-8aaa-fb4ae331133d" class=""><strong>1-基础入门题（理解DP思想）</strong></h3><ol type="1" id="1e40427e-38bb-8088-83d3-e7273eeefb0b" class="numbered-list" start="1"><li><strong>斐波那契数列</strong><ul id="1e40427e-38bb-808f-bdee-f6f68669fc16" class="bulleted-list"><li style="list-style-type:disc">题目：计算第 n 个斐波那契数（递推式：<code>F(n) = F(n-1) + F(n-2)</code>）。</li></ul><ul id="1e00427e-38bb-808d-a3d9-ff01bf9c1c05" class="toggle"><li><details open=""><summary>例题：斐波那契数列</summary><p id="1e00427e-38bb-80f6-833c-e321d9b3b949" class="">【问题】</p><p id="1e00427e-38bb-80b6-831c-e31f0dd3020c" class="">斐波那契数列是以递推方式定义的数列：</p><ul id="1e00427e-38bb-80d0-9408-c7abc8bc4f9f" class="bulleted-list"><li style="list-style-type:disc">初始条件：F(0)=0，F(1)=1</li></ul><ul id="1e00427e-38bb-80a6-bc9a-d6eb98c7b215" class="bulleted-list"><li style="list-style-type:disc">递推关系：F(n)=F(n−1)+F(n−2)          (n≥2)</li></ul><p id="1e00427e-38bb-8034-a450-fb5030e7d96f" class="">示例：该数列的前几项为：0, 1, 1, 2, 3, 5, 8, 13, 21...</p><p id="1e00427e-38bb-80ee-8445-fe29209b6ea2" class="">要求设计算法：输入n，求F(n)。</p><p id="1e00427e-38bb-80f7-a1ac-e33284de47c9" class="">【解-普通递归解法】</p><p id="1e00427e-38bb-8080-9c30-f3f8339affc2" class="">直接根据定义递归计算，但存在重复计算子问题的缺陷。例如计算F(5)时，F(3)会被计算多次。</p><blockquote id="1e00427e-38bb-807f-913b-e4515b956e03" class="">时间复杂度：O(2<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow></mrow><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6644em;"></span><span class="mord"><span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span>)，指数级增长（递归树展开后节点数指数爆炸）。空间复杂度O(n)，由递归树深度决定。<figure id="1e00427e-38bb-80d0-907c-f560588a40fd" class="image"><a href="%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%201e00427e38bb8020a284dd58793ce9f8/image%201.png"><img style="width:384px" src="%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%201e00427e38bb8020a284dd58793ce9f8/image%201.png"/></a><figcaption>从这里可以看出它的指数爆炸和大量子问题被重复计算</figcaption></figure></blockquote><ul id="1e00427e-38bb-808e-a68c-f0cec95d6645" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-8083-a233-e4b2ba40a574" class="code"><code class="language-Plain Text">def fib_rec(n):
+    if n &lt;= 1:
+        return n
+    return fib_rec(n-1) + fib_rec(n-2)</code></pre></details></li></ul><p id="1e00427e-38bb-80f2-9fe9-c219d1705e8f" class="">【解-自顶向下的动态规划】</p><p id="1e00427e-38bb-8031-8617-fe60acccb2c4" class="">其实就是普通递归解法加了一个缓存机制。</p><p id="1e00427e-38bb-80a3-801d-d7f4a0af6a21" class="">使用数组或哈希表缓存已计算的子问题结果，每次递归前先查缓存，避免重复计算。</p><blockquote id="1e00427e-38bb-804c-a13f-cf7034618d0b" class="">这样F(n)里面的n=1,n=2,n=3….的情况都只需要计算一次就好，所以时间复杂度O(n)，又因为缓存表需要把这些情况都记一次，所以空间复杂度O(n)。</blockquote><ul id="1e00427e-38bb-806a-b9d7-efcdd702b5ad" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-8059-abb4-d795ced8a3fa" class="code"><code class="language-Plain Text">def fib_memo(n, memo={}):
+    if n &lt;= 1:
+        return n
+    if n not in memo:
+        memo[n] = fib_memo(n-1, memo) + fib_memo(n-2, memo)
+    return memo[n]</code></pre></details></li></ul><p id="1e00427e-38bb-8075-982c-e88fba6dbe0d" class="">【解-自底向上的动态规划】</p><p id="1e00427e-38bb-808d-8a73-fbf55da8e476" class="">其实就是正着把问题分解成多个小问题，比如求F(5)就分解成：<div class="indented"><p id="1e00427e-38bb-80f1-bc2c-e360816d75e5" class="">1、已知F(1)、F(0)，求F(2)</p><p id="1e00427e-38bb-8072-8408-ecec54b6b756" class="">2、已知F(2)、F(1)，求F(3)</p><p id="1e00427e-38bb-8095-83c3-d6d5bd68244d" class="">3、已知F(3)、F(2)，求F(4)</p><p id="1e00427e-38bb-80c9-86c7-f3a4975d09d6" class="">4、已知F(4)、F(3)，求F(5)</p></div></p><p id="1e00427e-38bb-80c3-84de-c7bb10bcfc56" class="">然后把小问题套进一个循环里面统统解掉即可。</p><blockquote id="1e00427e-38bb-8022-921d-e7d0d4df319c" class="">有多少个n就有多少个小问题所以时间复杂度O(n)，又因为用滚动变量代替数组，空间复杂度降至O(1)</blockquote><ul id="1e00427e-38bb-8051-96e0-e2af083defd4" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-8001-81ed-f78d55420c8b" class="code"><code class="language-Plain Text">def fib_dp(n):
+    if n &lt;= 1:
+        return n
+    prev1, prev2 = 0, 1
+    for i in range(2, n+1):
+        current = prev1 + prev2
+        prev1, prev2 = prev2, current
+    return prev2</code></pre></details></li></ul></details></li></ul><ul id="1e40427e-38bb-80df-b548-e09f0adb1b76" class="bulleted-list"><li style="list-style-type:disc">变种：爬楼梯（每次爬 1 或 2 阶，求到第 n 阶的方法数）。</li></ul><ul id="1e40427e-38bb-80b7-954d-fce430ae7785" class="toggle"><li><details open=""><summary>例题：<a href="https://leetcode-cn.com/problems/climbing-stairs/">LeetCode 70. 爬楼梯</a></summary><p id="1eb0427e-38bb-803e-999d-e52de6838bd1" class="">【题目】</p><p id="1eb0427e-38bb-8000-a6c7-daeff7e79e78" class="">假设你正在爬楼梯。需要 <code>n</code> 阶你才能到达楼顶。</p><p id="1eb0427e-38bb-8033-a4f6-de548763557b" class="">每次你可以爬 <code>1</code> 或 <code>2</code> 个台阶。你有多少种不同的方法可以爬到楼顶呢？</p><p id="1eb0427e-38bb-80c8-8d27-dd58c0b885a7" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8025-b15e-c79b8302d501" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：n = 2
+输出：2
+解释：有两种方法可以爬到楼顶。
+1. 1 阶 + 1 阶
+2. 2 阶</code></pre><p id="1eb0427e-38bb-8076-90b0-c56db51059a7" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-809e-b52d-cfc0a756c821" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：n = 3
+输出：3
+解释：有三种方法可以爬到楼顶。
+1. 1 阶 + 1 阶 + 1 阶
+2. 1 阶 + 2 阶
+3. 2 阶 + 1 阶</code></pre><p id="1eb0427e-38bb-80d5-b488-f52252a06f9f" class="">【解法】</p><p id="1eb0427e-38bb-8000-a54e-f5638bf1da48" class="">思路：<div class="indented"><p id="1eb0427e-38bb-8089-8abd-d416c0dd556f" class="">到达第n阶的方法数等于到达第n-1阶（再爬1步）和到达第n-2阶（再爬2步）的方法数之和</p><p id="1eb0427e-38bb-8063-baec-cefdcd05046e" class="">所以可以转化为斐波那契数列</p><blockquote id="1eb0427e-38bb-8019-87ba-dfda53b56439" class="">证明：<p id="1eb0427e-38bb-80c5-b44e-d5bed750c397" class="">假设你已站在第n阶台阶上，思考最后一步怎么上来的：</p><ul id="1eb0427e-38bb-8067-b305-f7d33f688d73" class="bulleted-list"><li style="list-style-type:disc">若最后一步是跨1阶，则之前的位置是第n-1阶</li></ul><ul id="1eb0427e-38bb-809b-b696-d8c73a8e9da6" class="bulleted-list"><li style="list-style-type:disc">若最后一步是跨2阶，则之前的位置是第n-2阶</li></ul><p id="1eb0427e-38bb-80ea-be62-eedf5f3b1c75" class="">这两种情况：</p><ol type="1" id="1eb0427e-38bb-8092-acfb-d44bee234005" class="numbered-list" start="1"><li><strong>完全独立</strong>：不存在同时跨1阶和2阶到达的情况</li></ol><ol type="1" id="1eb0427e-38bb-805f-a4e3-f9e2ef6f8955" class="numbered-list" start="2"><li><strong>完全覆盖</strong>：所有到达方式必属其中一种</li></ol><p id="1eb0427e-38bb-80a2-8a8c-c312c6569469" class="">因此，总方法数 = 到n-1阶的方法数 + 到n-2阶的方法数</p></blockquote></div></p><ul id="1eb0427e-38bb-80d5-819f-c32bd3947311" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8098-bf3c-dd9a6beb4ec3" class="code"><code class="language-Plain Text">class Solution {
+public:
+    int climbStairs(int n) {
+        if (n &lt;= 1) return 1;
+        int prev = 1, curr = 1;
+        for (int i = 2; i &lt;= n; ++i) {
+            int temp = curr;
+            curr = prev + curr;
+            prev = temp;
+        }
+        return curr;
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ol><ol type="1" id="1e40427e-38bb-801a-a4cd-ff198e3cfa53" class="numbered-list" start="2"><li><strong>最小路径和</strong><ul id="1e40427e-38bb-80d0-abc4-cce9cac83792" class="bulleted-list"><li style="list-style-type:disc">题目：在二维网格中从左上角到右下角，只能向右或向下移动，求路径数字和的最小值。</li></ul><ul id="1e40427e-38bb-809a-8514-cdc82ff657e4" class="toggle"><li><details open=""><summary>例题：<a href="https://leetcode-cn.com/problems/minimum-path-sum/">LeetCode 64. 最小路径和</a></summary><p id="1eb0427e-38bb-8057-9894-e043bd7ae0df" class="">【题目】</p><p id="1eb0427e-38bb-80e5-8962-c30f06499144" class="">给定一个包含非负整数的 <em><code>m</code></em><code> x </code><em><code>n</code></em> 网格 <code>grid</code> ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。</p><p id="1eb0427e-38bb-8005-b6d1-e68f8a263684" class=""><strong>说明：</strong>每次只能向下或者向右移动一步。</p><p id="1eb0427e-38bb-80c2-b341-da4b011401d3" class=""><strong>示例 1：</strong></p><figure id="1eb0427e-38bb-801e-b309-dd4e5a2a1cd4" class="image"><a href="https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg"><img style="width:242px" src="https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg"/></a></figure><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80ec-b863-e96459411046" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+输出：7
+解释：因为路径 1→3→1→1→1 的总和最小。</code></pre><p id="1eb0427e-38bb-8057-8eae-eab2577cbd24" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-802e-852f-c32390fea3fc" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：grid = [[1,2,3],[4,5,6]]
+输出：12</code></pre><p id="1eb0427e-38bb-809f-af20-c6913a77e828" class="">【解法】</p><p id="1eb0427e-38bb-804d-912d-cb367d829018" class="">思路：<div class="indented"><ul id="1eb0427e-38bb-801d-943a-e38485484e44" class="bulleted-list"><li style="list-style-type:disc"><strong>动态规划（DP）</strong>：可以用 <code>dp[i][j]</code> 表示从 <code>(0, 0)</code> 到 <code>(i, j)</code> 的最小路径和。</li></ul><ul id="1eb0427e-38bb-8089-b640-c38368ad8f30" class="bulleted-list"><li style="list-style-type:disc"><strong>状态转移方程</strong>：<ul id="1eb0427e-38bb-8079-9d00-dc3b6befa591" class="bulleted-list"><li style="list-style-type:circle">如果 <code>i == 0</code> 且 <code>j == 0</code>，<code>dp[0][0] = grid[0][0]</code>（起点）。</li></ul><ul id="1eb0427e-38bb-8013-90c9-c2b91c55d84b" class="bulleted-list"><li style="list-style-type:circle">如果 <code>i == 0</code>（第一行），只能从左边过来，<code>dp[0][j] = dp[0][j-1] + grid[0][j]</code>。</li></ul><ul id="1eb0427e-38bb-8099-9bce-d606b80c5cfe" class="bulleted-list"><li style="list-style-type:circle">如果 <code>j == 0</code>（第一列），只能从上面过来，<code>dp[i][0] = dp[i-1][0] + grid[i][0]</code>。</li></ul><ul id="1eb0427e-38bb-8086-8bc1-dadcf054e391" class="bulleted-list"><li style="list-style-type:circle">其他情况：<code>dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]</code>（取上方或左方的最小值）。</li></ul></li></ul><ul id="1eb0427e-38bb-8021-9d01-cdba5f8fb57c" class="bulleted-list"><li style="list-style-type:disc"><strong>空间优化</strong>：由于 <code>dp[i][j]</code> 只依赖于 <code>dp[i-1][j]</code> 和 <code>dp[i][j-1]</code>，可以用一维数组 <code>dp[j]</code> 来优化空间复杂度，从 <code>O(m*n)</code> 降到 <code>O(n)</code>。</li></ul></div></p><ul id="1eb0427e-38bb-80e5-8841-df92e268db4b" class="toggle"><li><details open=""><summary>代码-直观版本（二维DP）</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8043-ad00-d8db150bde61" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt; // for min
+using namespace std;
+
+int minPathSum(vector&lt;vector&lt;int&gt;&gt;&amp; grid) {
+    int m = grid.size();
+    int n = grid[0].size();
+    vector&lt;vector&lt;int&gt;&gt; dp(m, vector&lt;int&gt;(n, 0));
+    
+    dp[0][0] = grid[0][0]; // 起点
+    
+    // 初始化第一行
+    for (int j = 1; j &lt; n; ++j) {
+        dp[0][j] = dp[0][j-1] + grid[0][j];
+    }
+    
+    // 初始化第一列
+    for (int i = 1; i &lt; m; ++i) {
+        dp[i][0] = dp[i-1][0] + grid[i][0];
+    }
+    
+    // 填充 dp 表
+    for (int i = 1; i &lt; m; ++i) {
+        for (int j = 1; j &lt; n; ++j) {
+            dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}</code></pre></details></li></ul><ul id="1eb0427e-38bb-8013-9fff-d8ed81c89ab4" class="toggle"><li><details open=""><summary>代码-空间优化版本</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8080-a827-f5e327049283" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt; // for min
+using namespace std;
+
+int minPathSum(vector&lt;vector&lt;int&gt;&gt;&amp; grid) {
+    int m = grid.size();
+    int n = grid[0].size();
+    vector&lt;vector&lt;int&gt;&gt; dp(m, vector&lt;int&gt;(n, 0));
+    
+    dp[0][0] = grid[0][0]; // 起点
+    
+    // 初始化第一行
+    for (int j = 1; j &lt; n; ++j) {
+        dp[0][j] = dp[0][j-1] + grid[0][j];
+    }
+    
+    // 初始化第一列
+    for (int i = 1; i &lt; m; ++i) {
+        dp[i][0] = dp[i-1][0] + grid[i][0];
+    }
+    
+    // 填充 dp 表
+    for (int i = 1; i &lt; m; ++i) {
+        for (int j = 1; j &lt; n; ++j) {
+            dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}</code></pre></details></li></ul></details></li></ul></li></ol><ol type="1" id="1e40427e-38bb-80d5-a66d-e8726e776358" class="numbered-list" start="3"><li><strong>不同路径</strong><ul id="1e40427e-38bb-8013-a237-c66eead38e18" class="bulleted-list"><li style="list-style-type:disc">题目：机器人从网格左上角到右下角（有障碍物或无障碍物），求路径数量。</li></ul><ul id="1e40427e-38bb-80d2-b602-ebaf1a2e9770" class="toggle"><li><details open=""><summary>例题：<a href="https://leetcode-cn.com/problems/unique-paths/">LeetCode 62. 不同路径</a>（无障碍）</summary><p id="1eb0427e-38bb-801e-8cfc-c381c2791d61" class="">【题目】</p><p id="1eb0427e-38bb-80ba-a064-e92ab29432ba" class="">一个机器人位于一个 <code>m x n</code><em> </em>网格的左上角 （起始点在下图中标记为 “Start” ）。</p><p id="1eb0427e-38bb-8034-aeb0-cd5168d47aeb" class="">机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。</p><p id="1eb0427e-38bb-800c-994c-eedeb57a007f" class="">问总共有多少条不同的路径？</p><p id="1eb0427e-38bb-802f-bb07-ce4d22431935" class=""><strong>示例 1：</strong></p><figure id="1eb0427e-38bb-8029-9819-d06485a7794a" class="image"><a href="https://pic.leetcode.cn/1697422740-adxmsI-image.png"><img style="width:400px" src="https://pic.leetcode.cn/1697422740-adxmsI-image.png"/></a></figure><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8066-8f2f-f6d2f3c97a0f" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：m = 3, n = 7
+输出：28</code></pre><p id="1eb0427e-38bb-8021-9320-fe3b7aee0bbf" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8041-87e0-cf3716a5b314" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：m = 3, n = 2
+输出：3
+解释：
+从左上角开始，总共有 3 条路径可以到达右下角。
+1. 向右 -&gt; 向下 -&gt; 向下
+2. 向下 -&gt; 向下 -&gt; 向右
+3. 向下 -&gt; 向右 -&gt; 向下
+</code></pre><p id="1eb0427e-38bb-80e6-8720-d77659404148" class=""><strong>示例 3：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-805c-a0d0-dc95550e9c2c" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：m = 7, n = 3
+输出：28
+</code></pre><p id="1eb0427e-38bb-8090-8205-e8c4b52e92aa" class=""><strong>示例 4：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80cb-8a14-e3bd3a578497" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：m = 3, n = 3
+输出：6</code></pre><p id="1eb0427e-38bb-8033-9665-c1ab51b01cd6" class="">【解法】</p><p id="1eb0427e-38bb-8074-b93f-cdf4b91fb371" class="">思路1：<div class="indented"><p id="1eb0427e-38bb-8030-a4cd-caae387fb850" class="">因为机器人只能向右或向下移动，所以到达 <code>(i, j)</code> 的路径有两条，一条是从(i-1,j)向右走，一条是从(i,j-1)向下走。</p><p id="1eb0427e-38bb-80c2-81a7-cb76888b9ae4" class="">所以可以用 <code>dp[i][j]</code> 表示到达 <code>(i, j)</code> 的路径数，状态转移方程为：<div class="indented"><p id="1eb0427e-38bb-808f-8a92-f003e6aa3c6f" class=""><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>p</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>=</mo><mi>d</mi><mi>p</mi><mo stretchy="false">[</mo><mi>i</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo><mo stretchy="false">[</mo><mi>j</mi><mo stretchy="false">]</mo><mo>+</mo><mi>d</mi><mi>p</mi><mo stretchy="false">[</mo><mi>i</mi><mo stretchy="false">]</mo><mo stretchy="false">[</mo><mi>j</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">dp[i][j]=dp[i−1][j]+dp[i][j−1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">p</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">p</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal">p</span><span class="mopen">[</span><span class="mord mathnormal">i</span><span class="mclose">]</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span></span><span>﻿</span></span></p></div></p><ul id="1eb0427e-38bb-80e1-a682-ffe62d71c370" class="toggle"><li><details open=""><summary>代码-时间复杂度O(mn)</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80cc-aaa9-d3949bc34c5e" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+using namespace std;
+
+int uniquePaths(int m, int n) {
+    vector&lt;vector&lt;int&gt;&gt; dp(m, vector&lt;int&gt;(n, 1)); // 初始化为1
+    
+    for (int i = 1; i &lt; m; ++i) {
+        for (int j = 1; j &lt; n; ++j) {
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    
+    return dp[m-1][n-1];
+}</code></pre></details></li></ul></div></p><p id="1eb0427e-38bb-8061-bcaa-e2d7e5d05bd0" class="">思路2：<div class="indented"><p id="1eb0427e-38bb-807c-bfaa-eb4f5bfac94d" class="">到达(i,j)的路径数就相当于是对“i-1个右键和j-1个下键”进行排列组合，总部数为 <code>(i+j-2)</code> 步</p><p id="1eb0427e-38bb-808f-9b59-e73467db3cbc" class="">所以，总路径数就是组合数<style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>C</mi><mrow><mi>i</mi><mo>+</mo><mi>j</mi><mo>−</mo><mn>2</mn></mrow><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msubsup></mrow><annotation encoding="application/x-tex"> C^{i-1}_{i+j-2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2778em;vertical-align:-0.413em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8648em;"><span style="top:-2.4231em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">+</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span><span class="mbin mtight">−</span><span class="mord mtight">2</span></span></span></span><span style="top:-3.1031em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.413em;"><span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span></p><ul id="1eb0427e-38bb-802d-a583-df938b140d4c" class="toggle"><li><details open=""><summary>代码-时间复杂度O(min(m, n))</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8098-862d-f72b90758ff4" class="code"><code class="language-Plain Text">#include &lt;iostream&gt;
+
+int uniquePaths(int m, int n) {
+    long long res = 1;
+    int N = m + n - 2; // 总步数
+    int k = min(m - 1, n - 1); // 取较小的组合数计算
+    
+    // 计算 C(N, k)
+    for (int i = 1; i &lt;= k; ++i) {
+        res = res * (N - k + i) / i;
+    }
+    
+    return (int)res;
+}</code></pre></details></li></ul></div></p></details></li></ul><ul id="1e40427e-38bb-8016-b9f0-e7d88bb78e43" class="toggle"><li><details open=""><summary>变种：<a href="https://leetcode-cn.com/problems/unique-paths-ii/">LeetCode 63. 不同路径 II</a>（有障碍）</summary><p id="1eb0427e-38bb-802e-b847-ec069afd3560" class="">【题目】</p><p id="1eb0427e-38bb-8078-81aa-fc15bdb52f4b" class="">给定一个 <code>m x n</code> 的整数数组 <code>grid</code>。一个机器人初始位于 <strong>左上角</strong>（即 <code>grid[0][0]</code>）。机器人尝试移动到 <strong>右下角</strong>（即 <code>grid[m - 1][n - 1]</code>）。机器人每次只能向下或者向右移动一步。</p><p id="1eb0427e-38bb-800c-bf78-d02e727e5544" class="">网格中的障碍物和空位置分别用 <code>1</code> 和 <code>0</code> 来表示。机器人的移动路径中不能包含 <strong>任何</strong> 有障碍物的方格。</p><p id="1eb0427e-38bb-806e-ab7b-d767ff5d8c76" class="">返回机器人能够到达右下角的不同路径数量。</p><p id="1eb0427e-38bb-80a9-b6cc-c95663d14218" class="">测试用例保证答案小于等于 <code>2 * 10^9</code>。</p><p id="1eb0427e-38bb-807b-badf-e54fd7947726" class=""><strong>示例 1：</strong></p><figure id="1eb0427e-38bb-8091-8ab5-d497171e96d7" class="image"><a href="https://assets.leetcode.com/uploads/2020/11/04/robot1.jpg"><img src="https://assets.leetcode.com/uploads/2020/11/04/robot1.jpg"/></a></figure><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-805f-a60e-c1e23df08a0a" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+输出：2
+解释：3x3 网格的正中间有一个障碍物。
+从左上角到右下角一共有2 条不同的路径：
+1. 向右 -&gt; 向右 -&gt; 向下 -&gt; 向下
+2. 向下 -&gt; 向下 -&gt; 向右 -&gt; 向右</code></pre><p id="1eb0427e-38bb-8040-b5c2-c15849cc679e" class=""><strong>示例 2：</strong></p><figure id="1eb0427e-38bb-8026-a468-ce97f0ba27b2" class="image"><a href="https://assets.leetcode.com/uploads/2020/11/04/robot2.jpg"><img src="https://assets.leetcode.com/uploads/2020/11/04/robot2.jpg"/></a></figure><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80ed-ad03-da8249649fc7" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：obstacleGrid = [[0,1],[0,0]]
+输出：1</code></pre><p id="1eb0427e-38bb-80fe-bd90-d40549dda032" class="">【解法】</p><p id="1eb0427e-38bb-80b9-8b93-eed554527fd8" class="">思路：<div class="indented"><p id="1eb0427e-38bb-808b-9627-f4e1c8124b51" class="">和上一道题一样的公式化 思路，就是状态转移方程改一下就好了</p><ul id="1eb0427e-38bb-8050-93b3-c5024530369a" class="bulleted-list"><li style="list-style-type:disc"><code>dp[i][j]</code> 表示从 <code>(0, 0)</code> 到 <code>(i, j)</code> 的路径数，其中：<ul id="1eb0427e-38bb-800a-8e0b-d95a0727a593" class="bulleted-list"><li style="list-style-type:circle">初始化第一行第一列：只要第一行&amp;列中有一个元素是1（障碍物），则它右边&amp;下边所有元素的bp表的值都为0。如果没有装到障碍物前，则bp表的对应项都填1（因为只有一条路：第一行只能从左边一直往有过来；第一列只能从上边一直往下过来）。</li></ul><ul id="1eb0427e-38bb-8068-b0b2-ef3ee1769eb8" class="bulleted-list"><li style="list-style-type:circle">状态转移方程如下：<ul id="1eb0427e-38bb-803b-b0df-d1ae8e49de06" class="bulleted-list"><li style="list-style-type:square">如果 <code>obstacleGrid[i][j] == 1</code>（障碍物），则 <code>dp[i][j] = 0</code>（无法到达）。</li></ul><ul id="1eb0427e-38bb-802a-ba0c-c1ecbedbe75c" class="bulleted-list"><li style="list-style-type:square">否则，<code>dp[i][j] = dp[i-1][j] + dp[i][j-1]</code>（从上方或左方转移）。</li></ul></li></ul></li></ul><ul id="1eb0427e-38bb-8036-9a12-d576e9b98d19" class="bulleted-list"><li style="list-style-type:disc">边界条件：如果起点或者终点是障碍物则直接无法到达</li></ul></div></p><ul id="1eb0427e-38bb-8092-9444-c459fc8558dc" class="toggle"><li><details open=""><summary>代码：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80ed-a81c-f2725e1c5ec9" class="code"><code class="language-Plain Text">class Solution {
+public:
+    int uniquePathsWithObstacles(vector&lt;vector&lt;int&gt;&gt;&amp; obstacleGrid) {
+        int m = obstacleGrid.size();
+        if (m == 0)
+            return 0;
+        int n = obstacleGrid[0].size();
+
+        // 如果起点或终点是障碍物，直接返回 0
+        if (obstacleGrid[0][0] == 1 || obstacleGrid[m - 1][n - 1] == 1) {
+            return 0;
+        }
+
+        vector&lt;vector&lt;long long&gt;&gt; dp(m, vector&lt;long long&gt;(n, 0));
+        dp[0][0] = 1; // 起点
+
+        // 初始化第一行
+        for (int j = 1; j &lt; n; ++j) {
+            if (obstacleGrid[0][j] == 1) {
+                dp[0][j] = 0; // 障碍物，无法到达
+            } else {
+                dp[0][j] = dp[0][j - 1]; // 只能从左边过来
+            }
+        }
+
+        // 初始化第一列
+        for (int i = 1; i &lt; m; ++i) {
+            if (obstacleGrid[i][0] == 1) {
+                dp[i][0] = 0; // 障碍物，无法到达
+            } else {
+                dp[i][0] = dp[i - 1][0]; // 只能从上面过来
+            }
+        }
+
+        // 填充 dp 表
+        for (int i = 1; i &lt; m; ++i) {
+            for (int j = 1; j &lt; n; ++j) {
+                if (obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0; // 障碍物，无法到达
+                } else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1]; // 从上方或左方转移
+                }
+            }
+        }
+
+        return dp[m - 1][n - 1];
+    }
+};</code></pre></details></li></ul></details></li></ul></li></ol><hr id="1e40427e-38bb-80f8-9ff0-c673ea751af5"/><h3 id="1e40427e-38bb-80b4-9e0f-cecdb6795eeb" class=""><strong>2-背包问题（经典DP模型）</strong></h3><ol type="1" id="1e40427e-38bb-800c-b635-df9e3a2cc7dc" class="numbered-list" start="1"><li><strong>0-1 背包</strong><ul id="1e40427e-38bb-8084-ad5e-e06d2b6aa288" class="bulleted-list"><li style="list-style-type:disc">题目：给定物品的重量和价值，背包容量限制，求最大价值（每个物品选或不选）。</li></ul><ul id="1e00427e-38bb-804f-983a-da37215ea300" class="toggle"><li><details open=""><summary>模板题：01背包问题</summary><p id="1e00427e-38bb-804b-8f26-ff368984cae2" class="">【问题】</p><p id="1e00427e-38bb-806a-8abf-d944d0088984" class="">假设你要去徒步旅行，背包最多能装 <strong>4公斤</strong>。你有以下物品可选，每件物品只能装入一次，如何选择物品使得背包中的物品总价值最大？</p><table id="1e00427e-38bb-8041-a4a1-c5fda26e149e" class="simple-table"><tbody><tr id="1e00427e-38bb-80ee-9710-f4c39eef2a6d"><td id="XAGV" class="">物品</td><td id="EN@H" class="">重量（公斤）</td><td id="&gt;cjb" class="">价值（元）</td></tr><tr id="1e00427e-38bb-8052-a9d4-e22ca4fa7fe2"><td id="XAGV" class="">帐篷</td><td id="EN@H" class="">1</td><td id="&gt;cjb" class="">15</td></tr><tr id="1e00427e-38bb-80db-87cb-cdf8912d6a6e"><td id="XAGV" class="">睡袋</td><td id="EN@H" class="">3</td><td id="&gt;cjb" class="">20</td></tr><tr id="1e00427e-38bb-803f-be55-d5a899184c28"><td id="XAGV" class="">炊具</td><td id="EN@H" class="">4</td><td id="&gt;cjb" class="">30</td></tr></tbody></table><p id="1e00427e-38bb-8044-bac1-eb83122051d2" class="">【解决】</p><p id="1e00427e-38bb-8014-b7fd-f6eec76c59a2" class="">拆解为如下子问题：<div class="indented"><p id="1e00427e-38bb-806f-b3a3-ef03e7ea4902" class="">假设已经处理了前 <code>i-1</code> 个物品，现在考虑第 <code>i</code> 个物品是否放入背包。</p></div></p><p id="1e00427e-38bb-806d-a1be-e0f7d52263a1" class="">具体思路如下：<div class="indented"><p id="1e00427e-38bb-803f-8991-c7d1df2a9f80" class="">想象你有一个dp表，表格的行代表物品，列代表背包容量（从 0 到 4 公斤）。每个格子记录的是：在当前背包容量下，能装下的最大价值。</p><table id="1e00427e-38bb-8044-adec-fad15df6e193" class="simple-table"><tbody><tr id="1e00427e-38bb-802a-b4b2-d08b0535a63e"><td id="XCrH" class="" style="width:136px">物品\容量</td><td id="A&gt;im" class="" style="width:65px">0kg</td><td id="O{f:" class="" style="width:61px">1kg</td><td id="PSXw" class="" style="width:56px">2kg</td><td id="P}VY" class="" style="width:60px">3kg</td><td id="T`X&lt;" class="" style="width:95px">4kg</td></tr><tr id="1e00427e-38bb-80f6-b95d-e84264889752"><td id="XCrH" class="" style="width:136px"><strong>无物品</strong></td><td id="A&gt;im" class="" style="width:65px">0</td><td id="O{f:" class="" style="width:61px">0</td><td id="PSXw" class="" style="width:56px">0</td><td id="P}VY" class="" style="width:60px">0</td><td id="T`X&lt;" class="" style="width:95px">0</td></tr><tr id="1e00427e-38bb-80b5-a94f-d34ac59765cf"><td id="XCrH" class="" style="width:136px"><strong>帐篷（1kg,15元）</strong></td><td id="A&gt;im" class="" style="width:65px">0</td><td id="O{f:" class="" style="width:61px">15</td><td id="PSXw" class="" style="width:56px">15</td><td id="P}VY" class="" style="width:60px">15</td><td id="T`X&lt;" class="" style="width:95px">15</td></tr><tr id="1e00427e-38bb-80e8-828f-c8290b1f61bf"><td id="XCrH" class="" style="width:136px"><strong>睡袋（3kg,20元）</strong></td><td id="A&gt;im" class="" style="width:65px">0</td><td id="O{f:" class="" style="width:61px">15</td><td id="PSXw" class="" style="width:56px">15</td><td id="P}VY" class="" style="width:60px">20</td><td id="T`X&lt;" class="" style="width:95px">35</td></tr><tr id="1e00427e-38bb-80d5-9f99-e49e5cc09957"><td id="XCrH" class="" style="width:136px"><strong>炊具（4kg,30元）</strong></td><td id="A&gt;im" class="" style="width:65px">0</td><td id="O{f:" class="" style="width:61px">15</td><td id="PSXw" class="" style="width:56px">15</td><td id="P}VY" class="" style="width:60px">20</td><td id="T`X&lt;" class="" style="width:95px">35</td></tr></tbody></table><p id="1e00427e-38bb-8003-8639-f049bbe95683" class="">然后用以下规则来填表：<div class="indented"><ol type="1" id="1e00427e-38bb-8024-be87-c63383d17659" class="numbered-list" start="1"><li>初始化：<ul id="1e00427e-38bb-8044-9fb5-f636e21320b8" class="bulleted-list"><li style="list-style-type:disc">当背包容量为 0 时，什么都装不下，价值为 0。</li></ul><ul id="1e00427e-38bb-8081-816c-fe051209a85a" class="bulleted-list"><li style="list-style-type:disc">没有物品可选时，价值也是 0。</li></ul></li></ol><ol type="1" id="1e00427e-38bb-805a-96f6-c97255898e70" class="numbered-list" start="2"><li>逐步填充表格：<ul id="1e00427e-38bb-804b-894a-c1bedb86bbdb" class="bulleted-list"><li style="list-style-type:disc">不选当前物品：最大价值与前一行的同列相同。</li></ul><ul id="1e00427e-38bb-80cb-8284-ecff40eb41bc" class="bulleted-list"><li style="list-style-type:disc">选当前物品：剩余容量必须足够，且总价值为当前物品价值 + 剩余容量能装的最大价值。</li></ul><blockquote id="1e00427e-38bb-80b8-8007-cda26fa8c5fe" class="">这里剩余容量能装的最大价值要去上一行的对应列找，而不是直接看上一行的同列。比如我在填睡袋行的4kg列，剩下的1kg就要去找帐篷行的1kg列。<p id="1e00427e-38bb-80cf-9ddd-c7abf675dccb" class="">要注意这第二步是最重要的，它对应的代码叫做“状态转移方程”</p></blockquote></li></ol><ol type="1" id="1e00427e-38bb-800f-97f6-d0516990a6c5" class="numbered-list" start="3"><li>最终答案：<p id="1e00427e-38bb-80d3-970a-e74849c1bbd0" class="">表格最右下角的格子即为最大价值。</p></li></ol></div></p></div></p><ul id="1e00427e-38bb-80ea-bd1c-d3615491e451" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-80d5-8316-f6a29820be61" class="code"><code class="language-Plain Text">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt; // for max
+using namespace std;
+
+int knapsack_01(vector&lt;int&gt;&amp; weights, vector&lt;int&gt;&amp; values, int W) {
+    int n = weights.size();
+    vector&lt;vector&lt;int&gt;&gt; dp(n + 1, vector&lt;int&gt;(W + 1, 0));
+
+    for (int i = 1; i &lt;= n; ++i) {
+        for (int w = 1; w &lt;= W; ++w) {
+            // 不选当前物品
+            dp[i][w] = dp[i-1][w];
+            // 选当前物品（需容量足够）
+            if (w &gt;= weights[i-1]) {
+                dp[i][w] = max(dp[i][w], dp[i-1][w - weights[i-1]] + values[i-1]);
+            }
+        }
+    }
+    return dp[n][W];
+}
+
+int main() {
+    vector&lt;int&gt; weights = {1, 3, 4};
+    vector&lt;int&gt; values = {15, 20, 30};
+    int W = 4;
+    cout &lt;&lt; &quot;最大价值：&quot; &lt;&lt; knapsack_01(weights, values, W); // 输出 35
+    return 0;
+}</code></pre><blockquote id="1e00427e-38bb-8054-ac9e-d36ccf1d3a94" class="">这里的<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-80ed-b7a9-cfe4c5610f20" class="code"><code class="language-Plain Text">            // 不选当前物品
+            dp[i][w] = dp[i-1][w];
+            // 选当前物品（需容量足够）
+            if (w &gt;= weights[i-1]) {
+                dp[i][w] = max(dp[i][w], dp[i-1][w - weights[i-1]] + values[i-1]);
+            }</code></pre><p id="1e00427e-38bb-803f-9604-fb72c363bc03" class="">就是“状态转移方程”</p></blockquote></details></li></ul><p id="1e00427e-38bb-80b6-850b-f1672e4e942a" class="">【改进】</p><p id="1e00427e-38bb-80fe-ae84-ecc2f55dedc0" class="">实际上，dp表在遍历某一行的时候，都只看它的上一行，所以其实可以改成一维数组即可。这样可以简化空间复杂度，假设东西总数是i，最大容量是j，那时间复杂度就是从O(ij)降到了O(j)。</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e00427e-38bb-8006-a46d-e3f2464a9ef3" class="code"><code class="language-Plain Text">dp = [0] * (W + 1)
+for i in 1 to n:
+    for w in W downto weight[i]:  # 倒序！
+        dp[w] = max(dp[w], dp[w - weight[i]] + value[i])</code></pre><p id="1e00427e-38bb-80fc-9ea7-ef0e791d5288" class="">为什么倒序：正序会导致同一物品被多次计算（相当于完全背包问题），而倒序保证每个物品只被处理一次。</p></details></li></ul><ul id="1e40427e-38bb-8067-9975-cf162b9eecfc" class="toggle"><li><details open=""><summary>变种：<a href="https://leetcode-cn.com/problems/partition-equal-subset-sum/">LeetCode 416. 分割等和子集</a>（转化为背包问题）</summary><p id="1eb0427e-38bb-80ee-afd2-c2d324fbcd4d" class="">【题目】</p><p id="1eb0427e-38bb-807f-8e64-cc3ce79e2c46" class="">给你一个 <strong>只包含正整数 </strong>的 <strong>非空 </strong>数组 <code>nums</code> 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。</p><p id="1eb0427e-38bb-804f-a318-efe24321ed27" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80de-8232-eb67408eace9" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：nums = [1,5,11,5]
+输出：true
+解释：数组可以分割成 [1, 5, 5] 和 [11] 。</code></pre><p id="1eb0427e-38bb-8095-842b-fe9ffe510137" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8043-8a4a-caae3d8474f0" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：nums = [1,2,3,5]
+输出：false
+解释：数组不能分割成两个元素和相等的子集。
+</code></pre><p id="1eb0427e-38bb-8092-8b45-f4dd8ac43c18" class="">【解法】</p><p id="1eb0427e-38bb-8049-b056-fdec2b1ef1a9" class="">思考：<div class="indented"><p id="1eb0427e-38bb-805e-b7e5-d3e485413f89" class="">边界条件：如果数组的总和 <code>sum(nums)</code> 是奇数，那么不可能分割成两个和相等的子集</p><p id="1eb0427e-38bb-80f3-b5d2-f064d539563d" class="">可以转化为经典的 0-1 背包问题：<div class="indented"><ul id="1eb0427e-38bb-80ef-ae6d-cc020194e2b9" class="bulleted-list"><li style="list-style-type:disc"><strong>背包容量</strong>：<code>sum(nums) / 2</code></li></ul><ul id="1eb0427e-38bb-80da-a7a7-f75532d0130e" class="bulleted-list"><li style="list-style-type:disc"><strong>物品</strong>：<code>nums</code> 中的每个数字</li></ul><ul id="1eb0427e-38bb-80be-9313-f409e8bd2969" class="bulleted-list"><li style="list-style-type:disc"><strong>目标</strong>：能否恰好装满背包（即子集和等于 <code>sum(nums) / 2</code>）</li></ul></div></p><p id="1eb0427e-38bb-8084-b2d0-dc8c0a061879" class=""><code>dp[i][j]</code> 表示前 <code>i</code> 个数字中是否存在一个子集，其和为 <code>j</code>。状态转移方程：<div class="indented"><ul id="1eb0427e-38bb-800f-b935-ce96fb3510a4" class="bulleted-list"><li style="list-style-type:disc">如果 <code>j &lt; nums[i-1]</code>（当前数字&gt;j），则 <code>dp[i][j] = dp[i-1][j]</code>。</li></ul><ul id="1eb0427e-38bb-80a1-a879-f1e77e66fda1" class="bulleted-list"><li style="list-style-type:disc">否则，<code>dp[i][j] = dp[i-1][j] || dp[i-1][j-nums[i-1]]</code>（前面那个表示不选当前数字，后面那个是表示选当前数字）。</li></ul></div></p><p id="1eb0427e-38bb-8045-a024-c9870833a3b4" class="">空间优化：由于 <code>dp[i][j]</code> 只依赖于 <code>dp[i-1][j]</code> 和 <code>dp[i-1][j-nums[i-1]]</code>，所以可以用一维数组优化空间：<div class="indented"><ul id="1eb0427e-38bb-8084-b8de-fc79d26c288c" class="bulleted-list"><li style="list-style-type:disc"><code>dp[j] = dp[j] || dp[j-nums[i-1]]</code>（从后往前遍历，避免覆盖）。</li></ul></div></p></div></p><ul id="1eb0427e-38bb-801c-909e-cb0c83b4b210" class="toggle"><li><details open=""><summary>代码：</summary><p id="1eb0427e-38bb-80cc-909a-e1d195784ac5" class=""><strong>方法 1：二维 DP（直观）</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80f2-bd8a-d16036ee3264" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all"></code></pre><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80aa-8179-e8d7955fcf59" class="code"><code class="language-C++" style="white-space:pre-wrap;word-break:break-all">#include &lt;vector&gt;using namespace std;
+
+bool canPartition(vector&lt;int&gt;&amp; nums) {
+    int n = nums.size();
+    int sum = 0;
+    for (int num : nums) sum += num;
+
+    // 如果总和是奇数，直接返回 false
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+
+    // dp[i][j] 表示前 i 个数字是否能组成和 j
+    vector&lt;vector&lt;bool&gt;&gt; dp(n + 1, vector&lt;bool&gt;(target + 1, false));
+    dp[0][0] = true; // 空集的和为 0
+
+    for (int i = 1; i &lt;= n; ++i) {
+        int num = nums[i - 1];
+        for (int j = 0; j &lt;= target; ++j) {
+            if (j &lt; num) {
+                dp[i][j] = dp[i - 1][j];
+            } else {
+                dp[i][j] = dp[i - 1][j] || dp[i - 1][j - num];
+            }
+        }
+    }
+
+    return dp[n][target];
+}
+</code></pre><p id="1eb0427e-38bb-8052-8923-d8db4f5a02e3" class=""><strong>时间复杂度</strong>：O(n × target)</p><p id="1eb0427e-38bb-80be-b2b5-ecbe79a1e7dc" class=""><strong>空间复杂度</strong>：O(n × target)</p><hr id="1eb0427e-38bb-8045-8062-f977209ef81b"/><p id="1eb0427e-38bb-8081-95a5-ce38f6c669f8" class=""><strong>方法 2：一维 DP（优化空间）</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-803f-a2f0-f89c084bbbf5" class="code"><code class="language-C++" style="white-space:pre-wrap;word-break:break-all">#include &lt;vector&gt;using namespace std;
+
+bool canPartition(vector&lt;int&gt;&amp; nums) {
+    int n = nums.size();
+    int sum = 0;
+    for (int num : nums) sum += num;
+
+    // 如果总和是奇数，直接返回 false
+    if (sum % 2 != 0) return false;
+    int target = sum / 2;
+
+    // dp[j] 表示是否能组成和 j
+    vector&lt;bool&gt; dp(target + 1, false);
+    dp[0] = true; // 空集的和为 0
+
+    for (int num : nums) {
+        // 从后往前遍历，避免覆盖
+        for (int j = target; j &gt;= num; --j) {
+            dp[j] = dp[j] || dp[j - num];
+        }
+    }
+
+    return dp[target];
+}
+</code></pre><p id="1eb0427e-38bb-800e-b8ae-c104266543d0" class=""><strong>时间复杂度</strong>：O(n × target)</p><p id="1eb0427e-38bb-80c2-807c-d58282c22da7" class=""><strong>空间复杂度</strong>：O(target)</p></details></li></ul></details></li></ul></li></ol><ol type="1" id="1e40427e-38bb-80d3-9f99-cc8b64059d71" class="numbered-list" start="2"><li><strong>完全背包</strong><ul id="1e40427e-38bb-805a-85c1-f63b4e108f46" class="bulleted-list"><li style="list-style-type:disc">题目：物品可无限次选取，求背包能装的最大价值。</li></ul><ul id="1e40427e-38bb-805c-b2e1-ca8823d35904" class="toggle"><li><details open=""><summary>例题：<a href="https://leetcode-cn.com/problems/coin-change/">LeetCode 322. 零钱兑换</a>（求最少硬币数）</summary><p id="1eb0427e-38bb-8080-a2b7-ce26f3d2e806" class="">【题目】</p><p id="1eb0427e-38bb-8022-a891-cdfedd8a3836" class="">给你一个整数数组 <code>coins</code> ，表示不同面额的硬币；以及一个整数 <code>amount</code> ，表示总金额。</p><p id="1eb0427e-38bb-8037-b9cf-e13acf172216" class="">计算并返回可以凑成总金额所需的 <strong>最少的硬币个数</strong> 。如果没有任何一种硬币组合能组成总金额，返回 <code>-1</code> 。</p><p id="1eb0427e-38bb-80b0-a530-ec24ca74b9fd" class="">你可以认为每种硬币的数量是无限的。</p><p id="1eb0427e-38bb-8011-89d7-c1f3d3adbb7e" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80ed-8ead-dc6d3f301643" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：coins =[1, 2, 5], amount =11
+输出：3
+解释：11 = 5 + 5 + 1</code></pre><p id="1eb0427e-38bb-80e5-8a26-d9285d8e967e" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8011-92d3-ebe0f2e1805f" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：coins =[2], amount =3
+输出：-1</code></pre><p id="1eb0427e-38bb-80f2-9908-d0e4e4c8562a" class=""><strong>示例 3：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-806c-a7be-ced942ae70d0" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：coins = [1], amount = 0
+输出：0</code></pre><p id="1eb0427e-38bb-80eb-93b0-f109a34c4335" class="">【解法】</p><p id="1eb0427e-38bb-80ca-9ea4-f91c84979e34" class="">思路：<div class="indented"><p id="1eb0427e-38bb-80df-b64d-d3ff00919d9f" class="">因为每种硬币可以使用无限次，所以是完全背包问题</p><p id="1eb0427e-38bb-80e1-92b5-da8943e28e6e" class=""><code>dp[i]</code> 表示凑出金额 <code>i</code> 所需的最少硬币数，对于dp表中的每个金额i，遍历所有硬币coin去套用以下状态转移公式：<div class="indented"><ul id="1eb0427e-38bb-80fc-8cf3-e598d867ed38" class="bulleted-list"><li style="list-style-type:disc">如果 <code>coin &lt;= i</code>，则 <code>dp[i] = min(dp[i], dp[i - coin] + 1)</code>。</li></ul></div></p></div></p><ul id="1eb0427e-38bb-80b3-8be4-d8662aae6c54" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8088-9c8a-e66631603864" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;algorithm&gt; // for min
+using namespace std;
+
+int coinChange(vector&lt;int&gt;&amp; coins, int amount) {
+    vector&lt;int&gt; dp(amount + 1, amount + 1); // 初始化为不可能的大值
+    dp[0] = 0; // 凑出金额 0 需要 0 枚硬币
+    
+    for (int i = 1; i &lt;= amount; ++i) {
+        for (int coin : coins) {
+            if (coin &lt;= i) {
+                dp[i] = min(dp[i], dp[i - coin] + 1);
+            }
+        }
+    }
+    
+    return (dp[amount] &gt; amount) ? -1 : dp[amount];
+}</code></pre></details></li></ul></details></li></ul><ul id="1e40427e-38bb-800a-96f5-dc282c4ea7bf" class="toggle"><li><details open=""><summary>变种：<a href="https://leetcode-cn.com/problems/coin-change-2/">LeetCode 518. 零钱兑换 II</a>（求组合方式数）</summary><p id="1eb0427e-38bb-80b1-9b76-c9557ab35094" class="">【题目】</p><p id="1eb0427e-38bb-8054-8bad-d53043b25b5c" class="">给你一个整数数组 <code>coins</code> 表示不同面额的硬币，另给一个整数 <code>amount</code> 表示总金额。</p><p id="1eb0427e-38bb-80ea-811d-f6a850e4602e" class="">请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 <code>0</code> 。</p><p id="1eb0427e-38bb-8074-ad75-e2f22e559637" class="">假设每一种面额的硬币有无限个。</p><p id="1eb0427e-38bb-80b7-a1d3-f38851a87ee1" class="">题目数据保证结果符合 32 位带符号整数。</p><p id="1eb0427e-38bb-8049-b2eb-c39cfe9de249" class=""><strong>示例 1：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-805c-bf59-cd2f44fc87be" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：amount = 5, coins = [1, 2, 5]
+输出：4
+解释：有四种方式可以凑成总金额：
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1
+</code></pre><p id="1eb0427e-38bb-80ec-80d5-f85168d83b2e" class=""><strong>示例 2：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8068-a2ee-d32bc31dc367" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：amount = 3, coins = [2]
+输出：0
+解释：只用面额 2 的硬币不能凑成总金额 3 。
+</code></pre><p id="1eb0427e-38bb-808c-b9be-d8a1e60259bf" class=""><strong>示例 3：</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-80c0-8305-d1492ae1dde7" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">输入：amount = 10, coins = [10]
+输出：1
+</code></pre><p id="1eb0427e-38bb-80b4-9fee-ddeac8f89bb4" class=""><strong>提示：</strong></p><ul id="1eb0427e-38bb-801e-b98d-d79d938645d4" class="bulleted-list"><li style="list-style-type:disc"><code>1 &lt;= coins.length &lt;= 300</code></li></ul><ul id="1eb0427e-38bb-8022-8f40-c2587fedaca3" class="bulleted-list"><li style="list-style-type:disc"><code>1 &lt;= coins[i] &lt;= 5000</code></li></ul><ul id="1eb0427e-38bb-804a-916f-e1356e78fd91" class="bulleted-list"><li style="list-style-type:disc"><code>coins</code> 中的所有值 <strong>互不相同</strong></li></ul><ul id="1eb0427e-38bb-8025-95bd-c5d1f387c65e" class="bulleted-list"><li style="list-style-type:disc"><code>0 &lt;= amount &lt;= 5000</code></li></ul><p id="1eb0427e-38bb-80e4-9d57-c35ae09bba2c" class="">【解法】</p><p id="1eb0427e-38bb-8013-9625-cbcf843585d6" class="">思路：<div class="indented"><p id="1eb0427e-38bb-800b-97de-e2151b2cf1f5" class="">做表，<code>dp[i]</code> 表示凑出金额 <code>i</code> 的组合数。<code>dp[0] = 1</code>（凑出金额 <code>0</code> 需要 <code>1</code> 种方式：不选任何硬币）。</p><p id="1eb0427e-38bb-8083-8dfc-eafdd0d4bc06" class="">假设有硬币1元、2元、5元、7元，则dp[i]=dp[i-1]+dp[i-2]+dp[i-5]+dp[i-7]。参考爬楼梯问题。</p><p id="1eb0427e-38bb-805b-a516-f9a0ca61a0e7" class="">所以在填写dp[i]时，应当遍历金额≤i的每个硬币 <code>coin</code>，在每个循环体中<code>dp[i] += dp[i - coin]</code>。</p></div></p><ul id="1eb0427e-38bb-809c-ba09-ce355804f391" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1eb0427e-38bb-8000-a5ae-f0ac0dd556b2" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+using namespace std;
+
+int change(int amount, vector&lt;int&gt;&amp; coins) {
+    vector&lt;int&gt; dp(amount + 1, 0);
+    dp[0] = 1; // 凑出金额 0 的组合数为 1
+    
+    for (int coin : coins) {
+        for (int i = coin; i &lt;= amount; ++i) {
+            dp[i] += dp[i - coin];
+        }
+    }
+    
+    return dp[amount];
+}</code></pre></details></li></ul></details></li></ul></li></ol><ol type="1" id="1e40427e-38bb-8061-903a-e7f53b4bff0b" class="numbered-list" start="3"><li><strong>多重背包</strong><ul id="1e40427e-38bb-805a-852d-c1c309467696" class="bulleted-list"><li style="list-style-type:disc">题目：物品有数量限制，求最大价值。</li></ul><ul id="1e40427e-38bb-8076-8495-f77ac6cec20b" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://www.acwing.com/problem/content/4/">AcWing 4. 多重背包问题</a></li></ul></li></ol><hr id="1e40427e-38bb-8099-8194-e2ac9014ba84"/><h3 id="1e40427e-38bb-804d-a70f-e12679cbb678" class=""><strong>3-序列问题（字符串/数组DP）</strong></h3><ol type="1" id="1e40427e-38bb-8007-8994-f1f68d472b16" class="numbered-list" start="1"><li><strong>最长递增子序列（LIS）</strong><ul id="1e40427e-38bb-80fe-a852-cfe0a17c8ce4" class="bulleted-list"><li style="list-style-type:disc">题目：求数组中最长的严格递增子序列长度。</li></ul><ul id="1e40427e-38bb-80e0-b209-d74325061316" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/longest-increasing-subsequence/">LeetCode 300. 最长递增子序列</a></li></ul><ul id="1e40427e-38bb-8022-a6e6-e235f11f662d" class="bulleted-list"><li style="list-style-type:disc">变种：<a href="https://leetcode-cn.com/problems/russian-doll-envelopes/">LeetCode 354. 俄罗斯套娃信封问题</a>（二维 LIS）</li></ul></li></ol><ol type="1" id="1e40427e-38bb-805b-8cbe-c487630ab478" class="numbered-list" start="2"><li><strong>最长公共子序列（LCS）</strong><ul id="1e40427e-38bb-80ee-be8e-e1b4ac160014" class="bulleted-list"><li style="list-style-type:disc">题目：求两个字符串的最长公共子序列长度。</li></ul><ul id="1e40427e-38bb-80f1-8a95-da1df0818911" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/longest-common-subsequence/">LeetCode 1143. 最长公共子序列</a></li></ul></li></ol><ol type="1" id="1e40427e-38bb-801a-b2d9-deb4a7c0c018" class="numbered-list" start="3"><li><strong>编辑距离</strong><ul id="1e40427e-38bb-8002-8520-cbb4dbe1ac15" class="bulleted-list"><li style="list-style-type:disc">题目：计算将一个字符串转换成另一个字符串的最少操作次数（增、删、改）。</li></ul><ul id="1e40427e-38bb-80b3-84c2-d78f2a65cff9" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/edit-distance/">LeetCode 72. 编辑距离</a></li></ul></li></ol><hr id="1e40427e-38bb-8034-a61a-f60fa4862658"/><h3 id="1e40427e-38bb-8025-8589-d55d94e4492c" class=""><strong>4-区间DP（分段优化）</strong></h3><ol type="1" id="1e40427e-38bb-80b7-b6bd-ea4f11dc6eec" class="numbered-list" start="1"><li><strong>矩阵链乘法</strong><ul id="1e40427e-38bb-809c-bb91-fa81771f90d5" class="bulleted-list"><li style="list-style-type:disc">题目：计算矩阵乘法的最少运算次数（通过括号划分优化）。</li></ul><ul id="1e40427e-38bb-80cd-b5bf-dcda0486213f" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/permutation-i-lcci/">LeetCode 面试题 08.07. 无重复字符串的排列组合</a>（类似思想）</li></ul></li></ol><ol type="1" id="1e40427e-38bb-80e3-ab36-ec9b351e7b3d" class="numbered-list" start="2"><li><strong>戳气球</strong><ul id="1e40427e-38bb-8034-ab81-d5afaf5798d6" class="bulleted-list"><li style="list-style-type:disc">题目：按一定顺序戳破气球，求获得硬币的最大数量。</li></ul><ul id="1e40427e-38bb-80db-b671-e3db7b5a6aa4" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/burst-balloons/">LeetCode 312. 戳气球</a></li></ul></li></ol><ol type="1" id="1e40427e-38bb-803b-919c-e89ca2f977b0" class="numbered-list" start="3"><li><strong>石子合并</strong><ul id="1e40427e-38bb-8092-91a4-ebfd3b941eed" class="bulleted-list"><li style="list-style-type:disc">题目：合并相邻石子堆，求最小总代价。</li></ul><ul id="1e40427e-38bb-80db-a219-d8dc4a84fd03" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://www.acwing.com/problem/content/284/">AcWing 282. 石子合并</a></li></ul></li></ol><hr id="1e40427e-38bb-80b3-b156-db1ec4ce05bc"/><h3 id="1e40427e-38bb-8034-83fa-cab0d407ca3b" class=""><strong>5-树形DP（结合树结构）</strong></h3><ol type="1" id="1e40427e-38bb-80af-97b5-de4bcde53713" class="numbered-list" start="1"><li><strong>二叉树中的最大路径和</strong><ul id="1e40427e-38bb-805a-8a7c-d6a48bde3d2a" class="bulleted-list"><li style="list-style-type:disc">题目：在二叉树中找一条路径，使得路径和最大。</li></ul><ul id="1e40427e-38bb-80fe-8107-ec58a3c9dcd2" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/">LeetCode 124. 二叉树中的最大路径和</a></li></ul></li></ol><ol type="1" id="1e40427e-38bb-805d-9cf2-f1c1b34cbb81" class="numbered-list" start="2"><li><strong>打家劫舍 III</strong><ul id="1e40427e-38bb-8015-9463-ceb5da70bcf8" class="bulleted-list"><li style="list-style-type:disc">题目：在二叉树结构的房屋中偷窃，不能偷相邻节点，求最大收益。</li></ul><ul id="1e40427e-38bb-80f7-a09b-da3b9ef42426" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/house-robber-iii/">LeetCode 337. 打家劫舍 III</a></li></ul></li></ol><hr id="1e40427e-38bb-807c-a2a7-f7a6ab031356"/><h3 id="1e40427e-38bb-80f9-befe-c46f215aed74" class=""><strong>6-状态压缩DP（复杂状态表示）</strong></h3><ol type="1" id="1e40427e-38bb-80bf-909c-fccd1d6c082c" class="numbered-list" start="1"><li><strong>旅行商问题（TSP）</strong><ul id="1e40427e-38bb-80f5-a7dc-f92bfd4121e2" class="bulleted-list"><li style="list-style-type:disc">题目：访问所有城市一次并返回起点的最短路径。</li></ul><ul id="1e40427e-38bb-80d0-bf6c-df51656768fe" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/find-the-shortest-superstring/">LeetCode 943. 最短超级串</a>（类似思想）</li></ul></li></ol><ol type="1" id="1e40427e-38bb-8022-8839-d708c8fa765f" class="numbered-list" start="2"><li><strong>位运算优化</strong><ul id="1e40427e-38bb-8016-a583-d9fcfe6ee1a5" class="bulleted-list"><li style="list-style-type:disc">题目：用二进制表示状态（如选或不选）。</li></ul><ul id="1e40427e-38bb-8020-bb6f-e8d49f4408b5" class="bulleted-list"><li style="list-style-type:disc">例题：<a href="https://leetcode-cn.com/problems/can-i-win/">LeetCode 464. 我能赢吗</a></li></ul></li></ol><hr id="1e40427e-38bb-8029-a570-e32f8d4f783b"/><h3 id="1e40427e-38bb-8012-b097-c537725e64b9" class="">7-更多</h3><ul id="1e00427e-38bb-8091-b606-c4900797bd5f" class="toggle"><li><details open=""><summary>力扣-通配符匹配</summary><p id="1e00427e-38bb-80cd-be5e-d01a09a65dbe" class="">【问题】</p><p id="1e10427e-38bb-80cd-b013-e540c3aa4e44" class="">给你一个输入字符串 (s) 和一个字符模式 (p) ，请你实现一个支持 &#x27;?&#x27; 和 &#x27;*&#x27; 匹配规则的通配符匹配：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e10427e-38bb-80df-b2ae-f924099c5ad0" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">&#x27;?&#x27; 可以匹配任何单个字符。
+&#x27;*&#x27; 可以匹配任意字符序列（包括空字符序列）。</code></pre><p id="1e10427e-38bb-806c-82b9-d5f262b7c140" class="">判定匹配成功的充要条件是：字符模式必须能够 完全匹配 输入字符串（而不是部分匹配）。</p><ul id="1e10427e-38bb-8003-86a6-c5dae855e395" class="toggle"><li><details open=""><summary>示例</summary><p id="1e10427e-38bb-80f3-85c7-e4b52ece5d31" class="">示例 1：</p><p id="1e10427e-38bb-80ef-bde8-f92646ea0f7f" class="">输入：s = &quot;aa&quot;, p = &quot;a&quot;<br/>输出：false<br/>解释：&quot;a&quot; 无法匹配 &quot;aa&quot; 整个字符串。<br/></p><p id="1e10427e-38bb-8098-9429-f8fc8a163d02" class="">示例 2：</p><p id="1e10427e-38bb-8091-ab7f-f5dadccacc5c" class="">输入：s = &quot;aa&quot;, p = &quot;<em>&quot;<br/>输出：true<br/>解释：&#x27;<br/></em>&#x27; 可以匹配任意字符串。</p><p id="1e10427e-38bb-80a9-8e2f-dde4e35d49b0" class="">示例 3：</p><p id="1e10427e-38bb-80cb-8ac2-d1a5477125fc" class="">输入：s = &quot;cb&quot;, p = &quot;?a&quot;<br/>输出：false<br/>解释：&#x27;?&#x27; 可以匹配 &#x27;c&#x27;, 但第二个 &#x27;a&#x27; 无法匹配 &#x27;b&#x27;。<br/></p><p id="1e10427e-38bb-8056-81b2-f80ceebae50a" class="">提示：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e10427e-38bb-809e-a279-f75d2a853544" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">0 &lt;= s.length, p.length &lt;= 2000
+s 仅由小写英文字母组成
+p 仅由小写英文字母、&#x27;?&#x27; 或 &#x27;*&#x27; 组成</code></pre></details></li></ul><p id="1e00427e-38bb-8084-af2a-f1e848e53f16" class="">【解-动态规划解法】</p><p id="1e00427e-38bb-8018-882e-eda902253d86" class="">思考：<div class="indented"><p id="1e20427e-38bb-8083-9ff0-eea14e7d3ebc" class="">其中的问号是可以匹配任意的字单个字符看起来很高级，但实际上你就把它当成是呃三个字符成功匹配就行了。所以情况就直接分成三类，一个是单字符成功匹配，一个是单字符失败匹配，一个是星号。</p><p id="1e20427e-38bb-8091-8691-e59ea4c6961f" class="">然后你就看是不是符合动态规划的条件？首先他肯定可以分解成小问题吧，分解成的小问题大概就是s[0,i]和p[0,j]是否匹配。然后就是看是否依赖情侣的状态，那当然依赖了。</p><p id="1e20427e-38bb-80d5-a30f-cad0c0e16b58" class="">缓存表：dp[i][j]表示字符串 <code>s</code> 的前 <code>i</code> 个字符和模式 <code>p</code> 的前 <code>j</code> 个字符是否匹配，画出来如下：<div class="indented"><table id="1e20427e-38bb-8006-9840-d8fa89297062" class="simple-table"><tbody><tr id="1e20427e-38bb-8017-af18-d11a21c7aaa0"><td id="wAR&lt;" class="">字符串s\模式字符串p</td><td id="U=Hb" class="">p[0]</td><td id="{\_=" class="">p[1]</td><td id="@s=O" class="">p[2]</td><td id="PkkZ" class="">p[3]</td></tr><tr id="1e20427e-38bb-80d9-a1a1-d876c0e7e191"><td id="wAR&lt;" class="">s[0]</td><td id="U=Hb" class=""></td><td id="{\_=" class=""></td><td id="@s=O" class=""></td><td id="PkkZ" class=""></td></tr><tr id="1e20427e-38bb-80eb-86f2-ea06f21a41e1"><td id="wAR&lt;" class="">s[1]</td><td id="U=Hb" class=""></td><td id="{\_=" class=""></td><td id="@s=O" class=""></td><td id="PkkZ" class=""></td></tr><tr id="1e20427e-38bb-801b-9705-cb40fcadf6df"><td id="wAR&lt;" class="">s[2]</td><td id="U=Hb" class=""></td><td id="{\_=" class=""></td><td id="@s=O" class=""></td><td id="PkkZ" class=""></td></tr><tr id="1e20427e-38bb-80c9-872c-dfa9cd3c9faf"><td id="wAR&lt;" class="">s[3]</td><td id="U=Hb" class=""></td><td id="{\_=" class=""></td><td id="@s=O" class=""></td><td id="PkkZ" class=""></td></tr></tbody></table></div></p><p id="1e20427e-38bb-8060-a2b8-c7c1af6d1eeb" class="">那我们就尝试做一张dp表，那横轴肯定是s[i]，纵轴肯定是p[j]，然后我们就要去思考这个表的能不能写出来一个状态转换方程：<div class="indented"><p id="1e20427e-38bb-80c9-8ce5-eb3faceab0c9" class="">我们先想没有星号的情况。如果不匹配的话就直接填不匹配然后退出了。如果匹配的话，那就要看他前面一直累积下来是不是匹配的，如果前面不匹配了那就算现在匹配了也没用，所以他是继承左上角邻居的状态。</p><p id="1e20427e-38bb-80c3-9f74-f8532a7be972" class="">然后我们再想加上星号。如果他本来左上角邻居已经不匹配了，让他加上星号也没有用。<br/>然后我们思考如果星号匹配多个符号的情况，假设星号是匹配两个符号，那如果最终要匹配的话，匹配字符串比被匹配字符串肯定要短一个符号。也就是表格的高比表格的宽要长1。那我就一定要从上一个新号的匹配来继承，也就是他的上面的邻居。<br/></p><p id="1e20427e-38bb-80f8-be11-d5adc9ad98fb" class="">那假设新号匹配零个符号，那就要从它的左边邻居的匹配状态来继承。</p><p id="1e20427e-38bb-8038-98b8-e688c6ce7f3b" class="">然后我们又可以推断说如果一个格子他的状态是不匹配的话，那他下面的邻居和右边的所有邻居的状态肯定都是不匹配。</p><p id="1e20427e-38bb-80fe-8638-e7fb2d91df1b" class="">如果星号的左边邻居是不匹配的话，那新号还可以尝试匹配多个字符，也就是看上边邻居是不是一。如果星号的上边邻居是不匹配的话，那新号还可以尝试匹配零个字符，也就是看左边邻居是不是一。如果星号的左边跟上边都不匹配，那就说明他的左上邻居是不匹配的，那星号也可以直接就不匹配了。</p><p id="1e20427e-38bb-806e-9040-d56d1ac14b1e" class="">所以至此我们就写好了规则。</p></div></p><p id="1e10427e-38bb-803d-925b-e0f62f9787a6" class="">书写状态转移方程（填表规则）：<div class="indented"><ul id="1e10427e-38bb-80d0-9d1f-c3ea3135e1be" class="bulleted-list"><li style="list-style-type:disc">若p的当前字符是”?“，则<code>dp[i][j]</code>直接继承该格子左上角那个格子的状态（左上角没有就直接填True，下同）</li></ul><ul id="1e20427e-38bb-8036-861a-c083b88a93c4" class="bulleted-list"><li style="list-style-type:disc">若p的当前字符是普通 字母，则看是不是与对应的s的字符相同：<p id="1e20427e-38bb-8086-a2af-f5ae141adb4c" class="">如果相同就直接继承该格子左上角那个格子的状态。</p><p id="1e20427e-38bb-80cc-abee-fcadc60c0642" class="">如果不同就填False。 </p><blockquote id="1e20427e-38bb-808b-a822-dc2575b56a85" class="">这里就算填了False也不会导致后面全部变成False，因为你看第三条规则有一个“或”逻辑。</blockquote></li></ul><ul id="1e10427e-38bb-8073-9123-debff2ad17c7" class="bulleted-list"><li style="list-style-type:disc">若p的当前字符是 &#x27;*&#x27;，则 <code>dp[i][j] = dp[i][j-1] || dp[i-1][j]</code>。这里是一个“或逻辑”，如果没有上一行视为上一行为True，如果没有上一列视为上一列为True</li></ul></div></p></div></p><p id="1e20427e-38bb-8055-9c50-ea908ec192fd" class="">搞个示例验证一下：<div class="indented"><p id="1e20427e-38bb-80af-91f2-c13054629c5f" class="">s = &quot;csadqf&quot;, p = &quot;c?a*f&quot;，对应的表：</p><table id="1e20427e-38bb-80a7-808c-f62d2e0895d8" class="simple-table"><tbody><tr id="1e20427e-38bb-800f-98a8-f2b2c6fb0a11"><td id="wAR&lt;" class="">字符串s\模式字符串p</td><td id="U=Hb" class="" style="width:71px">p[0]  c</td><td id="{\_=" class="" style="width:75px">p[1]  ?</td><td id="@s=O" class="" style="width:74px">p[2]  a</td><td id="PkkZ" class="" style="width:75px">p[3]  *</td><td id="eJMD" class="" style="width:70px">p[4]  f</td></tr><tr id="1e20427e-38bb-800d-b1e1-c920e447f108"><td id="wAR&lt;" class="">s[0]  c</td><td id="U=Hb" class="" style="width:71px">t</td><td id="{\_=" class="" style="width:75px"></td><td id="@s=O" class="" style="width:74px">f</td><td id="PkkZ" class="" style="width:75px">t</td><td id="eJMD" class="" style="width:70px"></td></tr><tr id="1e20427e-38bb-801d-9dfd-e1bbb1c9f676"><td id="wAR&lt;" class="">s[1]  s</td><td id="U=Hb" class="" style="width:71px"></td><td id="{\_=" class="" style="width:75px">t</td><td id="@s=O" class="" style="width:74px">f</td><td id="PkkZ" class="" style="width:75px">t</td><td id="eJMD" class="" style="width:70px"></td></tr><tr id="1e20427e-38bb-8009-9cd5-e48e7e8bff8f"><td id="wAR&lt;" class="">s[2]  a</td><td id="U=Hb" class="" style="width:71px"></td><td id="{\_=" class="" style="width:75px"></td><td id="@s=O" class="" style="width:74px">t</td><td id="PkkZ" class="" style="width:75px">t</td><td id="eJMD" class="" style="width:70px"></td></tr><tr id="1e20427e-38bb-8010-b41e-fa80c9f6b8ee"><td id="wAR&lt;" class="">s[3]  d</td><td id="U=Hb" class="" style="width:71px"></td><td id="{\_=" class="" style="width:75px"></td><td id="@s=O" class="" style="width:74px"></td><td id="PkkZ" class="" style="width:75px">t</td><td id="eJMD" class="" style="width:70px"></td></tr><tr id="1e20427e-38bb-80c1-b371-c0b338a67682"><td id="wAR&lt;" class="">s[4]  q</td><td id="U=Hb" class="" style="width:71px"></td><td id="{\_=" class="" style="width:75px"></td><td id="@s=O" class="" style="width:74px"></td><td id="PkkZ" class="" style="width:75px">t</td><td id="eJMD" class="" style="width:70px">f</td></tr><tr id="1e20427e-38bb-8054-b7ec-f507cbbf880d"><td id="wAR&lt;" class="">s[5]  f</td><td id="U=Hb" class="" style="width:71px"></td><td id="{\_=" class="" style="width:75px"></td><td id="@s=O" class="" style="width:74px"></td><td id="PkkZ" class="" style="width:75px"></td><td id="eJMD" class="" style="width:70px">t</td></tr></tbody></table></div></p><ul id="1e10427e-38bb-8072-9ff9-c02c292e834e" class="toggle"><li><details open=""><summary>代码</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1e10427e-38bb-801b-a294-d3d9be1270ae" class="code"><code class="language-Plain Text">#include &lt;vector&gt;
+#include &lt;string&gt;
+
+using namespace std;
+
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int m = s.size(), n = p.size();
+        vector&lt;vector&lt;bool&gt;&gt; dp(m + 1, vector&lt;bool&gt;(n + 1, false));
+        dp[0][0] = true; // 空字符串匹配空模式
+        
+        // 处理模式p的前j个字符匹配空字符串的情况
+        for (int j = 1; j &lt;= n; ++j) {
+            if (p[j - 1] == &#x27;*&#x27;) {
+                dp[0][j] = dp[0][j - 1];
+            }
+        }
+        
+        // 填充dp数组
+        for (int i = 1; i &lt;= m; ++i) {
+            for (int j = 1; j &lt;= n; ++j) {
+                if (p[j - 1] == &#x27;?&#x27; || s[i - 1] == p[j - 1]) {
+                    // 当前字符匹配，取决于前i-1和j-1的状态
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else if (p[j - 1] == &#x27;*&#x27;) {
+                    // &#x27;*&#x27; 可以匹配零个（dp[i][j-1]）或多个字符（dp[i-1][j]）
+                    dp[i][j] = dp[i][j - 1] || dp[i - 1][j];
+                }
+                // 不匹配的情况保持false
+            }
+        }
+        
+        return dp[m][n];
+    }
+};</code></pre></details></li></ul></details></li></ul><p id="1e40427e-38bb-80ab-87b8-e30fa405dc9a" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
