@@ -1,0 +1,684 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>业务系统漏洞大全</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="630d0576-cf13-4fb4-b105-9fea767cbd4f" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/archive_blue.svg"/></div><h1 class="page-title">业务系统漏洞大全</h1><p class="page-description"></p></header><div class="page-body"><h1 id="bf6e1e04-e560-44bf-ae8a-ab48681beec7" class="">基础概念</h1><p id="5c38a1a1-3308-4a7f-a186-900a95a82a6d" class=""><strong>CMS系统：</strong><div class="indented"><p id="93c9aa67-24ac-4850-9040-e62ef4df2542" class="">是用于创建和管理网站内容的专业工具。</p><p id="5fb4eb12-0f57-49a5-8a6d-15fd72784558" class="">CMS提供了更强大的内容管理和发布功能，比如用户权限管理、内容版本控制、模板设计、SEO优化等，以及对多种媒体格式的支持。</p><p id="620bfbb9-8719-4e61-80ce-f9c5b02c0a58" class="">它可以被配置成多种类型的内容平台，包括但不限于论坛、博客、新闻站点、产品目录或电子商务网站。</p></div></p><p id="3e543b1a-f45f-450d-8b5c-26c458ba64d7" class=""><strong>OA系统：</strong><div class="indented"><p id="2778981c-46b2-46f7-b3a0-cebf18e0d0d3" class="">OA系统，即办公自动化系统，主要侧重于员工内部办公。</p><p id="b351a51f-2dbb-4f45-9166-0b85eb7a6e0f" class="">它的价值是通过将传统的办公流程和文档管理电子化实现——提高沟通和工作流管理效率，减少纸张使用，加快决策过程，并提供数据的安全存储和检索。</p><p id="eb9ac23d-11be-46cc-a313-d43dca34149f" class="">OA系统通常包括电子邮件、日程安排、文件共享、工作流管理、会议安排、人力资源管理等功能。</p></div></p><p id="fc8537c5-ce5d-4aec-a440-ccf153846714" class=""><strong>ERP系统：</strong><div class="indented"><p id="784b2259-2530-4f0d-aa5b-5712d793b096" class="">ERP系统，即企业资源规划系统。</p><p id="77a14e66-f195-489e-8b6f-1f8f13329657" class="">用于集成企业内部的所有“资源”——包括核心业务流程，包括财务、人力资源、采购、生产、销售和服务等。以确保企业所有部门使用的是同一套资源数据，使各部门掌握的数据信息一致。</p></div></p><p id="06ad0dea-d4bf-4ca5-8430-38d25fb749b3" class=""><strong>EIS系统：</strong><div class="indented"><p id="e25deb13-c142-4295-a833-020b08e14f95" class="">EIS系统，即执行信息系统。</p><p id="33d84e50-0826-49af-b0e5-78a00f49c36d" class="">专为高层管理者设计的信息系统，提供关键绩效指标（KPIs）、趋势分析、市场情报、预算差异分析等高级信息，以帮助他们进行战略决策。</p></div></p><p id="3dcb78ba-18aa-40e2-80c4-b555bef3ae9e" class=""><strong>EKP系统：</strong><div class="indented"><p id="6fc68e40-a392-4158-a99f-e7d9253869a8" class="">EKP系统，即企业知识平台。是一种专注于企业内部知识管理、信息共享的系统。</p></div></p><h1 id="53679b46-9fe0-4502-9ddd-98f02d85b10e" class="">目录</h1><p id="29dceb24-5a3b-4d8a-a4a1-c5ada4e203f9" class="">报表系统：<div class="indented"><figure id="d3571167-223b-495f-a959-ae8b0c8ecee3" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E5%B8%86%E8%BD%AF%E6%8A%A5%E8%A1%A8%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20d3571167223b495fa959ae8b0c8ecee3.html"><img class="icon" src="https://www.notion.so/icons/flag_gray.svg"/>帆软报表系统漏洞合集</a></figure></div></p><p id="78d446bd-50c6-4bc4-bfca-a03892ac5f13" class="">CMS系统：<div class="indented"><figure id="048b0f9b-0ac1-4165-8bbd-d551e4df3604" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604.html"><img class="icon" src="https://www.notion.so/icons/upload-document_gray.svg"/>metinfo CMS系统漏洞合集 (php)</a></figure><figure id="4ab65232-4024-42fa-a454-8cb5c73bba4f" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/dede%20CMS%E7%BB%87%E6%A2%A6%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%204ab65232402442faa4548cb5c73bba4f.html"><img class="icon" src="https://www.notion.so/icons/bookmark_gray.svg"/>dede CMS织梦漏洞合集 (php)</a></figure><figure id="94baa8fd-fd2a-4f77-8011-74eeba0de0c5" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E6%B5%B7%E6%B4%8B%20CMS%20%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%2094baa8fdfd2a4f77801174eeba0de0c5.html"><img class="icon" src="https://www.notion.so/icons/snorkel_gray.svg"/>海洋 CMS 漏洞合集</a></figure></div></p><p id="f33a4d91-cce8-481a-8690-4141eb886b81" class="">管理系统：<div class="indented"><figure id="6083cb3a-43bd-48bf-a8c1-f4528972f786" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/Alibaba%20Nacos%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(java)%206083cb3a43bd48bfa8c1f4528972f786.html"><img class="icon" src="https://www.notion.so/icons/chess-knight_gray.svg"/>Alibaba Nacos漏洞合集 (java)</a></figure></div></p><p id="2db05623-91ac-409b-b2c3-cc51826fc30f" class="">OA(办公)系统：<div class="indented"><figure id="70c0d7af-589c-45b5-b4f1-41dc194d2166" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E5%BE%AE%E6%B3%9BOA%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(java)%2070c0d7af589c45b5b4f141dc194d2166.html"><img class="icon" src="https://www.notion.so/icons/chart-area_gray.svg"/>微泛OA系统漏洞合集 (java)</a></figure><figure id="b73f43c1-639a-4217-a465-6808eaf34809" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E8%87%B4%E8%BF%9COA%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(java)%20b73f43c1639a4217a4656808eaf34809.html"><img class="icon" src="https://www.notion.so/icons/invitation_gray.svg"/>致远OA漏洞合集 (java)</a></figure><figure id="90e875a0-e185-4042-89fa-1746f8142903" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E9%80%9A%E8%BE%BEOA%20%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%2090e875a0e185404289fa1746f8142903.html"><img class="icon" src="https://www.notion.so/icons/archery_gray.svg"/>通达OA 漏洞合集 (php)</a></figure></div></p><p id="593c373b-6ac4-4c59-a966-6f327a68f325" class="">ERP系统：<div class="indented"><figure id="93307d7f-611d-4d80-99b1-1f422bab5bd4" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E6%98%8E%E6%BA%90%E4%BA%91%20ERP%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(java)%2093307d7f611d4d8099b11f422bab5bd4.html"><img class="icon" src="https://www.notion.so/icons/database_gray.svg"/>明源云 ERP系统漏洞合集 (java)</a></figure><figure id="e0a2fab0-ee86-4659-9bb8-f93defc96cf3" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E5%A4%A9%E9%97%AE%E7%89%A9%E4%B8%9AERP%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20e0a2fab0ee8646599bb8f93defc96cf3.html"><img class="icon" src="https://www.notion.so/icons/translate_gray.svg"/>天问物业ERP系统漏洞合集</a></figure><figure id="df513c5e-01d7-448d-bdcf-10cb60394734" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E7%94%A8%E5%8F%8BNC%20%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%EF%BC%88java%EF%BC%89%20df513c5e01d7448dbdcf10cb60394734.html"><img class="icon" src="https://www.notion.so/icons/capricorn_gray.svg"/>用友NC 漏洞合集（java）</a></figure></div></p><p id="46d9fb8c-b0e1-405e-94b0-47d0bd3bc319" class="">EIS系统：<div class="indented"><figure id="ca1e14ad-adc8-4ede-89fa-6a8b00328023" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E8%93%9D%E5%87%8CEIS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(%20Net)%20ca1e14adadc84ede89fa6a8b00328023.html"><img class="icon" src="https://www.notion.so/icons/chart-area_gray.svg"/>蓝凌EIS系统漏洞合集 (.Net)</a></figure></div></p><p id="aa6f6a22-f252-4884-ba4e-68b6d2cad2ba" class="">档案系统&amp;EKP系统：<div class="indented"><figure id="7f83dcbc-da9b-4a16-b0dc-9181b3b5110f" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E7%B4%AB%E5%85%89%E6%A1%A3%E6%A1%88%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%20(java)%207f83dcbcda9b4a16b0dc9181b3b5110f.html"><img class="icon" src="https://www.notion.so/icons/checkmark-square_gray.svg"/>紫光档案管理系统 (java) </a></figure><figure id="098b19c3-1719-4c25-81f0-0afcdaca757d" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/XWiki%20PlatForm%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(java)%20098b19c317194c2581f00afcdaca757d.html"><img class="icon" src="https://www.notion.so/icons/playlist_gray.svg"/>XWiki PlatForm漏洞合集 (java)</a></figure><figure id="3ef55bd3-3e0f-46e4-9243-92390a2fd8b0" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E8%93%9D%E5%87%8CEKP%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%203ef55bd33e0f46e4924392390a2fd8b0.html">蓝凌EKP系统漏洞合集</a></figure></div></p><p id="23ba6833-842e-4e8c-a0cb-9d3c936f1c63" class="">财务系统：<div class="indented"><figure id="df06764d-afa9-4894-96f3-add18d4e9d29" class="link-to-page"><a href="%E4%B8%9A%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20630d0576cf134fb4b1059fea767cbd4f/%E6%B5%AA%E6%BD%AE%E4%BA%91%E8%B4%A2%E5%8A%A1%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20df06764dafa9489496f3add18d4e9d29.html"><img class="icon" src="https://www.notion.so/icons/aquarius_gray.svg"/>浪潮云财务系统漏洞合集</a></figure></div></p><h1 id="2151688d-fbdd-40ea-b095-66772fdc47eb" class="">更多</h1><p id="a97dc2fd-8216-415b-999a-56de6f361514" class="">这里有一篇神文：<a href="https://forum.ywhack.com/bountytips.php?Vulnerability">https://forum.ywhack.com/bountytips.php?Vulnerability</a></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

